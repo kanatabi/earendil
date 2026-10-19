@@ -16,6 +16,8 @@
 
 <a
 	href="/posts/{post.slug}"
+	data-sveltekit-preload-data="tap"
+	data-sveltekit-preload-code="hover"
 	class="group flex flex-col overflow-hidden rounded-xl border border-border transition-colors hover:bg-accent/40"
 >
 	{#if post.thumbnail}

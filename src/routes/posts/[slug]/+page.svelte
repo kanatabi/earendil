@@ -31,6 +31,10 @@
 		'rounded-full bg-muted px-2.5 py-0.5 text-xs font-medium text-muted-foreground transition-all duration-150 hover:bg-foreground/10 hover:text-foreground hover:-translate-y-0.5';
 </script>
 
+<svelte:head>
+	<title>{data.post.title} · gofar;</title>
+</svelte:head>
+
 <article class="fade-up grid grid-cols-12 gap-8">
 	<aside class="col-span-12 grid grid-cols-12 gap-6 lg:col-span-9">
 		<div class="hidden pt-2 lg:col-span-2 lg:block">

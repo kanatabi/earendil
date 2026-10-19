@@ -37,6 +37,19 @@
 		}
 	});
 
+	// Person schema: pen-word ↔ legal name, machine-linked (DESIGN §2). Braces are
+	// generated via stringify — a literal {...} inside {@html `...`} trips the
+	// svelte-eslint-parser template lexer; the closing tag is split so its raw
+	// sequence never appears in this file's source (it would end this block).
+	const personJsonLd =
+		`<script type="application/ld+json">${JSON.stringify({
+			'@context': 'https://schema.org',
+			'@type': 'Person',
+			name: 'Faiz Ainur Rofiq',
+			alternateName: 'Gofar',
+			url: 'https://gofar.id'
+		})}</scr` + 'ipt>';
+
 	function toggleTheme() {
 		const next = theme === 'dark' ? 'light' : 'dark';
 		const apply = () => {
@@ -52,9 +65,17 @@
 
 <svelte:head>
 	<link rel="icon" href={favicon} />
+	<meta
+		name="description"
+		content="Essays on distributed systems, reliability, and photography — by Faiz Ainur Rofiq (gofar;)."
+	/>
+	<meta property="og:site_name" content="gofar;" />
 	<!-- Apply persisted theme before paint to avoid a flash of the wrong theme. -->
 	<!-- eslint-disable-next-line svelte/no-at-html-tags -- data.theme is a server-validated 'light'|'dark' literal -->
 	{@html `<script>document.documentElement.dataset.theme="${data.theme}"</script>`}
+	<!-- Identity anchor: pen-word ↔ legal name, machine-readable (DESIGN §2). -->
+	<!-- eslint-disable-next-line svelte/no-at-html-tags -- static JSON-LD, built above -->
+	{@html personJsonLd}
 </svelte:head>
 
 <div class="flex min-h-svh flex-col bg-background text-foreground">

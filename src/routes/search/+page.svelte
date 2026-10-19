@@ -9,11 +9,18 @@
 
 	let { data }: Props = $props();
 
+	// One rendered line: a multi-line <title> template leaks its indentation
+	// into the SSR HTML (ugly for crawlers and tab strips alike).
+	let pageTitle = $derived(
+		data.q ? `search: ${data.q}` : data.tag ? `posts tagged ${data.tag}` : 'search'
+	);
+
 	const filterQs = () =>
 		data.q ? `q=${encodeURIComponent(data.q)}` : `tag=${encodeURIComponent(data.tag as string)}`;
 </script>
 
 <svelte:head>
+	<title>{pageTitle} · gofar;</title>
 	{#if data.q}
 		<!-- Query pages are transient views over the corpus; tag pages may be indexed. -->
 		<meta name="robots" content="noindex" />

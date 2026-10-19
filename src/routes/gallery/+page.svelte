@@ -9,4 +9,8 @@
 	let { data }: Props = $props();
 </script>
 
+<svelte:head>
+	<title>gallery · gofar;</title>
+</svelte:head>
+
 <PhotoGallery photos={data.photos} />
