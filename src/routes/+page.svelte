@@ -10,6 +10,10 @@
 	let { data }: Props = $props();
 </script>
 
+<svelte:head>
+	<title>gofar; — essays by Faiz Ainur Rofiq</title>
+</svelte:head>
+
 <!-- Hero: display serif headline, "currently" line, featured photograph -->
 <section
 	class="fade-up mx-auto grid w-full max-w-3xl items-center gap-8 md:grid-cols-[minmax(0,1fr)_240px]"

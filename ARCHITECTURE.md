@@ -1,3 +1,8 @@
+> **Superseded (2026-10-19):** this single-node K3s draft predates the production
+> blueprint, which now lives in the sibling `vortex/` repo
+> (`vortex/INFRA_ARCHITECTURE.md`). Kept for history only — do not plan changes
+> against this file.
+
 # K3s Single-Node Cluster Blueprint & Resource Allocation Plan
 
 ## 1. Final VPS Hardware Specification Blueprint

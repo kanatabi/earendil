@@ -1,8 +1,8 @@
-# Personal Blog (FE) — `fzr;`
+# Personal Blog (FE) — `gofar;`
 
-SvelteKit frontend for the Markdown-driven personal blog of **Faiz Ainur Rofiq** (`fzr;` = his stylized initials). Content is served by a REST BE (`cms.`, contract in [DESIGN.md §4](DESIGN.md)); an in-repo mock layer runs until it exists — flip with `PUBLIC_API_BASE`.
+SvelteKit frontend for the Markdown-driven personal blog of **Faiz Ainur Rofiq**, published under the pen-word `gofar;` — "go far" (travel motif, cf. the `earendil` codename), and a legitimate Arabic/Indonesian name besides; the legal identity stays in the byline, ©, and schema. Content is served by a REST BE (`cms.`, contract in [DESIGN.md §4](DESIGN.md)); an in-repo mock layer runs until it exists — flip with `PUBLIC_API_BASE`.
 
-**Canonical URL: `https://blog.ainurrofiq.com`** (subdomain & TLS plan in DESIGN.md §9).
+**Canonical URL: `https://gofar.id`** (domain strategy & migration checklist in DESIGN.md §9; `ainurrofiq.com` 301s to it).
 
 ## What's here
 
@@ -16,7 +16,7 @@ SvelteKit frontend for the Markdown-driven personal blog of **Faiz Ainur Rofiq**
 
 Plus: **⌘K / `Mod+K` command palette** (capped launcher with see-all hand-off), cookie-persisted light/dark (View-Transitions cross-fade), brand-violet route progress bar, staggered fade entrances, animated mobile hamburger.
 
-**Stack:** Svelte 5 + SvelteKit (Kit 3) + TypeScript · Tailwind v4 (semantic token palette, ~7 deliberate raw-CSS exceptions) · markdown-it pipeline (anchors, task lists, container directive) + Shiki + DOMPurify · vitest. Docs: [DESIGN.md](DESIGN.md) (living spec) · [PLAN.md](PLAN.md) (milestones & status) · [ARCHITECTURE.md](ARCHITECTURE.md) (backend K3s blueprint).
+**Stack:** Svelte 5 + SvelteKit (Kit 3) + TypeScript · Tailwind v4 (semantic token palette, ~7 deliberate raw-CSS exceptions) · markdown-it pipeline (anchors, task lists, container directive) + Shiki + DOMPurify · vitest. Docs: [DESIGN.md](DESIGN.md) (living spec) · [PLAN.md](PLAN.md) (milestones & status) · [ARCHITECTURE.md](ARCHITECTURE.md) (legacy single-node draft — the live blueprint is `vortex/INFRA_ARCHITECTURE.md`).
 
 ## Live preview
 

@@ -189,6 +189,8 @@
 					<a
 						bind:this={rowEls[i]}
 						href="/posts/{post.slug}"
+						data-sveltekit-preload-data="tap"
+						data-sveltekit-preload-code="hover"
 						class="flex gap-4 rounded-lg px-3 py-3 transition-colors {selected === i
 							? 'bg-muted'
 							: 'hover:bg-muted'}"

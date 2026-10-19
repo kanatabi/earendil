@@ -7,14 +7,18 @@ the index.
 ## 1. What this repo is (60 seconds)
 
 - **SvelteKit 3** (Svelte 5 runes, Vite 8) SSR blog frontend via **`adapter-node`** →
-  containerized on a K3s cluster. Workspace parent (`../`) holds the infra: `AGENTS.md`
-  (non-negotiables: no secrets in Git, one public ingress = this frontend),
-  `INFRA_ARCHITECTURE.md` (blueprint), `k8s-platform-manifests/` (GitOps), `backend/`
-  (API contract mirror of `src/lib/api/client.ts`).
+  containerized on a K3s cluster. The workspace parent (`../` = `omicron`) is the project
+  family: **`lumen/`** = the REST backend (its own AGENTS/DESIGN; `../lumen/DESIGN.md` is
+  the contract mirror of `src/lib/api/client.ts`), **`vortex/`** = GitOps manifests + the
+  `INFRA_ARCHITECTURE.md` blueprint (no secrets in Git, one public ingress = this frontend),
+  `../AGENTS.md` = workspace rules — **written for the old `fzr-blog` layout, its paths are
+  stale** (`sv-fzr/` → `earendil/`, `backend/` → `lumen/`, `k8s-platform-manifests/` →
+  `vortex/`); verify before trusting it.
 - Content arrives **at runtime from a REST backend**; until the BE exists, the in-repo
   **mock layer is the data source of truth** (`createApi(undefined)` → fixtures). Dev and
   tests must work with no cluster and no backend.
 - Mermaid diagrams render **client-side** (adopted design, "Route B" — see §7).
+- **Brand**: wordmark **`gofar;`** — a pen-word ("go far"; also a legitimate Arabic/Indonesian given name). The legal identity **Faiz Ainur Rofiq** is anchored in the About page, the © footer, and the `Person` JSON-LD in `+layout.svelte` (`alternateName: Gofar`). Primary domain `gofar.id`; `ainurrofiq.com` 301-redirects to it (DESIGN §9).
 - UI source of truth: Flowstep file id in `DESIGN.md` header (8 screens, light/dark ×
   desktop/mobile).
 
@@ -56,7 +60,8 @@ churn, `git checkout -- <file>` and redo the content edit.
 
 ## 4. Git workflow (strict)
 
-- **Never commit directly to `master`.** One branch per milestone/round (`feature/<slug>`,
+- **Never commit directly to the default branch** (`main` here; `master` in the legacy
+  `fzr-blog/sv-fzr` copy). One branch per milestone/round (`feature/<slug>`,
   historically `milestone/<n>-<slug>`), human reviews and merges.
 - **Club related changes into ONE commit** — never one commit per file, no micro-commits.
   Conventional Commit subject (`feat|fix|docs|perf(scope): …`) with a WHY body.
@@ -147,7 +152,7 @@ guards what it can):
   the sync mechanism.
 - The pipeline is **diagram-type-agnostic** (fence rule keys on the `mermaid` info string);
   new types need no FE change. The backend ships raw fences — **no publish render pipeline**
-  (the mirror BE doc: `../backend/DESIGN.md`).
+  (the mirror BE doc: `../lumen/DESIGN.md`).
 
 ## 8. Tests — what protects what
 
@@ -173,6 +178,10 @@ are manually verified (§9).
   non-scrolling wrapper — verify it stays put when you swipe a long line (it regressed once).
 - Lightbox: pinch/pan/double-tap on photos and diagram zooms; caption fades while zoomed;
   backdrop tap/Esc/X still close (backdrop only reacts to `e.target === e.currentTarget`).
+- Preload-storm check: scroll the home feed on the dev server — logs must show **no**
+  per-slug `/posts/*/__data.json` flood (article links preload data on tap; hover warms
+  only the single shared route chunk). Assert in served HTML:
+  `curl -s localhost:5173/ | grep -c 'preload-data="tap"'` > 0.
 
 ## 10. Hard-won lessons (each cost a real bug fix — don't regress)
 
@@ -193,6 +202,17 @@ are manually verified (§9).
    (`cursor-zoom-in`) are generated, but ONLY if the literal appears somewhere scanned.
    Missing utility styles → check the spelling exists in source.
 7. `autofocus` no-ops on dynamically mounted dialogs — use the `focusOnMount` action.
+8. **Hover-preload + heavy server loads = render storm.** `pointerenter` fires while
+   _scrolling_ (feed rows sweep under a stationary cursor; touch press-move). Article
+   loads run the whole pipeline (BE fetch + Shiki + sanitize), so every list/palette link
+   to `/posts/[slug]` sets `data-sveltekit-preload-data="tap"` +
+   `data-sveltekit-preload-code="hover"` (DESIGN §2). Don't "restore" body-level hover for
+   article links; don't add hover-preload to any new expensive route.
+9. Two `</script>`-adjacent gotchas in `.svelte` files: a raw closing-script sequence
+   anywhere in the `<script>` block (even inside a comment!) terminates it early, and a
+   literal `{...}` inside a `{@html `...`}` template trips the svelte-eslint-parser lexer.
+   The JSON-LD in `+layout.svelte` walks both lines with `JSON.stringify` + split tags —
+   copy that pattern, don't inline HTML with braces.
 
 ## 11. Explicitly do NOT
 

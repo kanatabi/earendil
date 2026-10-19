@@ -1,6 +1,7 @@
 # SvelteKit SSR container (adapter-node). Build output in `build/` is self-contained,
-# so the runtime stage needs no node_modules. Used by the blog-frontend deployment —
-# see k8s-platform-manifests/applications/blog-frontend/ and README.md.
+# so the runtime stage needs no node_modules. Used by the earendil deployment —
+# see vortex/applications/earendil/ in the GitOps repo (renamed from
+# k8s-platform-manifests/applications/blog-frontend/).
 FROM node:22-alpine AS build
 WORKDIR /app
 COPY package.json package-lock.json ./

@@ -1,5 +1,8 @@
 {
-	"name": "pb-scaffold",
+	"name": "earendil",
+	"engines": {
+		"node": ">=22"
+	},
 	"private": true,
 	"version": "0.0.1",
 	"type": "module",

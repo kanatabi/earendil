@@ -14,8 +14,14 @@
 	});
 </script>
 
+<!-- Article loads run the full markdown pipeline (BE fetch + Shiki + sanitize), so
+     the body-level hover preload is overridden here: data on tap (fires at
+     pointer-down, still instant), code on hover (static chunks, browser-cached).
+     Same policy in ArticleCard/SearchDialog rows. -->
 <a
 	href="/posts/{post.slug}"
+	data-sveltekit-preload-data="tap"
+	data-sveltekit-preload-code="hover"
 	class="group flex items-center gap-4 border-t border-border px-5 py-5 transition-colors hover:bg-accent/40 sm:gap-6 sm:px-6 sm:py-6"
 >
 	<div class="flex min-w-0 flex-1 flex-col gap-1.5">

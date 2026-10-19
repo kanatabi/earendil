@@ -523,7 +523,7 @@ export function mermaidDiagrams(
 		});
 		for (const it of items) {
 			try {
-				const { svg } = await mermaid.render(`fzr-mmd-${++ids}`, it.src);
+				const { svg } = await mermaid.render(`mmd-${++ids}`, it.src);
 				if (disposed || my !== seq) return;
 				it.svg = svg;
 				if (!it.rendered) {
