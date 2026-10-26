@@ -11,9 +11,8 @@ the index.
   family: **`lumen/`** = the REST backend (its own AGENTS/DESIGN; `../lumen/DESIGN.md` is
   the contract mirror of `src/lib/api/client.ts`), **`vortex/`** = GitOps manifests + the
   `INFRA_ARCHITECTURE.md` blueprint (no secrets in Git, one public ingress = this frontend),
-  `../AGENTS.md` = workspace rules — **written for the old `fzr-blog` layout, its paths are
-  stale** (`sv-fzr/` → `earendil/`, `backend/` → `lumen/`, `k8s-platform-manifests/` →
-  `vortex/`); verify before trusting it.
+  `../AGENTS.md` = workspace-wide non-negotiables (the `omicron` superproject repo,
+  GitHub: <https://github.com/kanatabi/omicron>).
 - Content arrives **at runtime from a REST backend**; until the BE exists, the in-repo
   **mock layer is the data source of truth** (`createApi(undefined)` → fixtures). Dev and
   tests must work with no cluster and no backend.
