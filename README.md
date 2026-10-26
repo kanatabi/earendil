@@ -1,5 +1,9 @@
 # Personal Blog (FE) — `gofar;`
 
+Part of the [`omicron`](https://github.com/kanatabi/omicron) superproject ·
+Backend contract: [`lumen`](https://github.com/kanatabi/lumen) ·
+GitOps: [`vortex`](https://github.com/kanatabi/vortex)
+
 SvelteKit frontend for the Markdown-driven personal blog of **Faiz Ainur Rofiq**, published under the pen-word `gofar;` — "go far" (travel motif, cf. the `earendil` codename), and a legitimate Arabic/Indonesian name besides; the legal identity stays in the byline, ©, and schema. Content is served by a REST BE (`cms.`, contract in [DESIGN.md §4](DESIGN.md)); an in-repo mock layer runs until it exists — flip with `PUBLIC_API_BASE`.
 
 **Canonical URL: `https://gofar.id`** (domain strategy & migration checklist in DESIGN.md §9; `ainurrofiq.com` 301s to it).
