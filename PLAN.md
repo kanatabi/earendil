@@ -222,6 +222,16 @@ shipped the honest **lossless WebP at 640px (~96KB, cached forever)**; 512 would
 columns `240→288/320` so the square holds proportion with the Fraunces headline. Headline
 and intro type untouched by request.
 
+**Grid alignment follow-up:** growing the image column inside a 768px container had squeezed
+the headline to five lines. The home hero, the Writing feed and `/search` now ride the
+documented page grid (`max-w-page` 1120, DESIGN §4 — the 3xl blocks were the deviation, the
+gallery masonry never had one), so nav = content = footer edges align and the headline
+settles back to ~3 lines at a ~736px column. The wide rail keeps an editorial measure:
+`PostCard` text caps at `72ch` (thumbnail pinned right with `ml-auto`), hero intro/currently
+at `max-w-2xl`. The article body deliberately keeps its 3xl reading measure. Rendering
+typography, not data shaping — the no-FE-processing rule stands. Note: the Flowstep screens
+(1/5) predate this and now show the old narrow feed; re-cut when the screens get revisited.
+
 **Float — cutout reveal (same round):** the photo layer lost its rectangle. ImageMagick
 border-flood was tried first and rejected by QA: at fuzz 18 the wall-shadow gaps survived
 disconnected AND the bright face got eaten through a temple/hair-highlight bridge to the

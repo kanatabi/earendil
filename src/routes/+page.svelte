@@ -17,7 +17,7 @@
 
 <!-- Hero: display serif headline, "currently" line, ASCII profile portrait -->
 <section
-	class="fade-up mx-auto grid w-full max-w-3xl items-center gap-8 md:grid-cols-[minmax(0,1fr)_288px] lg:grid-cols-[minmax(0,1fr)_320px]"
+	class="fade-up mx-auto grid w-full max-w-page items-center gap-8 md:grid-cols-[minmax(0,1fr)_288px] lg:grid-cols-[minmax(0,1fr)_320px]"
 >
 	<div class="order-first md:order-last">
 		<ProfileVisual />
@@ -34,7 +34,7 @@
 			details behind reliable software.
 		</p>
 		<!-- Static until the BE grows a status endpoint. -->
-		<p class="text-xs text-muted-foreground">
+		<p class="max-w-2xl text-xs text-muted-foreground">
 			currently — building queue-depth metrics<span class="text-brand">;</span> reading The Design
 			of Everyday Things<span class="text-brand">;</span> running postgres on k3s<span
 				class="text-brand">;</span
@@ -44,7 +44,7 @@
 </section>
 
 <!-- Writing: the full list, paginated — /articles and /search reuse these rows -->
-<section id="writing" class="fade-up mx-auto flex w-full max-w-3xl flex-col gap-6">
+<section id="writing" class="fade-up mx-auto flex w-full max-w-page flex-col gap-6">
 	<SectionLabel title="Writing" />
 	<!-- Re-mounts when the page changes so the list fades in on Newer/Older. -->
 	{#key data.page}

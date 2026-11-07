@@ -27,7 +27,7 @@
 	{/if}
 </svelte:head>
 
-<section class="fade-up mx-auto flex w-full max-w-3xl flex-col gap-6">
+<section class="fade-up mx-auto flex w-full max-w-page flex-col gap-6">
 	<div class="flex items-center justify-between gap-4 border-t border-border pt-4">
 		<p class="text-xs font-medium tracking-widest text-muted-foreground uppercase">
 			{#if data.q}
