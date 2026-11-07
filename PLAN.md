@@ -421,6 +421,19 @@ opinions now ride inside the facts. Mobile portrait centers (`justify-self-cente
 md:justify-self-start`), text stays left. (40 tests pass; preview curls confirmed both
 details blocks, keyword lines, tree markup, merged stack, centering.)
 
+**About round 3 — three visual bugs from the owner's screenshots:** (1) timeline card
+hairlines were `li` border-t spanning the full container — straight THROUGH the rail
+channel; the separator is now an absolutely-positioned span starting at the text gutter
+(`left-10`), so no line ever crosses the journey (rail + `;` marker screenshot). (2) the
+education tree looked disconnected: each branch trunk only spanned its own li's box,
+leaving the padding gap between branches uncovered, and the root stub was 4px short of
+the heading; trunks are now full-height (`bottom: 0`, last stops at its elbow) and the
+stub meets both seams — corner-to-corner hairlines. (3) the `abstract;` toggle read as
+plain text, not a control — now the house pill affordance (`rounded-full border px-3 py-1`
+
+- ChevronRight rotating via `group-open:`, same grammar as the filter presets and the
+  retired mobile disclosure), native `<details>` semantics preserved.
+
 **Float — cutout reveal (same round):** the photo layer lost its rectangle. ImageMagick
 border-flood was tried first and rejected by QA: at fuzz 18 the wall-shadow gaps survived
 disconnected AND the bright face got eaten through a temple/hair-highlight bridge to the

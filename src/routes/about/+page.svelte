@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { ChevronRight } from 'lucide-svelte';
 	import SectionLabel from '#lib/components/SectionLabel.svelte';
 	import {
 		education,
@@ -60,8 +61,13 @@
 				<span class="rail-mark">;</span>
 			</span>
 			<ol class="flex flex-col">
-				{#each experience as job (job.period + job.company)}
-					<li class="relative border-t border-border py-5 pl-10 first:border-t-0">
+				{#each experience as job, i (job.period + job.company)}
+					<li class="relative py-5 pl-10">
+						<!-- Card hairline starts at the text gutter (left-10): it must
+						     never cross the rail channel, unlike the old li border-t. -->
+						{#if i > 0}
+							<span class="absolute top-0 right-0 left-10 h-px bg-border" aria-hidden="true"></span>
+						{/if}
 						<span
 							class="rail-dot absolute top-[26px] left-[5px]"
 							data-rail-off={undefined}
@@ -127,11 +133,14 @@
 					<p class="mt-2 max-w-[72ch] text-sm leading-relaxed text-muted-foreground">
 						{paper.note}
 					</p>
-					<details class="mt-2 max-w-[72ch]">
+					<details class="group mt-2 max-w-[72ch]">
 						<summary
-							class="w-fit cursor-pointer list-none font-mono text-xs text-primary transition-colors hover:text-foreground [&::-webkit-details-marker]:hidden"
+							class="flex w-fit cursor-pointer list-none items-center gap-2 rounded-full border border-border px-3 py-1 font-mono text-xs text-muted-foreground transition-colors hover:border-muted-foreground hover:text-foreground [&::-webkit-details-marker]:hidden"
 						>
 							abstract<span class="text-brand">;</span>
+							<ChevronRight
+								class="size-3 transition-transform duration-200 group-open:rotate-90 motion-reduce:transition-none"
+							/>
 						</summary>
 						<p
 							class="mt-2 text-sm leading-relaxed text-muted-foreground first-letter:font-brand first-letter:font-semibold"
@@ -242,12 +251,12 @@
 	   journey animation belongs to the career rail, not here. */
 	.tree {
 		position: relative;
-		margin-top: 1rem;
+		margin-top: 0.75rem;
 		padding-left: 0;
 		list-style: none;
 	}
 	.tree::before {
-		/* Root stub: the trunk rises to the degree heading. */
+		/* Root stub: meets the degree block exactly and the first trunk at 0. */
 		content: '';
 		position: absolute;
 		left: 5px;
@@ -264,12 +273,12 @@
 		color: var(--muted-foreground);
 	}
 	.tree li::before {
-		/* trunk segment down to this elbow */
+		/* Full-height trunk so consecutive branches join corner-to-corner. */
 		content: '';
 		position: absolute;
 		left: 5px;
 		top: 0;
-		bottom: 50%;
+		bottom: 0;
 		width: 1px;
 		background: var(--border);
 	}
