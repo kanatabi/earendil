@@ -351,7 +351,7 @@
 	}
 	.tree li {
 		position: relative;
-		padding: 0.375rem 0 0.375rem 1.75rem;
+		padding: 0.375rem 0 0.375rem 2rem;
 		font-size: 0.875rem;
 		line-height: 1.6;
 		color: var(--muted-foreground);
@@ -372,7 +372,7 @@
 		position: absolute;
 		left: calc(var(--stem-x) - 1px);
 		top: 50%;
-		width: 1.25rem;
+		width: 1rem;
 		height: 2px;
 		transform: translateY(-50%);
 		background: var(--border);
