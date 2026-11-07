@@ -529,6 +529,15 @@ Sidebar/RevealPast/FactCard seams, social module — already shaped right. 47 te
 proved 404 copy, both error variants, empty state, corner ghost, article whisper, about
 drawer, and exactly ONE occurrence of the asset URL in compiled CSS. Follow-up taste fix: the article end-credit was sized smaller (28vw) than the corner ghosts — conflating size with loudness; all watermarks now share the family geometry (45vw cap 560px) and ONLY opacity varies per placement (4% under prose, 6-8% on sparse pages).
 
+Correction the owner caught by looking: the article ghost was mounted IN-FLOW
+(`mx-auto aspect-square`), so it reserved a 560px square of page height — a banner
+wearing a watermark's costume, and the "empty space" at every article's end. It is now
+the same corner treatment as the family: `absolute bottom-0 right-0` inside the
+relative article (the blank zone under the sticky TOC rail), `-z-10` so it sits behind
+ALL content, zero scroll length added. The reuse lesson, written down: Watermark's
+"caller owns geometry" seam means callers must keep it OUT of flow — the component
+cannot enforce it; the pattern must.
+
 **Float — cutout reveal (same round):** the photo layer lost its rectangle. ImageMagick
 border-flood was tried first and rejected by QA: at fuzz 18 the wall-shadow gaps survived
 disconnected AND the bright face got eaten through a temple/hair-highlight bridge to the

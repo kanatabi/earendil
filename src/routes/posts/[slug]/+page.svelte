@@ -39,7 +39,7 @@
 
 <!-- Twelve columns only exist at lg: a 12-col grid with gap-8 spends 11 gaps
      (352px) — wider than a 360px viewport — and every spanning child clipped. -->
-<article class="fade-up grid grid-cols-1 gap-8 lg:grid-cols-12">
+<article class="fade-up relative grid grid-cols-1 gap-8 lg:grid-cols-12">
 	<aside class="grid grid-cols-1 gap-6 lg:col-span-9 lg:grid-cols-12 lg:gap-6">
 		<div class="hidden pt-2 lg:col-span-2 lg:block">
 			<div class="sticky top-6 text-xs text-muted-foreground">
@@ -135,12 +135,17 @@
 			{/if}
 		</div>
 	</aside>
-</article>
 
-<!-- End credit: a whisper of glyphs where the read finishes. Full family size
-     (45vw cap 560) at 4% opacity — size fills the corner, opacity keeps it a
-     whisper that never tints prose; desktop only. -->
-<Watermark class="mx-auto mt-16 hidden aspect-square w-[min(45vw,560px)] lg:block" opacity={0.04} />
+	<!-- End credit: a true watermark — corner ghost in the blank zone under
+	     the sticky TOC rail, exactly where About and search park theirs.
+	     absolute → zero scroll length added (the earlier in-flow block reserved
+	     a 560px square of "empty space"); 4% opacity keeps it a whisper, and
+	     the right-column placement keeps it out from under prose. Desktop only. -->
+	<Watermark
+		class="pointer-events-none absolute right-0 bottom-0 -z-10 hidden aspect-square w-[min(45vw,560px)] lg:block"
+		opacity={0.04}
+	/>
+</article>
 
 {#if zoomed}
 	<ImageLightbox image={zoomed} onclose={() => (zoomed = null)} />
