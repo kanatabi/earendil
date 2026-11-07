@@ -1,6 +1,9 @@
 <script lang="ts">
 	import { ChevronRight } from 'lucide-svelte';
 	import SectionLabel from '#lib/components/SectionLabel.svelte';
+	import Watermark from '#lib/components/Watermark.svelte';
+	import CardTitle from '#lib/components/CardTitle.svelte';
+	import PillLink from '#lib/components/PillLink.svelte';
 	import RevealPast from '#lib/components/rail/RevealPast.svelte';
 	import FactCard from '#lib/components/rail/FactCard.svelte';
 	import Sidebar from '#lib/components/rail/Sidebar.svelte';
@@ -24,10 +27,9 @@
 <section class="fade-up relative mx-auto flex w-full max-w-page">
 	<!-- Brand texture in the dead corner: the hero's ASCII glyphs, painted with the
 	     same --ascii-ink (theme-aware) at whisper opacity, behind everything. -->
-	<span
-		class="watermark pointer-events-none absolute right-0 bottom-0 hidden lg:block"
-		aria-hidden="true"
-	></span>
+	<Watermark
+		class="pointer-events-none absolute right-0 bottom-0 hidden aspect-square w-[min(45vw,560px)] lg:block"
+	/>
 
 	<div class="grid w-full gap-12 lg:grid-cols-[minmax(0,1fr)_272px]">
 		<div class="flex min-w-0 flex-col gap-12">
@@ -180,15 +182,7 @@
 									</p>
 								</div>
 							</details>
-							<a
-								href={paper.href}
-								target="_blank"
-								rel="noopener noreferrer"
-								class="mt-3 inline-flex w-fit items-center gap-2 rounded-full border border-border px-3 py-1 font-mono text-xs text-muted-foreground transition-colors hover:border-muted-foreground hover:text-foreground"
-							>
-								pdf<span aria-hidden="true">↗</span><span class="sr-only">(opens in a new tab)</span
-								>
-							</a>
+							<PillLink href={paper.href} external class="mt-3">pdf</PillLink>
 						</article>
 					{/each}
 				</div>
@@ -239,7 +233,7 @@
 			<FactCard title="facts" rows={facts} />
 			<FactCard title="colophon" rows={colophon} />
 			<div class="flex flex-col gap-3">
-				<p class="text-xs font-medium tracking-widest text-muted-foreground uppercase">elsewhere</p>
+				<CardTitle title="elsewhere" />
 				<p class="flex flex-wrap gap-x-4 gap-y-1.5 font-mono text-xs text-muted-foreground">
 					{#each elsewhere as link (link.label)}
 						<a href={link.href} class="transition-colors hover:text-foreground"
@@ -256,19 +250,6 @@
 	.photo {
 		/* Dark mode: same brand-violet halo that keeps the hero cutout readable. */
 		filter: var(--photo-glow);
-	}
-
-	.watermark {
-		width: min(45vw, 560px);
-		aspect-ratio: 1;
-		background-color: var(--ascii-ink);
-		opacity: 0.06;
-		-webkit-mask-image: url('/profile/ascii-glyphs-640.webp');
-		mask-image: url('/profile/ascii-glyphs-640.webp');
-		-webkit-mask-size: cover;
-		mask-size: cover;
-		-webkit-mask-repeat: no-repeat;
-		mask-repeat: no-repeat;
 	}
 
 	.rail {

@@ -2,6 +2,7 @@
 	import { page } from '$app/state';
 	import { Feather, House, Images, Search } from 'lucide-svelte';
 	import ThemeToggle from './ThemeToggle.svelte';
+	import { OPEN_SEARCH_EVENT } from '#lib/ui-events.ts';
 	import { chrome } from '#lib/scroll-chrome.svelte.ts';
 
 	interface Props {
@@ -46,7 +47,7 @@
 			el?.focus();
 			if (el instanceof HTMLInputElement) el.select();
 		} else {
-			window.dispatchEvent(new Event('gofar:open-search'));
+			window.dispatchEvent(new Event(OPEN_SEARCH_EVENT));
 		}
 	}
 </script>

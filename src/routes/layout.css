@@ -19,6 +19,9 @@
 	--brand: #7c3aed;
 	/* Hero ASCII portrait — ink follows the theme (monochrome in light mode). */
 	--ascii-ink: var(--foreground);
+	/* The ASCII glyph field — one URL for every consumer (hero layer, monogram,
+	   drawer knob, watermarks). Components reference this token, never the path. */
+	--ascii-mask: url('/profile/ascii-glyphs-640.webp');
 	/* Photo cutout needs no halo on white — silhouette is already dark-on-light. */
 	--photo-glow: none;
 	/* Diagram palette — source of truth for client-rendered mermaid (Route B). */

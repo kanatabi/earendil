@@ -1,4 +1,5 @@
 <script lang="ts">
+	import CardTitle from '../CardTitle.svelte';
 	import type { Tag } from '#lib/api/index.ts';
 
 	interface Props {
@@ -10,7 +11,7 @@
 
 <!-- Home rail: plain link rows — the cloud as BE-served, one tag per click. -->
 <div class="flex flex-col gap-3">
-	<p class="text-xs font-medium tracking-widest text-muted-foreground uppercase">topics</p>
+	<CardTitle title="topics" />
 	<ul class="flex flex-col divide-y divide-border">
 		{#each tags as tag (tag.name)}
 			<li>

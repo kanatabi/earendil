@@ -1,4 +1,5 @@
 <script lang="ts">
+	import CardTitle from '../CardTitle.svelte';
 	import type { FactRow } from '#lib/content/about.ts';
 
 	interface Props {
@@ -11,7 +12,7 @@
 
 <!-- Rail card: label — value rows in the mono voice (facts, colophon). -->
 <div class="flex flex-col gap-3">
-	<p class="text-xs font-medium tracking-widest text-muted-foreground uppercase">{title}</p>
+	<CardTitle {title} />
 	<div class="flex flex-col gap-1.5">
 		{#each rows as row (row.label)}
 			<p class="flex flex-wrap items-baseline gap-x-2 font-mono text-xs leading-relaxed">

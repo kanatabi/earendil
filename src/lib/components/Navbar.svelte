@@ -3,6 +3,7 @@
 	import { Search } from 'lucide-svelte';
 	import ThemeToggle from './ThemeToggle.svelte';
 	import SearchDialog from './SearchDialog.svelte';
+	import { OPEN_SEARCH_EVENT } from '#lib/ui-events.ts';
 
 	interface Props {
 		theme: 'light' | 'dark';
@@ -59,8 +60,8 @@
 	// the dialog (and its focus-return contract) stays owned by the Navbar.
 	$effect(() => {
 		const onRequest = () => openSearch();
-		window.addEventListener('gofar:open-search', onRequest);
-		return () => window.removeEventListener('gofar:open-search', onRequest);
+		window.addEventListener(OPEN_SEARCH_EVENT, onRequest);
+		return () => window.removeEventListener(OPEN_SEARCH_EVENT, onRequest);
 	});
 </script>
 
