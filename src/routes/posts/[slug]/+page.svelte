@@ -10,6 +10,7 @@
 	import ImageLightbox from '#lib/components/ImageLightbox.svelte';
 	import type { LightboxImage } from '#lib/components/ImageLightbox.svelte';
 	import IdentityCard from '#lib/components/rail/IdentityCard.svelte';
+	import Watermark from '#lib/components/Watermark.svelte';
 	import type { PageData } from './$types';
 
 	interface Props {
@@ -135,6 +136,10 @@
 		</div>
 	</aside>
 </article>
+
+<!-- End credit: a whisper of glyphs where the read finishes. 4% — texture,
+     never tint under prose; desktop only; the rail/scroll never overlaps it. -->
+<Watermark class="mx-auto mt-16 hidden aspect-square w-[min(28vw,300px)] lg:block" opacity={0.04} />
 
 {#if zoomed}
 	<ImageLightbox image={zoomed} onclose={() => (zoomed = null)} />

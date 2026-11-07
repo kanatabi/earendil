@@ -508,6 +508,27 @@ elbow, grey continuing to Robotics), the thesis dot lit like a rail waypoint. Fo
 the elbow landed flush on the text edge (28px padding) — shortened to 1rem (ends 24px) with
 the indent at 2rem, leaving a deliberate 8px gap; connector meets copy, never touches it.
 
+**Watermark round + kit consolidation (reuse review):** asked "where else does the ghost
+fit?", the answer was everywhere it makes emptiness mean something — and building it
+exposed that ten rounds had quietly re-printed the same code: the mask URL in 4 components,
+the card kicker in 6, the pill grammar in ~8 places, the search event string in 3. Two
+commits: (1) PURE REFACTOR — `--ascii-mask` token (URL now exists once in CSS),
+`Watermark.svelte` (decorative ghost; caller owns geometry), `CardTitle`, `Pill`
+(aria-pressed toggle chip) + `PillLink` (owns the external-link pattern: ↗, target/rel,
+sr-only), `OPEN_SEARCH_EVENT` constant; all existing consumers swapped with zero visual
+delta (deliberate exceptions kept custom: the calendar trigger dialog affordance, the
+SearchPill fake-input, the primary-action apply button, and the native `<summary>`).
+(2) PLACEMENTS — `/search` gains the corner ghost (About-sibling anatomy) and the bare
+"No posts matched" line became a ghost-field empty state with a `clear filters;` (or
+`back home;`) pill; a REAL root `+error.svelte` finally replaces SvelteKit's bare 500/400
+page (status-aware house voice, ghost field, pills, no raw server details), and the posts
+error variant joins the pattern; articles end with a 4%-opacity ghost after Further
+reading (lg-only, never under prose — documented rule); About grew the last missing mobile
+parity piece, a `RailDrawer` carrying facts+colophon. Audit verdict elsewhere: scroll-chrome,
+Sidebar/RevealPast/FactCard seams, social module — already shaped right. 47 tests; preview
+proved 404 copy, both error variants, empty state, corner ghost, article whisper, about
+drawer, and exactly ONE occurrence of the asset URL in compiled CSS.
+
 **Float — cutout reveal (same round):** the photo layer lost its rectangle. ImageMagick
 border-flood was tried first and rejected by QA: at fuzz 18 the wall-shadow gaps survived
 disconnected AND the bright face got eaten through a temple/hair-highlight bridge to the

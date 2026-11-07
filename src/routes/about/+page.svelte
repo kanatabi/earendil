@@ -5,6 +5,7 @@
 	import CardTitle from '#lib/components/CardTitle.svelte';
 	import PillLink from '#lib/components/PillLink.svelte';
 	import RevealPast from '#lib/components/rail/RevealPast.svelte';
+	import RailDrawer from '#lib/components/rail/RailDrawer.svelte';
 	import FactCard from '#lib/components/rail/FactCard.svelte';
 	import Sidebar from '#lib/components/rail/Sidebar.svelte';
 	import { scrollRail } from '#lib/actions.ts';
@@ -245,6 +246,13 @@
 		</Sidebar>
 	</div>
 </section>
+
+<!-- Phones/tablets: facts and colophon ride the floating bottom-sheet drawer —
+     the rail itself is lg-only and the Elsewhere strip already lives in flow. -->
+<RailDrawer label="More about the author" variant="identity">
+	<FactCard title="facts" rows={facts} />
+	<FactCard title="colophon" rows={colophon} />
+</RailDrawer>
 
 <style>
 	.photo {

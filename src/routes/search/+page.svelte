@@ -3,6 +3,8 @@
 	import { SvelteURLSearchParams } from 'svelte/reactivity';
 	import { Search } from 'lucide-svelte';
 	import PostCard from '#lib/components/PostCard.svelte';
+	import PillLink from '#lib/components/PillLink.svelte';
+	import Watermark from '#lib/components/Watermark.svelte';
 	import FilterPanel from '#lib/components/rail/FilterPanel.svelte';
 	import RailDrawer from '#lib/components/rail/RailDrawer.svelte';
 	import Sidebar from '#lib/components/rail/Sidebar.svelte';
@@ -93,7 +95,14 @@
 	{/if}
 </svelte:head>
 
-<section class="fade-up mx-auto grid w-full max-w-page gap-8 lg:grid-cols-[minmax(0,1fr)_272px]">
+<section
+	class="fade-up relative mx-auto grid w-full max-w-page gap-8 lg:grid-cols-[minmax(0,1fr)_272px]"
+>
+	<!-- Same brand ghost as the About page: these two share an anatomy, now an
+	     atmosphere. Below lg the single column needs no backdrop. -->
+	<Watermark
+		class="pointer-events-none absolute right-0 bottom-0 hidden aspect-square w-[min(45vw,560px)] lg:block"
+	/>
 	<div class="flex min-w-0 flex-col gap-6">
 		<div class="flex items-center justify-between gap-4 border-t border-border pt-4">
 			<p class="text-xs font-medium tracking-widest text-muted-foreground uppercase">
@@ -192,10 +201,29 @@
 						<PostCard {post} />
 					{/each}
 					{#if data.posts.length === 0}
-						<p class="border-t border-border py-6 text-sm text-muted-foreground">
-							No posts matched{#if data.q}
-								&ldquo;{data.q}&rdquo;{/if}.
-						</p>
+						<!-- The dead end gets the ghost treatment: an ASCII field behind
+						     the apology and a way out, instead of one sad line. -->
+						<div
+							class="relative flex flex-col items-center justify-center gap-3 border-t border-border py-16 text-center"
+						>
+							<Watermark
+								class="pointer-events-none absolute inset-0 m-auto aspect-square w-72"
+								opacity={0.08}
+							/>
+							<p class="relative text-sm text-muted-foreground">
+								nothing matched{#if data.q}
+									&ldquo;{data.q}&rdquo;{/if}{#if hasFilters}
+									under these filters{/if};
+							</p>
+							{#if hasFilters}
+								{@const qs = buildQs({ tags: [] })}
+								<PillLink href={qs ? `/search?${qs}` : '/search'} class="relative"
+									>clear filters;</PillLink
+								>
+							{:else}
+								<PillLink href="/" class="relative">back home;</PillLink>
+							{/if}
+						</div>
 					{/if}
 				</div>
 
