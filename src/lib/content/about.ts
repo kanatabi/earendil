@@ -23,7 +23,6 @@ export interface Highlight {
 export interface Paper {
 	title: string;
 	year: string;
-	venue: string;
 	note: string;
 	abstract: string;
 	keywords: string[];
@@ -94,8 +93,6 @@ export const research: Paper[] = [
 		title:
 			'Design and Development of Know Your Customer Mechanism using Blockchain in the Process of Small Business Loans Application in Indonesia',
 		year: '2021',
-		// PLACEHOLDER(venue): the conference/journal it appeared in.
-		venue: 'PLACEHOLDER venue',
 		note: 'Catena, published: what if the KYC form never had to leave the vault?',
 		abstract:
 			'Know Your Customer, in general, is a process or mechanism done by an institution to identify and verify the identity of a business partner. In the banking industry, this mechanism is implemented to identify a customer and monitor the transaction activities of a customer, which includes reporting suspicious transactions to the authority. The aim is to avoid criminal acts such as money laundering. However, the existing system has shortcomings that can disrupt business activities: the customer must submit physical documents for each initiation of a business relationship — a duplication process that takes time and makes the whole flow inefficient — and the incumbent centralized model, managed and controlled by a single institution, is more vulnerable to cyber-attacks. This research builds a system using blockchain and the Interplanetary File System (IPFS) that implements the KYC mechanism to provide a more efficient system to the banking industry. From the results of tests carried out on the system, it can be concluded that the performance of the system depends on the specification of the computer used — the better the specification, the better the performance.',
@@ -106,8 +103,6 @@ export const research: Paper[] = [
 		title:
 			'ImBlock: A Blockchain Implementation of Land Ownership Recording System using Hyperledger Fabric',
 		year: '2021',
-		// PLACEHOLDER(venue): the conference/journal it appeared in.
-		venue: 'PLACEHOLDER venue',
 		note: 'Land titles on a ledger nobody owns — the same Fabric stack, pointed at an older trust problem.',
 		abstract:
 			'Recently blockchain is implemented in many sectors such as arts, gaming, education, and health. Blockchain is proposed as a solution for decentralized ledgering systems. One of the most common problems that depends on a trusted ledger is the certification of land ownership: the records of ownership must be trustworthy and orderly so that issues such as double certification do not occur. This paper presents a certificate of land ownership recording system based on blockchain technology, implemented on Hyperledger Fabric — with the expectation that the system achieves good integrity and transparency, solving the problem of land-ownership disputes.',

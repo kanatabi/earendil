@@ -434,6 +434,16 @@ plain text, not a control — now the house pill affordance (`rounded-full borde
 - ChevronRight rotating via `group-open:`, same grammar as the filter presets and the
   retired mobile disclosure), native `<details>` semantics preserved.
 
+**About round 4 — research block polish:** venue dropped entirely (field gone, not hidden
+— meta row is year + keywords); the **paper title became the link** (scholarly convention)
+wearing the house underline-grow grammar with an ↗ and sr-only "(opens in a new tab)",
+while a matching `pdf ↗` pill stays for explicitness; the `abstract` label and keyword
+rows shed their brand semicolons (UI labels, not prose voice); the abstract disclosure
+**glides open** via a one-shot `grid-template-rows 0fr→1fr` + opacity keyframe on
+`details[open] .abs-body` (RevealPast's collapse grammar) — closing stays instant, the
+honest tradeoff of keeping native `<details>` and JS-off readability over a JS-controlled
+symmetric disclosure; reduced-motion disables it.
+
 **Float — cutout reveal (same round):** the photo layer lost its rectangle. ImageMagick
 border-flood was tried first and rejected by QA: at fuzz 18 the wall-shadow gaps survived
 disconnected AND the bright face got eaten through a temple/hair-highlight bridge to the

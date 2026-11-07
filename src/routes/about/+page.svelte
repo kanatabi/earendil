@@ -119,42 +119,56 @@
 		<div class="flex flex-col">
 			{#each research as paper (paper.title)}
 				<article class="border-t border-border py-5 first:border-t-0 first:pt-0">
+					<!-- The title IS the link (scholarly convention), wearing the house
+					     underline-grow grammar of the article rows; the ↗ says "leaves". -->
 					<h3
-						class="max-w-[72ch] font-brand text-base leading-snug font-semibold tracking-tight text-foreground"
+						class="group max-w-[72ch] font-brand text-base leading-snug font-semibold tracking-tight text-foreground"
 					>
-						{paper.title}
+						<a
+							href={paper.href}
+							target="_blank"
+							rel="noopener noreferrer"
+							class="relative inline after:absolute after:-bottom-0.5 after:left-0 after:h-px after:w-0 after:bg-brand after:transition-[width] after:duration-200 hover:after:w-full"
+						>
+							{paper.title}
+							<span aria-hidden="true" class="align-top text-xs text-muted-foreground">↗</span>
+							<span class="sr-only">(opens in a new tab)</span>
+						</a>
 					</h3>
-					<p class="mt-1.5 font-mono text-xs text-muted-foreground">
-						{paper.year} · {paper.venue}
-					</p>
+					<p class="mt-1.5 font-mono text-xs text-muted-foreground">{paper.year}</p>
 					<p class="mt-1 max-w-[72ch] font-mono text-xs text-muted-foreground">
-						{paper.keywords.join(' · ')}<span class="text-brand">;</span>
+						{paper.keywords.join(' · ')}
 					</p>
 					<p class="mt-2 max-w-[72ch] text-sm leading-relaxed text-muted-foreground">
 						{paper.note}
 					</p>
-					<details class="group mt-2 max-w-[72ch]">
+					<!-- Native <details> (JS-off keeps the content readable); the body
+					     glides open via a grid-rows keyframe — closing stays instant:
+					     the honest tradeoff of animating unmount without JS. -->
+					<details class="group mt-3 max-w-[72ch]">
 						<summary
 							class="flex w-fit cursor-pointer list-none items-center gap-2 rounded-full border border-border px-3 py-1 font-mono text-xs text-muted-foreground transition-colors hover:border-muted-foreground hover:text-foreground [&::-webkit-details-marker]:hidden"
 						>
-							abstract<span class="text-brand">;</span>
+							abstract
 							<ChevronRight
 								class="size-3 transition-transform duration-200 group-open:rotate-90 motion-reduce:transition-none"
 							/>
 						</summary>
-						<p
-							class="mt-2 text-sm leading-relaxed text-muted-foreground first-letter:font-brand first-letter:font-semibold"
-						>
-							{paper.abstract}
-						</p>
+						<div class="abs-body">
+							<p
+								class="mt-2 min-h-0 overflow-hidden text-sm leading-relaxed text-muted-foreground first-letter:font-brand first-letter:font-semibold"
+							>
+								{paper.abstract}
+							</p>
+						</div>
 					</details>
 					<a
 						href={paper.href}
 						target="_blank"
 						rel="noopener noreferrer"
-						class="mt-2 inline-block font-mono text-xs text-primary transition-colors hover:text-foreground"
+						class="mt-3 inline-flex w-fit items-center gap-2 rounded-full border border-border px-3 py-1 font-mono text-xs text-muted-foreground transition-colors hover:border-muted-foreground hover:text-foreground"
 					>
-						paper<span class="text-brand">↗</span>
+						pdf<span aria-hidden="true">↗</span><span class="sr-only">(opens in a new tab)</span>
 					</a>
 				</article>
 			{/each}
@@ -311,10 +325,33 @@
 		background: var(--brand);
 	}
 
+	/* Abstract disclosure: the body glides open on a grid-rows keyframe
+	   (one-shot when <details> mounts its content); closing is instant — the
+	   native unmount — which is the honest tradeoff for JS-off readability. */
+	.abs-body {
+		display: grid;
+	}
+	details[open] .abs-body {
+		animation: abs-open 240ms ease-out;
+	}
+	@keyframes abs-open {
+		from {
+			grid-template-rows: 0fr;
+			opacity: 0;
+		}
+		to {
+			grid-template-rows: 1fr;
+			opacity: 1;
+		}
+	}
+
 	@media (prefers-reduced-motion: reduce) {
 		.rail-fill,
 		.rail-dot {
 			transition: none;
+		}
+		details[open] .abs-body {
+			animation: none;
 		}
 	}
 </style>
