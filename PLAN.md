@@ -375,6 +375,21 @@ axes — every app trains "person glyph = my account", and the home drawer's ASC
 the face: a feather, which fits the wordmark's pen-name identity and keeps the doorknob
 unique. Do not swap it back to a person glyph.
 
+**About page — base structure (2026-11-07):** from a two-paragraph stub to a real identity
+page. Content moved to `#lib/content/about.ts` — typed, FE-owned brand copy (like the
+hero's `currently` line), with every invented bio/role/link marked `PLACEHOLDER` for the
+owner to edit in one file. Composition: header, floating BW cutout portrait (reuses
+`photo-640` + the `--photo-glow` dark halo — the hero reveal's end-state as a static
+signature) beside the bio, a **scroll-following experience timeline**, and an `elsewhere;`
+row. The rail: new `scrollRail` action — one passive rAF-throttled scroll listener maps
+"how far the block crossed the 55%-viewport anchor" onto the violet fill's height (two-way:
+retreats on scroll-up, per the owner), dots light as the fill passes their center; markup
+defaults to the FULLY-DRAWN rail so no-JS and reduced-motion readers see the finished
+state and the action only ever retreats it (synchronous measure at mount = no visible
+reset). Chose rect-based math over `animation-timeline: scroll()` — Firefox still has no
+baseline support. GitHub stats/sparkline block: designed (chips + 12-week commits,
+server-side, optional `GITHUB_TOKEN`, graceful null) but HELD per the owner.
+
 **Float — cutout reveal (same round):** the photo layer lost its rectangle. ImageMagick
 border-flood was tried first and rejected by QA: at fuzz 18 the wall-shadow gaps survived
 disconnected AND the bright face got eaten through a temple/hair-highlight bridge to the
