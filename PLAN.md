@@ -334,6 +334,13 @@ on deliberate scroll-down (8px hysteresis), instant reveal on scroll-up, 600ms i
 re-reveal when stopping anywhere, always visible near the top, `focusin` forces shown
 (no stranded keyboard focus), composited translate+fade 200ms, reduced-motion instant.
 Per the owner's call only the bar participates — the floating drawer FAB keeps its post.
+Drag-to-dismiss for the sheet followed the same day: pointer events on the grab band
+(touch-action:none so page scroll never fights the gesture), the panel follows the finger
+1:1 downward with 15% rubber-band upward, and release decides by distance (≥ min(140px,
+40% height)) or fling velocity (>0.45 px/ms) — glide off + close on transitionend, else
+spring back. The svelte slide outro still runs on a panel already translated out of view,
+so the sheet vanishes under the fading scrim with no double motion; reduced-motion closes
+instantly. No per-page wiring needed — the behavior lives inside RailDrawer itself.
 
 **Float — cutout reveal (same round):** the photo layer lost its rectangle. ImageMagick
 border-flood was tried first and rejected by QA: at fuzz 18 the wall-shadow gaps survived
