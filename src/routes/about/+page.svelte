@@ -118,7 +118,7 @@
 					<p class="mt-1 font-mono text-xs text-muted-foreground">{education.period}</p>
 					<ul class="tree">
 						{#each education.highlights as item (item.body)}
-							<li>
+							<li class={item.active ? 'tbranch' : ''}>
 								<span class="node {item.active ? 'node-lit' : ''}" aria-hidden="true"
 								></span>{item.body}{#if item.link}
 									(<a
@@ -326,23 +326,28 @@
 		transform: scale(0.85);
 	}
 
-	/* Education tree — hairline elbows off the degree root. Lines only; the
-	   journey animation belongs to the career rail, not here. */
+	/* Education tree — one dialect with the Experience rail: 2px strokes, 8px
+	   dots, a single integer centerline (--stem-x, matching the rail stem's
+	   8..10px span), every junction centered with transforms so nothing lands
+	   on half pixels. Color carries the rail's meaning: violet = traveled —
+	   the branch from the degree root into the Catena thesis; grey continues
+	   down to Robotics. */
 	.tree {
+		--stem-x: 9px;
 		position: relative;
 		margin-top: 0.75rem;
 		padding-left: 0;
 		list-style: none;
 	}
 	.tree::before {
-		/* Root stub: meets the degree block exactly and the first trunk at 0. */
+		/* Root stub: violet, meeting the first trunk exactly at the row top. */
 		content: '';
 		position: absolute;
-		left: 5px;
+		left: calc(var(--stem-x) - 1px);
 		top: -0.75rem;
-		width: 1px;
+		width: 2px;
 		height: 0.75rem;
-		background: var(--border);
+		background: var(--brand);
 	}
 	.tree li {
 		position: relative;
@@ -352,23 +357,24 @@
 		color: var(--muted-foreground);
 	}
 	.tree li::before {
-		/* Full-height trunk so consecutive branches join corner-to-corner. */
+		/* Full-height trunk; consecutive branches join corner-to-corner. */
 		content: '';
 		position: absolute;
-		left: 5px;
+		left: calc(var(--stem-x) - 1px);
 		top: 0;
 		bottom: 0;
-		width: 1px;
+		width: 2px;
 		background: var(--border);
 	}
 	.tree li::after {
-		/* horizontal elbow to the node */
+		/* Elbow, centered exactly on the node's centerline. */
 		content: '';
 		position: absolute;
-		left: 5px;
+		left: calc(var(--stem-x) - 1px);
 		top: 50%;
-		width: 0.75rem;
-		height: 1px;
+		width: 1.25rem;
+		height: 2px;
+		transform: translateY(-50%);
 		background: var(--border);
 	}
 	.tree li:last-child::before {
@@ -376,12 +382,25 @@
 		bottom: auto;
 		height: 50%;
 	}
+	.tree li.tbranch::before {
+		/* Traveled above the elbow, ordinary below it. */
+		background: linear-gradient(
+			to bottom,
+			var(--brand) 0,
+			var(--brand) 50%,
+			var(--border) 50%,
+			var(--border) 100%
+		);
+	}
+	.tree li.tbranch::after {
+		background: var(--brand);
+	}
 	.node {
 		position: absolute;
-		left: 3px;
+		left: calc(var(--stem-x) - 4px);
 		top: 50%;
-		width: 5px;
-		height: 5px;
+		width: 0.5rem;
+		height: 0.5rem;
 		border-radius: 9999px;
 		transform: translateY(-50%);
 		background: var(--border);
