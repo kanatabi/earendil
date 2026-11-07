@@ -497,6 +497,17 @@ WHERE), and the hero's `currently` line says `running postgres myself;`. Interna
 their K3s engineering records — those speak to the builder, not visitors. DESIGN's footer
 copy spec synced.
 
+**Tree/rail dialect unification (zoomed QA):** the Education tree read jaggy and foreign —
+1px strokes whose 0.5px-centered junctions (elbows at `top:50%` unshifted vs dots with
+translateY) smeared at zoom, beside a rail speaking 2px/8px. One vocabulary now: 2px strokes,
+a single `--stem-x: 9px` centerline all stems/elbows/nodes derive from (integer boundaries;
+coincidentally the rail's own stem+dots center on 9 — one axis system for both structures),
+transform-centering on every junction, and the rail's COLOR grammar: violet = traveled — root
+stub and the Catena branch render `--brand` (trunk via two-stop gradient: violet above the
+elbow, grey continuing to Robotics), the thesis dot lit like a rail waypoint. Follow-up zoom:
+the elbow landed flush on the text edge (28px padding) — shortened to 1rem (ends 24px) with
+the indent at 2rem, leaving a deliberate 8px gap; connector meets copy, never touches it.
+
 **Float — cutout reveal (same round):** the photo layer lost its rectangle. ImageMagick
 border-flood was tried first and rejected by QA: at fuzz 18 the wall-shadow gaps survived
 disconnected AND the bright face got eaten through a temple/hair-highlight bridge to the
