@@ -361,6 +361,14 @@ state is `inert` + pointer-events-none, fades/slides 200ms (reduced-motion insta
 the smooth scroll itself makes it fade away mid-flight — the threshold flips before the
 top lands.
 
+**Floating-column rhythm:** the first pill position (9.5rem everywhere) read wrong twice
+over — a dead gap above the bar on drawerless pages (article/gallery/about float nothing in
+the lower slot) and airy 32px spacing between the two pills on home/search. Now the column
+has explicit numbers: 16px bar clearance (trigger at 4.5rem), 12px inter-pill gap (pill at
+8.25rem when a drawer trigger exists, else the pill itself takes the 4.5rem slot). The
+route list lives in the layout (`stacked` prop) — meaningful consistency ("above whatever
+floats below you"), not coordinate consistency.
+
 **Float — cutout reveal (same round):** the photo layer lost its rectangle. ImageMagick
 border-flood was tried first and rejected by QA: at fuzz 18 the wall-shadow gaps survived
 disconnected AND the bright face got eaten through a temple/hair-highlight bridge to the

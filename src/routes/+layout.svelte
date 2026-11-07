@@ -1,6 +1,6 @@
 <script lang="ts">
 	import './layout.css';
-	import { navigating } from '$app/state';
+	import { navigating, page } from '$app/state';
 	import favicon from '#lib/assets/favicon.svg';
 	import BottomNav from '#lib/components/BottomNav.svelte';
 	import Navbar from '#lib/components/Navbar.svelte';
@@ -67,6 +67,11 @@
 
 	// One scroll listener drives the mobile chrome (bottom bar) visibility.
 	$effect(() => startScrollChrome());
+
+	// Pages that float a drawer trigger — the scroll-top pill stacks above it.
+	const drawerStacked = $derived(
+		page.url.pathname === '/' || page.url.pathname.startsWith('/search')
+	);
 </script>
 
 <svelte:head>
@@ -97,5 +102,5 @@
 	</div>
 	<!-- Icon-only primary bar for phones/tablets; retires at lg for the header. -->
 	<BottomNav {theme} onToggle={toggleTheme} />
-	<ScrollTopButton />
+	<ScrollTopButton stacked={drawerStacked} />
 </div>
