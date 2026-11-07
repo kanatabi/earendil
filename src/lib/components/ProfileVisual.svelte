@@ -23,7 +23,7 @@
 
 <button
 	type="button"
-	class="group relative block aspect-square w-40 overflow-hidden rounded-lg text-left md:w-60"
+	class="group relative block aspect-square w-48 overflow-hidden rounded-lg text-left md:w-72 lg:w-80"
 	aria-label="Portrait of Faiz Ainur Rofiq rendered in ASCII characters. Activate to reveal the photograph."
 	onclick={tap}
 >
@@ -50,8 +50,8 @@
 
 <style>
 	.ascii {
-		-webkit-mask-image: url('/profile/ascii-glyphs-512.webp');
-		mask-image: url('/profile/ascii-glyphs-512.webp');
+		-webkit-mask-image: url('/profile/ascii-glyphs-640.webp');
+		mask-image: url('/profile/ascii-glyphs-640.webp');
 		-webkit-mask-size: 100% 100%;
 		mask-size: 100% 100%;
 		-webkit-mask-repeat: no-repeat;

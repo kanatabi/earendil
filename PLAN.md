@@ -211,6 +211,17 @@ invisible in dark). The reveal is now a proper **two-way crossfade** (photo
 `opacity-0 → group-hover/tap → 100`, ASCII the inverse, shared `.fade` reduced-motion
 selector).
 
+**Re-tuned after visual QA:** the first mask was too timid and the frame too small against
+the headline block. Alpha recipe went from `-level 45%` (sparse, washed) to
+`-level 15%,80% -gamma 2.4` — note ImageMagick gamma is `1/g`, so gamma>1 LIFTS (an early
+`gamma 0.45` darkened the alpha to blank). Coverage ~7x; the figure now reads as a portrait.
+Explored hard for a smaller encoding (lossy WebP grew on alpha noise; AVIF q10 = 14KB but
+banding plus a no-`<picture>`-fallback story for `mask-image`; posterize/blur all lost) —
+shipped the honest **lossless WebP at 640px (~96KB, cached forever)**; 512 would land under
+1:1 device pixels at 320 CSS px. Frame: `w-40→w-48` mobile, `md:w-72 lg:w-80` desktop, grid
+columns `240→288/320` so the square holds proportion with the Fraunces headline. Headline
+and intro type untouched by request.
+
 ---
 
 ## Milestone 7 — Responsive + a11y polish

@@ -17,7 +17,7 @@
 
 <!-- Hero: display serif headline, "currently" line, ASCII profile portrait -->
 <section
-	class="fade-up mx-auto grid w-full max-w-3xl items-center gap-8 md:grid-cols-[minmax(0,1fr)_240px]"
+	class="fade-up mx-auto grid w-full max-w-3xl items-center gap-8 md:grid-cols-[minmax(0,1fr)_288px] lg:grid-cols-[minmax(0,1fr)_320px]"
 >
 	<div class="order-first md:order-last">
 		<ProfileVisual />
