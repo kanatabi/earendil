@@ -1,8 +1,8 @@
 /**
  * About-page identity content. Brand copy, not blog data — like the hero's
  * `currently` line it is FE-owned until (if ever) the BE absorbs it.
- * Sourced from the owner's CV (Nov 2026); `PLACEHOLDER` marks remain where a
- * fact must come from the human.
+ * Sourced from the owner's CV + the two paper PDFs (Nov 2026); `PLACEHOLDER`
+ * marks remain where a fact must come from the human.
  */
 
 export interface Experience {
@@ -16,6 +16,8 @@ export interface Experience {
 export interface Highlight {
 	body: string;
 	link?: { label: string; href: string };
+	/** The thesis branch lights like the gofar line's traveled rail. */
+	active?: boolean;
 }
 
 export interface Paper {
@@ -23,16 +25,14 @@ export interface Paper {
 	year: string;
 	venue: string;
 	note: string;
+	abstract: string;
+	keywords: string[];
 	href: string;
-}
-
-export interface Anchor {
-	name: string;
-	note: string;
 }
 
 export interface StackGroup {
 	label: string;
+	/** First item may carry an opinion inline — `go, the default answer …`. */
 	items: string[];
 }
 
@@ -54,21 +54,21 @@ export const experience: Experience[] = [
 		company: 'Gojek',
 		period: 'Apr 2024 — now',
 		blurb:
-			'Core GoMart features in Go, Ruby, Clojure, and JavaScript; event-driven plumbing over Kafka, RabbitMQ, and Sidekiq; migrating services from VMs to Kubernetes; and tuning applications to survive peak load while using the fleet efficiently.'
+			'Build and maintain core GoMart features across a polyglot backend — Go, Ruby, Clojure, JavaScript — with event-driven plumbing over Kafka, RabbitMQ, and Sidekiq carrying the load. Helped migrate long-lived services from VMs to Kubernetes across team boundaries, and tune applications to survive peak traffic while using the fleet sparingly. Day-to-day also means reviewing peers’ code, planning features with product and front-end, and keeping Grafana, Kibana, and New Relic honest.'
 	},
 	{
 		role: 'Software Engineer',
 		company: 'Tokopedia',
 		period: 'Apr 2022 — Sep 2023',
 		blurb:
-			'Built and maintained Tokopedia Affiliate, including real-time data delivery to the affiliate portal over Server-Sent Events; gRPC and GraphQL APIs in Go, over PostgreSQL, Cassandra, Redis, and BigTable.'
+			'Owned core features of Tokopedia Affiliate and its real-time data delivery to the partner portal — Server-Sent Events, chosen so affiliates watched their numbers move as they happened. Shipped gRPC and GraphQL APIs in Go over PostgreSQL, Cassandra, Redis, and BigTable, with New Relic and Datadog as the watchdogs, and integrated features across teams into the Tokopedia app.'
 	},
 	{
 		role: 'Software Engineer Internship',
 		company: 'JalanMimpi',
 		period: 'Oct 2020 — Nov 2020',
 		blurb:
-			'The first production sprint: a crowdfunding backend of 41 REST endpoints and 31 Jest tests in Express/Firebase over a designed PostgreSQL schema, built beside two front-end engineers.'
+			'The first production backend, end to end: designed the PostgreSQL schema, implemented 41 REST endpoints in Express/Firebase with Midtrans payment integration, wrote 31 Jest tests, and shipped beside two front-end engineers. The 41/31 numbers stuck — it was the first time I measured what I built, and this blog still sounds like that habit.'
 	}
 ];
 
@@ -78,8 +78,9 @@ export const education = {
 	period: '2018 — 2022',
 	highlights: [
 		{
-			body: 'Undergraduate thesis — Catena: a blockchain-based KYC mechanism for small-business loans, on Hyperledger Fabric and IPFS. 35 endpoints, 19.5k lines of code, and two published papers',
-			link: { label: 'research;', href: '#research' }
+			body: 'Undergraduate thesis — Catena: a blockchain-based KYC mechanism for small-business loans, on Hyperledger Fabric and IPFS. 35 endpoints, 19.5k lines of code',
+			link: { label: 'published in research;', href: '#research' },
+			active: true
 		},
 		{
 			body: 'Robotics Team of Universitas Indonesia — software engineer, 2018–2019. Where the habit of writing down what broke started.'
@@ -87,6 +88,7 @@ export const education = {
 	] satisfies Highlight[]
 };
 
+/** Abstracts + keywords transcribed from the local paper PDFs (Nov 2026). */
 export const research: Paper[] = [
 	{
 		title:
@@ -95,6 +97,9 @@ export const research: Paper[] = [
 		// PLACEHOLDER(venue): the conference/journal it appeared in.
 		venue: 'PLACEHOLDER venue',
 		note: 'Catena, published: what if the KYC form never had to leave the vault?',
+		abstract:
+			'Know Your Customer, in general, is a process or mechanism done by an institution to identify and verify the identity of a business partner. In the banking industry, this mechanism is implemented to identify a customer and monitor the transaction activities of a customer, which includes reporting suspicious transactions to the authority. The aim is to avoid criminal acts such as money laundering. However, the existing system has shortcomings that can disrupt business activities: the customer must submit physical documents for each initiation of a business relationship — a duplication process that takes time and makes the whole flow inefficient — and the incumbent centralized model, managed and controlled by a single institution, is more vulnerable to cyber-attacks. This research builds a system using blockchain and the Interplanetary File System (IPFS) that implements the KYC mechanism to provide a more efficient system to the banking industry. From the results of tests carried out on the system, it can be concluded that the performance of the system depends on the specification of the computer used — the better the specification, the better the performance.',
+		keywords: ['kyc', 'blockchain', 'ipfs', 'performance'],
 		href: 'https://www.researchgate.net/profile/Faiz_Rofiq/publication/353620198_Design_and_Development_of_Know_Your_Customer_Mechanism_using_Blockchain_in_the_Process_of_Small_Business_Loans_Application_in_Indonesia/links/61065e731e95fe241a9f0509/Design-and-Development-of-Know-Your-Customer-Mechanism-using-Blockchain-in-the-Process-of-Small-Business-Loans-Application-in-Indonesia.pdf'
 	},
 	{
@@ -104,43 +109,65 @@ export const research: Paper[] = [
 		// PLACEHOLDER(venue): the conference/journal it appeared in.
 		venue: 'PLACEHOLDER venue',
 		note: 'Land titles on a ledger nobody owns — the same Fabric stack, pointed at an older trust problem.',
+		abstract:
+			'Recently blockchain is implemented in many sectors such as arts, gaming, education, and health. Blockchain is proposed as a solution for decentralized ledgering systems. One of the most common problems that depends on a trusted ledger is the certification of land ownership: the records of ownership must be trustworthy and orderly so that issues such as double certification do not occur. This paper presents a certificate of land ownership recording system based on blockchain technology, implemented on Hyperledger Fabric — with the expectation that the system achieves good integrity and transparency, solving the problem of land-ownership disputes.',
+		keywords: [
+			'blockchain',
+			'distributed ledgers',
+			'hyperledger',
+			'ipfs',
+			'management',
+			'performance'
+		],
 		href: 'https://www.researchgate.net/profile/Faiz_Rofiq/publication/353620446_ImBlock_A_Blockchain_Implementation_of_Land_Ownership_Recording_System_using_Hyperledger_Fabric/links/61065ff20c2bfa282a13520d/ImBlock-A-Blockchain-Implementation-of-Land-Ownership-Recording-System-using-Hyperledger-Fabric.pdf'
 	}
 ];
 
-export const stack = {
-	anchors: [
-		{ name: 'go', note: 'the default answer until proven otherwise' },
-		{ name: 'queues', note: 'every handshake between services is a promise' },
-		{ name: 'dashboards', note: 'watch the system, or meet it at 3 a.m.' }
-	] satisfies Anchor[],
+/** Opinions ride inside the groups as annotated first items — no orphan zone. */
+export const stack: { groups: StackGroup[] } = {
 	groups: [
 		{
 			label: 'languages',
-			items: ['go', 'ruby', 'clojure', 'javascript', 'typescript', 'java', 'python']
+			items: [
+				'go, the default answer until proven otherwise',
+				'ruby',
+				'clojure',
+				'javascript',
+				'typescript',
+				'java',
+				'python'
+			]
 		},
 		{
 			label: 'data & streaming',
 			items: [
+				'kafka and rabbitmq, where every handshake between services is a promise',
 				'postgresql',
 				'cassandra',
 				'redis',
 				'mongodb',
 				'elasticsearch',
 				'bigtable',
-				'kafka',
-				'rabbitmq',
 				'hyperledger fabric',
 				'ipfs'
 			]
 		},
 		{
 			label: 'apis & frameworks',
-			items: ['gin', 'fiber', 'rails', 'express', 'grpc', 'graphql', 'server-sent events', 'vue']
+			items: [
+				'grpc and graphql in go',
+				'server-sent events',
+				'gin',
+				'fiber',
+				'rails',
+				'express',
+				'vue'
+			]
 		},
 		{
 			label: 'ops & observability',
 			items: [
+				'grafana / new relic / datadog — watch the system, or meet it at 3 a.m.',
 				'kubernetes',
 				'docker',
 				'aws',
@@ -148,13 +175,10 @@ export const stack = {
 				'tencent cloud',
 				'github',
 				'gitlab',
-				'grafana',
-				'new relic',
-				'datadog',
 				'kibana'
 			]
 		}
-	] satisfies StackGroup[]
+	]
 };
 
 export const elsewhere = [

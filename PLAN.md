@@ -406,6 +406,21 @@ but re-authored in-house: the boat became OUR punctuation; the full wavy SVG voy
 `venue` strings and the Instagram URL remain marked PLACEHOLDER for the owner; the footer's
 Instagram→LinkedIn placeholder is the same known family. (No logic tests; 40 pass.)
 
+**About round 2 — depth:** experience entries grew into rich paragraphs (the CV's bullets
+woven to prose — GoMart's polyglot load path, the SSE pipeline "so affiliates watched their
+numbers move", the 41/31 internship origin). Education became a **static hairline tree** —
+degree as root, thesis + robotics on CSS-elbow branches, the thesis node lit violet (the
+traveled branch) linking to `#research`; deliberately un-animated, the journey motion stays
+exclusive to the career rail. Research rows gained **abstracts + keywords transcribed from
+the local paper PDFs** (`pdftotext`, lightly grammar-normalized, claims untouched) —
+abstracts tucked in a native `<details>` (`abstract;` summary, JS-off friendly), keyword
+rows rendered mono outside so the scannable surface stays open. The Stack anchors were
+**merged into the groups** as annotated first items (`go, the default answer until proven
+otherwise · …`) — the orphan three-line philosophy zone confused even its own author;
+opinions now ride inside the facts. Mobile portrait centers (`justify-self-center
+md:justify-self-start`), text stays left. (40 tests pass; preview curls confirmed both
+details blocks, keyword lines, tree markup, merged stack, centering.)
+
 **Float — cutout reveal (same round):** the photo layer lost its rectangle. ImageMagick
 border-flood was tried first and rejected by QA: at fuzz 18 the wall-shadow gaps survived
 disconnected AND the bright face got eaten through a temple/hair-highlight bridge to the

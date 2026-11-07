@@ -23,10 +23,10 @@
 		</h1>
 		<!-- Identity block: the same floating cutout that ends the hero reveal. -->
 		<div class="grid items-start gap-8 md:grid-cols-[192px_minmax(0,1fr)] md:gap-10">
-			<picture>
+			<picture class="justify-self-center md:justify-self-start">
 				<source type="image/avif" srcset="/profile/photo-640.avif" />
 				<img
-					class="photo size-40 self-start rounded-lg object-cover md:size-48"
+					class="photo size-40 rounded-lg object-cover md:size-48"
 					src="/profile/photo-640.webp"
 					alt="Black-and-white portrait of {profile.name}"
 					width="640"
@@ -82,6 +82,9 @@
 		</div>
 	</div>
 
+	<!-- Education: a static tree — the degree is the root, the thesis and
+	     robotics hang beneath it on hairline elbows. The thesis node is lit
+	     violet: the traveled branch, linking down to the research block. -->
 	<div class="flex flex-col gap-6">
 		<SectionLabel title="Education" />
 		<div class="max-w-[72ch]">
@@ -91,10 +94,11 @@
 				>
 			</h3>
 			<p class="mt-1 font-mono text-xs text-muted-foreground">{education.period}</p>
-			<ul class="mt-4 flex flex-col gap-3">
+			<ul class="tree">
 				{#each education.highlights as item (item.body)}
-					<li class="border-l-2 border-border pl-4 text-sm leading-relaxed text-muted-foreground">
-						{item.body}{#if item.link}
+					<li>
+						<span class="node {item.active ? 'node-lit' : ''}" aria-hidden="true"
+						></span>{item.body}{#if item.link}
 							(<a href={item.link.href} class="text-primary transition-colors hover:text-foreground"
 								>{item.link.label}</a
 							>){/if}
@@ -117,9 +121,24 @@
 					<p class="mt-1.5 font-mono text-xs text-muted-foreground">
 						{paper.year} · {paper.venue}
 					</p>
+					<p class="mt-1 max-w-[72ch] font-mono text-xs text-muted-foreground">
+						{paper.keywords.join(' · ')}<span class="text-brand">;</span>
+					</p>
 					<p class="mt-2 max-w-[72ch] text-sm leading-relaxed text-muted-foreground">
 						{paper.note}
 					</p>
+					<details class="mt-2 max-w-[72ch]">
+						<summary
+							class="w-fit cursor-pointer list-none font-mono text-xs text-primary transition-colors hover:text-foreground [&::-webkit-details-marker]:hidden"
+						>
+							abstract<span class="text-brand">;</span>
+						</summary>
+						<p
+							class="mt-2 text-sm leading-relaxed text-muted-foreground first-letter:font-brand first-letter:font-semibold"
+						>
+							{paper.abstract}
+						</p>
+					</details>
 					<a
 						href={paper.href}
 						target="_blank"
@@ -133,27 +152,16 @@
 		</div>
 	</div>
 
+	<!-- Stack: opinions ride inside the groups as annotated first items. -->
 	<div class="flex flex-col gap-6">
 		<SectionLabel title="Stack" />
-		<div class="flex flex-col gap-6">
-			<ul class="flex flex-col gap-2.5">
-				{#each stack.anchors as anchor (anchor.name)}
-					<li class="flex flex-wrap items-baseline gap-x-3 gap-y-0.5">
-						<span class="font-brand text-lg font-semibold tracking-tight text-foreground"
-							>{anchor.name}<span class="text-brand">;</span></span
-						>
-						<span class="text-sm text-muted-foreground">{anchor.note}</span>
-					</li>
-				{/each}
-			</ul>
-			<div class="flex max-w-[72ch] flex-col gap-2">
-				{#each stack.groups as group (group.label)}
-					<p class="font-mono text-xs leading-relaxed text-muted-foreground">
-						<span class="text-foreground">{group.label} —</span>
-						{group.items.join(' · ')}<span class="text-brand">;</span>
-					</p>
-				{/each}
-			</div>
+		<div class="flex max-w-[72ch] flex-col gap-2">
+			{#each stack.groups as group (group.label)}
+				<p class="font-mono text-xs leading-relaxed text-muted-foreground">
+					<span class="text-foreground">{group.label} —</span>
+					{group.items.join(' · ')}<span class="text-brand">;</span>
+				</p>
+			{/each}
 		</div>
 	</div>
 
@@ -228,6 +236,70 @@
 		outline: 1.5px solid var(--border);
 		outline-offset: -1px;
 		transform: scale(0.85);
+	}
+
+	/* Education tree — hairline elbows off the degree root. Lines only; the
+	   journey animation belongs to the career rail, not here. */
+	.tree {
+		position: relative;
+		margin-top: 1rem;
+		padding-left: 0;
+		list-style: none;
+	}
+	.tree::before {
+		/* Root stub: the trunk rises to the degree heading. */
+		content: '';
+		position: absolute;
+		left: 5px;
+		top: -0.75rem;
+		width: 1px;
+		height: 0.75rem;
+		background: var(--border);
+	}
+	.tree li {
+		position: relative;
+		padding: 0.375rem 0 0.375rem 1.75rem;
+		font-size: 0.875rem;
+		line-height: 1.6;
+		color: var(--muted-foreground);
+	}
+	.tree li::before {
+		/* trunk segment down to this elbow */
+		content: '';
+		position: absolute;
+		left: 5px;
+		top: 0;
+		bottom: 50%;
+		width: 1px;
+		background: var(--border);
+	}
+	.tree li::after {
+		/* horizontal elbow to the node */
+		content: '';
+		position: absolute;
+		left: 5px;
+		top: 50%;
+		width: 0.75rem;
+		height: 1px;
+		background: var(--border);
+	}
+	.tree li:last-child::before {
+		/* stop the trunk at the last branch */
+		bottom: auto;
+		height: 50%;
+	}
+	.node {
+		position: absolute;
+		left: 3px;
+		top: 50%;
+		width: 5px;
+		height: 5px;
+		border-radius: 9999px;
+		transform: translateY(-50%);
+		background: var(--border);
+	}
+	.node-lit {
+		background: var(--brand);
 	}
 
 	@media (prefers-reduced-motion: reduce) {
