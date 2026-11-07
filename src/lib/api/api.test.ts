@@ -31,12 +31,43 @@ describe('getPosts', () => {
 		expect(items[0]).not.toHaveProperty('tags');
 	});
 
-	it('filters by tag', async () => {
-		const { total, items } = await mockApi.getPosts({ tag: 'queues' });
+	it('filters by tag(s), OR-matched', async () => {
+		const { total, items } = await mockApi.getPosts({ tags: ['queues'] });
 		expect(total).toBe(1);
 		expect(items[0].slug).toBe('shape-of-a-useful-queue');
-		const none = await mockApi.getPosts({ tag: 'nope' });
+		const union = await mockApi.getPosts({ tags: ['queues', 'latency'] });
+		expect(union.total).toBe(2);
+		expect(union.items.map((p) => p.slug)).toEqual([
+			'shape-of-a-useful-queue',
+			'when-latency-becomes-a-product-decision'
+		]);
+		const none = await mockApi.getPosts({ tags: ['nope'] });
 		expect(none.items).toEqual([]);
+	});
+
+	it('filters by inclusive date window', async () => {
+		const { total, items } = await mockApi.getPosts({ from: '2024-01-09', to: '2024-06-02' });
+		expect(total).toBe(5);
+		expect(items.every((p) => p.date >= '2024-01-09' && p.date <= '2024-06-02')).toBe(true);
+	});
+
+	it('combines tags and dates', async () => {
+		const { total, items } = await mockApi.getPosts({
+			tags: ['distributed-systems'],
+			from: '2023-12-01'
+		});
+		expect(total).toBe(2);
+		expect(items.map((p) => p.slug)).toEqual([
+			'shape-of-a-useful-queue',
+			'the-day-the-clock-jumped'
+		]);
+	});
+
+	it('narrows search results with tag facets', async () => {
+		const all = await mockApi.searchPosts('observability');
+		const scoped = await mockApi.searchPosts('observability', { tags: ['logging'] });
+		expect(scoped.total).toBeGreaterThan(0);
+		expect(scoped.total).toBeLessThanOrEqual(all.total);
 	});
 
 	it('searches with ranking, totals, and pagination', async () => {

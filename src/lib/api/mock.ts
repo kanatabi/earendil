@@ -617,9 +617,18 @@ function summarize(post: PostDetail): PostSummary {
 	};
 }
 
+// The facet predicate both list endpoints share: OR across tags, inclusive date window.
+function matches(post: PostDetail, tags?: string[], from?: string, to?: string) {
+	if (tags && tags.length > 0 && !post.tags.some((t) => tags.includes(t))) return false;
+	const day = post.date.slice(0, 10);
+	if (from && day < from) return false;
+	if (to && day > to) return false;
+	return true;
+}
+
 export const mockApi: BlogApi = {
-	async getPosts({ offset = 0, limit = posts.length, tag } = {}) {
-		const source = tag ? posts.filter((p) => p.tags.includes(tag)) : posts;
+	async getPosts({ offset = 0, limit = posts.length, tags, from, to } = {}) {
+		const source = posts.filter((p) => matches(p, tags, from, to));
 		return { total: source.length, items: source.slice(offset, offset + limit).map(summarize) };
 	},
 
@@ -638,10 +647,11 @@ export const mockApi: BlogApi = {
 		return { results };
 	},
 
-	async searchPosts(q, { offset = 0, limit = 10 } = {}) {
+	async searchPosts(q, { offset = 0, limit = 10, tags, from, to } = {}) {
 		const needle = q.toLowerCase().trim();
 		if (!needle) return { total: 0, items: [] };
 		const scored = posts
+			.filter((p) => matches(p, tags, from, to))
 			.map((p) => ({
 				post: p,
 				score:

@@ -9,11 +9,22 @@ import type {
 } from './types';
 
 export interface BlogApi {
-	getPosts(opts?: { offset?: number; limit?: number; tag?: string }): Promise<PostListResponse>;
+	getPosts(opts?: {
+		offset?: number;
+		limit?: number;
+		/** OR-match: posts carrying any of these tags. Empty/undefined disables filtering. */
+		tags?: string[];
+		/** Inclusive YYYY-MM-DD window on the post date. */
+		from?: string;
+		to?: string;
+	}): Promise<PostListResponse>;
 	getPost(slug: string): Promise<PostDetail>;
 	suggestPosts(q: string, limit?: number): Promise<SuggestResponse>;
 	/** Ranked, paginated full-text search — the /search page (suggest is the palette's capped launcher). */
-	searchPosts(q: string, opts?: { offset?: number; limit?: number }): Promise<PostListResponse>;
+	searchPosts(
+		q: string,
+		opts?: { offset?: number; limit?: number; tags?: string[]; from?: string; to?: string }
+	): Promise<PostListResponse>;
 	getPhotos(opts?: { limit?: number }): Promise<PhotoListResponse>;
 	/** The homepage hero photo — curation is the BE's call; null when unset. */
 	getFeaturedPhoto(): Promise<Photo | null>;
@@ -48,7 +59,9 @@ function createFetchApi(base: string): BlogApi {
 			const params = new URLSearchParams();
 			if (opts?.offset !== undefined) params.set('offset', String(opts.offset));
 			if (opts?.limit !== undefined) params.set('limit', String(opts.limit));
-			if (opts?.tag) params.set('tag', opts.tag);
+			for (const t of opts?.tags ?? []) params.append('tag', t);
+			if (opts?.from) params.set('from', opts.from);
+			if (opts?.to) params.set('to', opts.to);
 			const query = params.toString();
 			return get<PostListResponse>(`/api/posts${query ? `?${query}` : ''}`);
 		},
@@ -64,6 +77,9 @@ function createFetchApi(base: string): BlogApi {
 			const params = new URLSearchParams({ q });
 			if (opts?.offset !== undefined) params.set('offset', String(opts.offset));
 			if (opts?.limit !== undefined) params.set('limit', String(opts.limit));
+			for (const t of opts?.tags ?? []) params.append('tag', t);
+			if (opts?.from) params.set('from', opts.from);
+			if (opts?.to) params.set('to', opts.to);
 			return get<PostListResponse>(`/api/search?${params}`);
 		},
 		getPhotos(opts) {

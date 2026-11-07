@@ -1,8 +1,12 @@
 <script lang="ts">
-	import HomeRail from '#lib/components/HomeRail.svelte';
 	import PostCard from '#lib/components/PostCard.svelte';
 	import ProfileVisual from '#lib/components/ProfileVisual.svelte';
+	import IdentityCard from '#lib/components/rail/IdentityCard.svelte';
+	import RevealPast from '#lib/components/rail/RevealPast.svelte';
+	import SearchPill from '#lib/components/rail/SearchPill.svelte';
 	import SectionLabel from '#lib/components/SectionLabel.svelte';
+	import Sidebar from '#lib/components/rail/Sidebar.svelte';
+	import TopicCloud from '#lib/components/rail/TopicCloud.svelte';
 	import type { PageData } from './$types';
 
 	interface Props {
@@ -18,6 +22,7 @@
 
 <!-- Hero: display serif headline, "currently" line, ASCII profile portrait -->
 <section
+	id="hero"
 	class="fade-up mx-auto grid w-full max-w-page items-center gap-8 md:grid-cols-[minmax(0,1fr)_288px] lg:grid-cols-[minmax(0,1fr)_320px]"
 >
 	<div class="order-first md:order-last">
@@ -94,6 +99,13 @@
 			</div>
 		{/key}
 
-		<HomeRail tags={data.tags} />
+		<Sidebar label="About this site">
+			<!-- Identity + search hide while the hero is still on screen. -->
+			<RevealPast watch="hero">
+				<IdentityCard />
+				<SearchPill />
+			</RevealPast>
+			<TopicCloud tags={data.tags} />
+		</Sidebar>
 	</div>
 </section>

@@ -242,6 +242,29 @@ BE-curated (the mock fixture is hand-authored, mirroring the corpus the way the 
 does); rows link to `/search?tag=…`. Rail hidden below `lg`; the hero's `currently;` line
 stays put. Mirror updated in `../lumen/DESIGN.md` as its own commit (+2 tests → 34 total).
 
+**Rail kit, sticky fix, and search facets (2026-11-07):** the first rail never stuck — a
+`position: sticky` grid child is stretched to row height by default, so it had no scroll
+room; `lg:self-start` is the whole fix. The kit answer to plug-and-play: `rail/Sidebar`
+(shell, knows nothing about content) + `IdentityCard` / `SearchPill` / `TopicCloud` /
+`TopicFilter` / `DateRange` / `RevealPast` / `FilterPanel` — pages compose cards in one line
+each; `HomeRail` retired. `RevealPast` gates identity+search by an IntersectionObserver on
+`#hero`: children hide while the hero is in view, reversibly; server-rendered VISIBLE so
+JS-off shows everything (accepted: one soft fade-out at hydration on fresh loads). The
+search page rides the same grid: facets are repeatable `?tag=` (OR) + inclusive
+`from`/`to`, all URL-truth; `FilterPanel` buffers checkbox/date picks locally and commits
+with an `apply;` button (page `key`-remounts it on navigation so the buffer always reseeds
+from applied truth); applied facets echo as removable chips above the results; mobile gets
+the same panel in a native `<details>` disclosure. The date control is fully custom —
+mono-chip presets (7/30/90/all) + a popover calendar (Fraunces month header, JetBrains
+digits, Monday-first, brand-violet endpoints, in-range tint, Esc/outside-click close with
+focus return; non-modal by choice: the feed stays browsable, so no focus trap).
+Multi-tag/dates/combined-search is a contract change, done properly: `getPosts`/
+`searchPosts` opts gained `tags: string[]` (OR) + `from`/`to` — mock filters via one shared
+`matches()` predicate, `+page.server.ts` validates dates by regex and dedupes tags,
+kit-v3 `goto` uses `{ replace: true, reset: false }` (noScroll/replaceState are gone),
+lumen mirror carries the params (+3 tests → 37; gates green; preview curls proved the OR
+union, the date-window slice, chips and the disclosure).
+
 **Float — cutout reveal (same round):** the photo layer lost its rectangle. ImageMagick
 border-flood was tried first and rejected by QA: at fuzz 18 the wall-shadow gaps survived
 disconnected AND the bright face got eaten through a temple/hair-highlight bridge to the
