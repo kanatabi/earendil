@@ -76,6 +76,14 @@
 		window.addEventListener('keydown', onKey);
 		return () => window.removeEventListener('keydown', onKey);
 	});
+
+	// Home's rail search card asks for the palette through a window event —
+	// the dialog (and its focus-return contract) stays owned by the Navbar.
+	$effect(() => {
+		const onRequest = () => openSearch();
+		window.addEventListener('gofar:open-search', onRequest);
+		return () => window.removeEventListener('gofar:open-search', onRequest);
+	});
 </script>
 
 <header class="relative border-b border-border">

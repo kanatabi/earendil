@@ -128,3 +128,22 @@ describe('getPhotos', () => {
 		expect(featured?.alt).not.toBe('');
 	});
 });
+
+describe('listTags', () => {
+	it('serves a non-empty, count-sorted cloud with sane entries', async () => {
+		const tags = await mockApi.listTags();
+		expect(tags.length).toBeGreaterThan(0);
+		expect(tags.every((t) => t.name.length > 0 && t.posts >= 1)).toBe(true);
+		const posts = tags.map((t) => t.posts);
+		expect([...posts].sort((a, b) => b - a)).toEqual(posts);
+	});
+
+	it('every tag name resolves against the real corpus tags', async () => {
+		const slugs = (await mockApi.getPosts()).items.map((p) => p.slug);
+		const corpus = new Set(
+			(await Promise.all(slugs.map((s) => mockApi.getPost(s)))).flatMap((p) => p.tags)
+		);
+		const tags = await mockApi.listTags();
+		expect(tags.every((t) => corpus.has(t.name))).toBe(true);
+	});
+});

@@ -4,7 +4,8 @@ import type {
 	PhotoListResponse,
 	PostDetail,
 	PostListResponse,
-	SuggestResponse
+	SuggestResponse,
+	Tag
 } from './types';
 
 export interface BlogApi {
@@ -16,6 +17,8 @@ export interface BlogApi {
 	getPhotos(opts?: { limit?: number }): Promise<PhotoListResponse>;
 	/** The homepage hero photo — curation is the BE's call; null when unset. */
 	getFeaturedPhoto(): Promise<Photo | null>;
+	/** Tag cloud for the home rail: BE-curated counts and order, rendered as-is. */
+	listTags(): Promise<Tag[]>;
 }
 
 export class ApiError extends Error {
@@ -75,6 +78,9 @@ function createFetchApi(base: string): BlogApi {
 			if (!res.ok)
 				throw new ApiError(res.status, `GET /api/photos/featured failed with status ${res.status}`);
 			return (await res.json()) as Photo;
+		},
+		listTags() {
+			return get<Tag[]>('/api/tags');
 		}
 	};
 }

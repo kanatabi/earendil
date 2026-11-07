@@ -19,6 +19,12 @@ export interface Photo {
 	height: number;
 }
 
+export interface Tag {
+	name: string;
+	/** Posts carrying the tag in the corpus. Counting and ordering are BE curation. */
+	posts: number;
+}
+
 export interface PhotoListResponse {
 	total: number;
 	items: Photo[];

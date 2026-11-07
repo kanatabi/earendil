@@ -1,4 +1,5 @@
 <script lang="ts">
+	import HomeRail from '#lib/components/HomeRail.svelte';
 	import PostCard from '#lib/components/PostCard.svelte';
 	import ProfileVisual from '#lib/components/ProfileVisual.svelte';
 	import SectionLabel from '#lib/components/SectionLabel.svelte';
@@ -46,49 +47,53 @@
 <!-- Writing: the full list, paginated — /articles and /search reuse these rows -->
 <section id="writing" class="fade-up mx-auto flex w-full max-w-page flex-col gap-6">
 	<SectionLabel title="Writing" />
-	<!-- Re-mounts when the page changes so the list fades in on Newer/Older. -->
-	{#key data.page}
-		<div class="fade-in flex flex-col gap-6">
-			<div>
-				{#each data.posts as post (post.slug)}
-					<PostCard {post} />
-				{/each}
+	<div class="grid gap-12 lg:grid-cols-[minmax(0,1fr)_272px]">
+		<!-- Re-mounts when the page changes so the list fades in on Newer/Older. -->
+		{#key data.page}
+			<div class="fade-in flex flex-col gap-6">
+				<div>
+					{#each data.posts as post (post.slug)}
+						<PostCard {post} />
+					{/each}
+				</div>
+
+				{#if data.posts.length === 0}
+					<p class="py-6 text-sm text-muted-foreground">Nothing published yet.</p>
+				{:else if data.pages > 1}
+					<nav
+						class="flex items-center justify-between text-sm text-muted-foreground"
+						aria-label="Pagination"
+					>
+						{#if data.page > 1}
+							<a
+								href="/?page={data.page - 1}"
+								rel="prev"
+								class="font-medium text-primary transition-colors hover:text-foreground"
+							>
+								← Newer
+							</a>
+						{:else}
+							<span aria-hidden="true" class="opacity-40">← Newer</span>
+						{/if}
+
+						<p>Page {data.page} of {data.pages}</p>
+
+						{#if data.page < data.pages}
+							<a
+								href="/?page={data.page + 1}"
+								rel="next"
+								class="font-medium text-primary transition-colors hover:text-foreground"
+							>
+								Older →
+							</a>
+						{:else}
+							<span aria-hidden="true" class="opacity-40">Older →</span>
+						{/if}
+					</nav>
+				{/if}
 			</div>
+		{/key}
 
-			{#if data.posts.length === 0}
-				<p class="py-6 text-sm text-muted-foreground">Nothing published yet.</p>
-			{:else if data.pages > 1}
-				<nav
-					class="flex items-center justify-between text-sm text-muted-foreground"
-					aria-label="Pagination"
-				>
-					{#if data.page > 1}
-						<a
-							href="/?page={data.page - 1}"
-							rel="prev"
-							class="font-medium text-primary transition-colors hover:text-foreground"
-						>
-							← Newer
-						</a>
-					{:else}
-						<span aria-hidden="true" class="opacity-40">← Newer</span>
-					{/if}
-
-					<p>Page {data.page} of {data.pages}</p>
-
-					{#if data.page < data.pages}
-						<a
-							href="/?page={data.page + 1}"
-							rel="next"
-							class="font-medium text-primary transition-colors hover:text-foreground"
-						>
-							Older →
-						</a>
-					{:else}
-						<span aria-hidden="true" class="opacity-40">Older →</span>
-					{/if}
-				</nav>
-			{/if}
-		</div>
-	{/key}
+		<HomeRail tags={data.tags} />
+	</div>
 </section>

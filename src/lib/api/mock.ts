@@ -1,5 +1,20 @@
 import { ApiError, type BlogApi } from './client';
-import type { Photo, PostDetail, PostSummary } from './types';
+import type { Photo, PostDetail, PostSummary, Tag } from './types';
+
+// Home-rail tag cloud. A hand-written fixture, not a derived view: the real BE
+// counts and curates (order, which tags make the cut); the FE renders this as-is.
+const tags: Tag[] = [
+	{ name: 'distributed-systems', posts: 4 },
+	{ name: 'observability', posts: 3 },
+	{ name: 'operations', posts: 3 },
+	{ name: 'kubernetes', posts: 2 },
+	{ name: 'logging', posts: 2 },
+	{ name: 'performance', posts: 2 },
+	{ name: 'postgres', posts: 2 },
+	{ name: 'backpressure', posts: 1 },
+	{ name: 'latency', posts: 1 },
+	{ name: 'queues', posts: 1 }
+];
 
 const thumbnails = [
 	'https://images.unsplash.com/photo-1639322537228-f710d846310a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=1080',
@@ -652,5 +667,9 @@ export const mockApi: BlogApi = {
 			width: 900,
 			height: 1150
 		} satisfies Photo;
+	},
+
+	async listTags() {
+		return tags;
 	}
 };

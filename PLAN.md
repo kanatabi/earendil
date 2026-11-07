@@ -232,6 +232,16 @@ at `max-w-2xl`. The article body deliberately keeps its 3xl reading measure. Ren
 typography, not data shaping — the no-FE-processing rule stands. Note: the Flowstep screens
 (1/5) predate this and now show the old narrow feed; re-cut when the screens get revisited.
 
+**The writing rail:** the wide feed left a dead right margin (most visible in dark mode),
+so `#writing` became `lg:grid-cols-[minmax(0,1fr)_272px]` with a sticky `HomeRail` —
+identity card (the hero ASCII mask at 64px postage, static), a search pill (dispatches
+`gofar:open-search`; the Navbar keeps palette ownership and focus return), and the
+`topics;` cloud. The cloud rides a real contract addition, not FE counting:
+`BlogApi.listTags()` ↔ `GET /api/tags` returning `Tag[] = { name, posts }`, BE-sorted and
+BE-curated (the mock fixture is hand-authored, mirroring the corpus the way the feed order
+does); rows link to `/search?tag=…`. Rail hidden below `lg`; the hero's `currently;` line
+stays put. Mirror updated in `../lumen/DESIGN.md` as its own commit (+2 tests → 34 total).
+
 **Float — cutout reveal (same round):** the photo layer lost its rectangle. ImageMagick
 border-flood was tried first and rejected by QA: at fuzz 18 the wall-shadow gaps survived
 disconnected AND the bright face got eaten through a temple/hair-highlight bridge to the
