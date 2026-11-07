@@ -527,7 +527,7 @@ reading (lg-only, never under prose — documented rule); About grew the last mi
 parity piece, a `RailDrawer` carrying facts+colophon. Audit verdict elsewhere: scroll-chrome,
 Sidebar/RevealPast/FactCard seams, social module — already shaped right. 47 tests; preview
 proved 404 copy, both error variants, empty state, corner ghost, article whisper, about
-drawer, and exactly ONE occurrence of the asset URL in compiled CSS.
+drawer, and exactly ONE occurrence of the asset URL in compiled CSS. Follow-up taste fix: the article end-credit was sized smaller (28vw) than the corner ghosts — conflating size with loudness; all watermarks now share the family geometry (45vw cap 560px) and ONLY opacity varies per placement (4% under prose, 6-8% on sparse pages).
 
 **Float — cutout reveal (same round):** the photo layer lost its rectangle. ImageMagick
 border-flood was tried first and rejected by QA: at fuzz 18 the wall-shadow gaps survived

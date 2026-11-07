@@ -137,9 +137,10 @@
 	</aside>
 </article>
 
-<!-- End credit: a whisper of glyphs where the read finishes. 4% — texture,
-     never tint under prose; desktop only; the rail/scroll never overlaps it. -->
-<Watermark class="mx-auto mt-16 hidden aspect-square w-[min(28vw,300px)] lg:block" opacity={0.04} />
+<!-- End credit: a whisper of glyphs where the read finishes. Full family size
+     (45vw cap 560) at 4% opacity — size fills the corner, opacity keeps it a
+     whisper that never tints prose; desktop only. -->
+<Watermark class="mx-auto mt-16 hidden aspect-square w-[min(45vw,560px)] lg:block" opacity={0.04} />
 
 {#if zoomed}
 	<ImageLightbox image={zoomed} onclose={() => (zoomed = null)} />
