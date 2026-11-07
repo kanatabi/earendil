@@ -472,6 +472,16 @@ then the new `rail/FactCard` for `facts;` and `colophon;` (source → earendil �
 bottom-right) fills the corner the rail leaves empty. No new scroll machinery anywhere: one
 reused component, one presentational card, one static mask.
 
+**Social links, canonized + iconographic:** one true list now lives in
+`content/social.ts` (kanatabi GitHub, in/faizainur LinkedIn, ResearchGate profile, mailto,
+and the real instagram.com/faizarq — which also cured the footer's Instagram→LinkedIn
+copy-paste placeholder); `about.ts` re-exports it and zero live PLACEHOLDER marks remain.
+The footer trades words for inline brand marks: paths vendored from Simple Icons (CC0;
+LinkedIn pinned from the pre-removal v11.3.0 tag) via `lib/brand-icons.ts`, rendered with
+currentColor — theme-aware, no third-party requests — on size-9 targets with aria-label,
+external links `_blank rel=noopener`; the Mail glyph (lucide) and ResearchGate ride the
+shared list automatically.
+
 **Float — cutout reveal (same round):** the photo layer lost its rectangle. ImageMagick
 border-flood was tried first and rejected by QA: at fuzz 18 the wall-shadow gaps survived
 disconnected AND the bright face got eaten through a temple/hair-highlight bridge to the
