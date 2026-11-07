@@ -205,7 +205,11 @@ theme flip is pure CSS — correct pre-paint (`data-theme` from the cookie), on 
 with JS off. Consequence accepted: dark-mode glyphs are one hue modulated by opacity
 (per-glyph _hue_ variance flattens; density depth survives). The `border-border` frame is
 gone — frameless ASCII merges with the hero text; `rounded-lg` remains as the clip for the
-opaque photo reveal.
+opaque photo reveal. **Post-check fix**: the transparent glyphs exposed the one-way fade —
+an always-opaque photo under the ASCII double-exposed the resting state (loud in light mode,
+invisible in dark). The reveal is now a proper **two-way crossfade** (photo
+`opacity-0 → group-hover/tap → 100`, ASCII the inverse, shared `.fade` reduced-motion
+selector).
 
 ---
 
