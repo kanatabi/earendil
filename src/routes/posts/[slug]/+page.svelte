@@ -9,6 +9,7 @@
 	import ArticleTOC from '#lib/components/ArticleTOC.svelte';
 	import ImageLightbox from '#lib/components/ImageLightbox.svelte';
 	import type { LightboxImage } from '#lib/components/ImageLightbox.svelte';
+	import IdentityCard from '#lib/components/rail/IdentityCard.svelte';
 	import type { PageData } from './$types';
 
 	interface Props {
@@ -35,8 +36,10 @@
 	<title>{data.post.title} · gofar;</title>
 </svelte:head>
 
-<article class="fade-up grid grid-cols-12 gap-8">
-	<aside class="col-span-12 grid grid-cols-12 gap-6 lg:col-span-9">
+<!-- Twelve columns only exist at lg: a 12-col grid with gap-8 spends 11 gaps
+     (352px) — wider than a 360px viewport — and every spanning child clipped. -->
+<article class="fade-up grid grid-cols-1 gap-8 lg:grid-cols-12">
+	<aside class="grid grid-cols-1 gap-6 lg:col-span-9 lg:grid-cols-12 lg:gap-6">
 		<div class="hidden pt-2 lg:col-span-2 lg:block">
 			<div class="sticky top-6 text-xs text-muted-foreground">
 				<p class="mb-6 font-mono text-xs text-muted-foreground">
@@ -104,16 +107,33 @@
 				<!-- eslint-disable-next-line svelte/no-at-html-tags -- HTML is DOMPurify-sanitized in the server Markdown pipeline -->
 				{@html data.html}
 			</div>
+
+			<!-- The author card, automatic on every post: mobile/tablet get the
+			     end-of-body mount; desktop sees it in the right rail under the TOC. -->
+			<div class="mt-12 border-t border-border pt-6 lg:hidden">
+				<IdentityCard />
+			</div>
 		</div>
 	</aside>
 
-	{#if data.toc.length > 0}
-		<aside class="fade-up col-span-3 hidden [animation-delay:120ms] lg:block">
-			<div class="sticky top-6">
-				<ArticleTOC toc={data.toc} variant="sticky" />
-			</div>
-		</aside>
-	{/if}
+	<!-- Right rail is unconditional now: with a TOC it reads list → hairline →
+	     signature; without one the card simply tops the rail. The TOC box is
+	     height-capped so a long list can never push the sticky stack (or the
+	     card) off the viewport. -->
+	<aside class="fade-up col-span-3 hidden [animation-delay:120ms] lg:block">
+		<div class="sticky top-6 flex flex-col gap-6">
+			{#if data.toc.length > 0}
+				<div class="max-h-[50svh] overflow-y-auto overscroll-contain">
+					<ArticleTOC toc={data.toc} variant="sticky" />
+				</div>
+				<div class="border-t border-border pt-6">
+					<IdentityCard />
+				</div>
+			{:else}
+				<IdentityCard />
+			{/if}
+		</div>
+	</aside>
 </article>
 
 {#if zoomed}

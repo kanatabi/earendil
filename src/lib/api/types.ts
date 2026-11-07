@@ -19,6 +19,12 @@ export interface Photo {
 	height: number;
 }
 
+export interface Tag {
+	name: string;
+	/** Posts carrying the tag in the corpus. Counting and ordering are BE curation. */
+	posts: number;
+}
+
 export interface PhotoListResponse {
 	total: number;
 	items: Photo[];
@@ -37,3 +43,6 @@ export interface PostListResponse {
 export interface SuggestResponse {
 	results: PostSummary[];
 }
+
+/** URL-safe sort values; relevance only applies to search, absent = BE curation. */
+export type SortValue = 'newest' | 'oldest' | 'quickest' | 'longest' | 'relevance';

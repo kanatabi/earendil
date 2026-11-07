@@ -24,7 +24,9 @@
 	data-sveltekit-preload-code="hover"
 	class="group flex items-center gap-4 border-t border-border px-5 py-5 transition-colors hover:bg-accent/40 sm:gap-6 sm:px-6 sm:py-6"
 >
-	<div class="flex min-w-0 flex-1 flex-col gap-1.5">
+	<!-- Wide rail, editorial measure: the text column caps its line length so the
+	     hover band and thumbnail ride the full page grid without 130-char lines. -->
+	<div class="flex max-w-[72ch] min-w-0 flex-1 flex-col gap-1.5">
 		<!-- Meta first, like a masthead: mono is the developer voice. -->
 		<p class="font-mono text-xs text-muted-foreground">
 			{dateFormatter.format(new Date(post.date))} · {post.readTime} min read
@@ -47,7 +49,7 @@
 			src={post.thumbnail}
 			alt=""
 			loading="lazy"
-			class="size-20 shrink-0 rounded-lg border border-border object-cover transition-transform group-hover:scale-[1.03] sm:size-28"
+			class="ml-auto size-20 shrink-0 rounded-lg border border-border object-cover transition-transform group-hover:scale-[1.03] sm:size-28"
 		/>
 	{/if}
 </a>

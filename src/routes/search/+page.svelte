@@ -1,6 +1,11 @@
 <script lang="ts">
+	import { goto } from '$app/navigation';
+	import { SvelteURLSearchParams } from 'svelte/reactivity';
 	import { Search } from 'lucide-svelte';
 	import PostCard from '#lib/components/PostCard.svelte';
+	import FilterPanel from '#lib/components/rail/FilterPanel.svelte';
+	import RailDrawer from '#lib/components/rail/RailDrawer.svelte';
+	import Sidebar from '#lib/components/rail/Sidebar.svelte';
 	import type { PageData } from './$types';
 
 	interface Props {
@@ -11,12 +16,73 @@
 
 	// One rendered line: a multi-line <title> template leaks its indentation
 	// into the SSR HTML (ugly for crawlers and tab strips alike).
+	// An unfiltered /search is the archive, not an error — no redirect home.
 	let pageTitle = $derived(
-		data.q ? `search: ${data.q}` : data.tag ? `posts tagged ${data.tag}` : 'search'
+		data.q
+			? `search: ${data.q}`
+			: data.tags.length
+				? `posts tagged ${data.tags.join(' + ')}`
+				: 'archive'
 	);
 
-	const filterQs = () =>
-		data.q ? `q=${encodeURIComponent(data.q)}` : `tag=${encodeURIComponent(data.tag as string)}`;
+	// The URL is the single source of truth for applied filters; the rail's
+	// buffer only reaches it through apply() (or a chip's ×, which is a link).
+	interface Sel {
+		tags: string[];
+		from?: string;
+		to?: string;
+		readMin?: number;
+		readMax?: number;
+		sort?: string;
+	}
+
+	function buildQs(sel: Sel, page = 1): string {
+		const params = new SvelteURLSearchParams();
+		if (data.q) params.set('q', data.q);
+		for (const t of sel.tags) params.append('tag', t);
+		if (sel.from) params.set('from', sel.from);
+		if (sel.to) params.set('to', sel.to);
+		if (sel.readMin) params.set('readMin', String(sel.readMin));
+		if (sel.readMax) params.set('readMax', String(sel.readMax));
+		if (sel.sort) params.set('sort', sel.sort);
+		if (page > 1) params.set('page', String(page));
+		return params.toString();
+	}
+
+	function apply(sel: Sel) {
+		const qs = buildQs(sel);
+		goto(`/search${qs ? `?${qs}` : ''}`, { replace: true, reset: false });
+	}
+
+	const current = $derived<Sel>({
+		tags: data.tags,
+		from: data.from,
+		to: data.to,
+		readMin: data.readMin,
+		readMax: data.readMax,
+		sort: data.sort
+	});
+
+	const applied = $derived(
+		`${current.tags.join(',')}|${current.from ?? ''}|${current.to ?? ''}|${current.readMin ?? ''}|${current.readMax ?? ''}|${current.sort ?? ''}`
+	);
+	const hasFilters = $derived(
+		current.tags.length > 0 ||
+			!!current.from ||
+			!!current.to ||
+			!!current.readMin ||
+			!!current.readMax ||
+			!!current.sort
+	);
+
+	const dateLabel = $derived([data.from ?? '…', data.to ?? '…'].join(' → '));
+	const readLabel = $derived(
+		data.readMin && data.readMax
+			? `${data.readMin}–${data.readMax} min`
+			: data.readMin
+				? `≥ ${data.readMin} min`
+				: `≤ ${data.readMax} min`
+	);
 </script>
 
 <svelte:head>
@@ -27,92 +93,178 @@
 	{/if}
 </svelte:head>
 
-<section class="fade-up mx-auto flex w-full max-w-3xl flex-col gap-6">
-	<div class="flex items-center justify-between gap-4 border-t border-border pt-4">
-		<p class="text-xs font-medium tracking-widest text-muted-foreground uppercase">
-			{#if data.q}
-				Results for &ldquo;{data.q}&rdquo;
-			{:else}
-				Tagged &ldquo;{data.tag}&rdquo;
-			{/if}
-			· {data.total}
-			{data.total === 1 ? 'post' : 'posts'}
-		</p>
-		<a
-			href="/"
-			class="shrink-0 text-sm text-muted-foreground transition-colors hover:text-foreground"
-		>
-			Clear
-		</a>
-	</div>
+<section class="fade-up mx-auto grid w-full max-w-page gap-8 lg:grid-cols-[minmax(0,1fr)_272px]">
+	<div class="flex min-w-0 flex-col gap-6">
+		<div class="flex items-center justify-between gap-4 border-t border-border pt-4">
+			<p class="text-xs font-medium tracking-widest text-muted-foreground uppercase">
+				{#if data.q}
+					Results for &ldquo;{data.q}&rdquo;
+				{:else if data.tags.length}
+					Tagged {data.tags.map((t) => `“${t}”`).join(' + ')}
+				{:else}
+					All posts
+				{/if}
+				· {data.total}
+				{data.total === 1 ? 'post' : 'posts'}
+			</p>
+			<a
+				href="/search"
+				class="shrink-0 text-sm text-muted-foreground transition-colors hover:text-foreground"
+			>
+				Clear
+			</a>
+		</div>
 
-	<form method="GET" action="/search" class="flex items-center gap-3">
-		<label class="flex min-w-0 grow items-center gap-3 rounded-full border border-border px-4 py-2">
-			<Search class="size-4 shrink-0 text-muted-foreground" />
-			<!-- The tag filter is dropped on a new query — search is the intent switch. -->
-			<input
-				type="search"
-				name="q"
-				value={data.q ?? ''}
-				placeholder="Search posts…"
-				aria-label="Search posts"
-				class="w-full bg-transparent text-sm text-foreground outline-none placeholder:text-muted-foreground"
-			/>
-		</label>
-		<button
-			type="submit"
-			class="shrink-0 rounded-full border border-border px-4 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-		>
-			Search
-		</button>
-	</form>
+		<form method="GET" action="/search" class="flex items-center gap-3">
+			<label
+				class="flex min-w-0 grow items-center gap-3 rounded-full border border-border px-4 py-2"
+			>
+				<Search class="size-4 shrink-0 text-muted-foreground" />
+				<!-- The tag filter is dropped on a new query — search is the intent switch. -->
+				<input
+					type="search"
+					id="search-input"
+					name="q"
+					value={data.q ?? ''}
+					placeholder="Search posts…"
+					aria-label="Search posts"
+					class="w-full bg-transparent text-sm text-foreground outline-none placeholder:text-muted-foreground"
+				/>
+			</label>
+			<button
+				type="submit"
+				class="shrink-0 rounded-full border border-border px-4 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+			>
+				Search
+			</button>
+		</form>
 
-	{#key `${data.page}:${data.q ?? ''}:${data.tag ?? ''}`}
-		<div class="fade-in flex flex-col gap-6">
-			<div>
-				{#each data.posts as post (post.slug)}
-					<PostCard {post} />
+		<!-- Applied filters echo above the results, each removable in one click. -->
+		{#if hasFilters}
+			<div class="flex flex-wrap items-center gap-2">
+				{#each data.tags as t (t)}
+					<a
+						href="/search?{buildQs({ ...current, tags: data.tags.filter((x) => x !== t) })}"
+						class="flex items-center gap-1.5 rounded-full border border-brand/40 bg-brand/10 px-3 py-1 font-mono text-xs text-foreground transition-colors hover:border-brand"
+					>
+						{t}
+						<span aria-hidden="true" class="text-muted-foreground">×</span>
+						<span class="sr-only">remove filter {t}</span>
+					</a>
 				{/each}
-				{#if data.posts.length === 0}
-					<p class="border-t border-border py-6 text-sm text-muted-foreground">
-						No posts matched{#if data.q}
-							&ldquo;{data.q}&rdquo;{/if}.
-					</p>
+				{#if data.from || data.to}
+					<a
+						href="/search?{buildQs({ ...current, from: undefined, to: undefined })}"
+						class="flex items-center gap-1.5 rounded-full border border-brand/40 bg-brand/10 px-3 py-1 font-mono text-xs text-foreground transition-colors hover:border-brand"
+					>
+						{dateLabel}
+						<span aria-hidden="true" class="text-muted-foreground">×</span>
+						<span class="sr-only">remove date filter</span>
+					</a>
+				{/if}
+				{#if data.readMin || data.readMax}
+					<a
+						href="/search?{buildQs({ ...current, readMin: undefined, readMax: undefined })}"
+						class="flex items-center gap-1.5 rounded-full border border-brand/40 bg-brand/10 px-3 py-1 font-mono text-xs text-foreground transition-colors hover:border-brand"
+					>
+						{readLabel}
+						<span aria-hidden="true" class="text-muted-foreground">×</span>
+						<span class="sr-only">remove reading-time filter</span>
+					</a>
+				{/if}
+				{#if data.sort}
+					<a
+						href="/search?{buildQs({ ...current, sort: undefined })}"
+						class="flex items-center gap-1.5 rounded-full border border-brand/40 bg-brand/10 px-3 py-1 font-mono text-xs text-foreground transition-colors hover:border-brand"
+					>
+						{data.sort}
+						<span aria-hidden="true" class="text-muted-foreground">×</span>
+						<span class="sr-only">reset sort order</span>
+					</a>
 				{/if}
 			</div>
+		{/if}
 
-			{#if data.posts.length > 0 && data.pages > 1}
-				<nav
-					class="flex items-center justify-between text-sm text-muted-foreground"
-					aria-label="Pagination"
-				>
-					{#if data.page > 1}
-						<a
-							href="/search?page={data.page - 1}&{filterQs()}"
-							rel="prev"
-							class="font-medium text-primary transition-colors hover:text-foreground"
-						>
-							← Newer
-						</a>
-					{:else}
-						<span aria-hidden="true" class="opacity-40">← Newer</span>
+		{#key `${data.page}:${applied}:${data.q ?? ''}`}
+			<div class="fade-in flex flex-col gap-6">
+				<div>
+					{#each data.posts as post (post.slug)}
+						<PostCard {post} />
+					{/each}
+					{#if data.posts.length === 0}
+						<p class="border-t border-border py-6 text-sm text-muted-foreground">
+							No posts matched{#if data.q}
+								&ldquo;{data.q}&rdquo;{/if}.
+						</p>
 					{/if}
+				</div>
 
-					<p>Page {data.page} of {data.pages}</p>
+				{#if data.posts.length > 0 && data.pages > 1}
+					<nav
+						class="flex items-center justify-between text-sm text-muted-foreground"
+						aria-label="Pagination"
+					>
+						{#if data.page > 1}
+							<a
+								href="/search?{buildQs(current, data.page - 1)}"
+								rel="prev"
+								class="font-medium text-primary transition-colors hover:text-foreground"
+							>
+								← Newer
+							</a>
+						{:else}
+							<span aria-hidden="true" class="opacity-40">← Newer</span>
+						{/if}
 
-					{#if data.page < data.pages}
-						<a
-							href="/search?page={data.page + 1}&{filterQs()}"
-							rel="next"
-							class="font-medium text-primary transition-colors hover:text-foreground"
-						>
-							Older →
-						</a>
-					{:else}
-						<span aria-hidden="true" class="opacity-40">Older →</span>
-					{/if}
-				</nav>
-			{/if}
-		</div>
-	{/key}
+						<p>Page {data.page} of {data.pages}</p>
+
+						{#if data.page < data.pages}
+							<a
+								href="/search?{buildQs(current, data.page + 1)}"
+								rel="next"
+								class="font-medium text-primary transition-colors hover:text-foreground"
+							>
+								Older →
+							</a>
+						{:else}
+							<span aria-hidden="true" class="opacity-40">Older →</span>
+						{/if}
+					</nav>
+				{/if}
+			</div>
+		{/key}
+	</div>
+
+	<Sidebar label="Search filters">
+		{#key applied}
+			<FilterPanel
+				tags={data.tagCloud}
+				selected={data.tags}
+				from={data.from}
+				to={data.to}
+				readMin={data.readMin}
+				readMax={data.readMax}
+				sort={data.sort}
+				hasQuery={!!data.q}
+				onApply={apply}
+			/>
+		{/key}
+	</Sidebar>
 </section>
+
+<!-- Phones/tablets: the facet panel rides the floating bottom-sheet drawer. -->
+<RailDrawer label="Search filters" variant="filters">
+	{#key applied}
+		<FilterPanel
+			tags={data.tagCloud}
+			selected={data.tags}
+			from={data.from}
+			to={data.to}
+			readMin={data.readMin}
+			readMax={data.readMax}
+			sort={data.sort}
+			hasQuery={!!data.q}
+			onApply={apply}
+		/>
+	{/key}
+</RailDrawer>

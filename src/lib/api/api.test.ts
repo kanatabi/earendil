@@ -31,12 +31,66 @@ describe('getPosts', () => {
 		expect(items[0]).not.toHaveProperty('tags');
 	});
 
-	it('filters by tag', async () => {
-		const { total, items } = await mockApi.getPosts({ tag: 'queues' });
+	it('filters by tag(s), OR-matched', async () => {
+		const { total, items } = await mockApi.getPosts({ tags: ['queues'] });
 		expect(total).toBe(1);
 		expect(items[0].slug).toBe('shape-of-a-useful-queue');
-		const none = await mockApi.getPosts({ tag: 'nope' });
+		const union = await mockApi.getPosts({ tags: ['queues', 'latency'] });
+		expect(union.total).toBe(2);
+		expect(union.items.map((p) => p.slug)).toEqual([
+			'shape-of-a-useful-queue',
+			'when-latency-becomes-a-product-decision'
+		]);
+		const none = await mockApi.getPosts({ tags: ['nope'] });
 		expect(none.items).toEqual([]);
+	});
+
+	it('filters by inclusive date window', async () => {
+		const { total, items } = await mockApi.getPosts({ from: '2024-01-09', to: '2024-06-02' });
+		expect(total).toBe(5);
+		expect(items.every((p) => p.date >= '2024-01-09' && p.date <= '2024-06-02')).toBe(true);
+	});
+
+	it('combines tags and dates', async () => {
+		const { total, items } = await mockApi.getPosts({
+			tags: ['distributed-systems'],
+			from: '2023-12-01'
+		});
+		expect(total).toBe(2);
+		expect(items.map((p) => p.slug)).toEqual([
+			'shape-of-a-useful-queue',
+			'the-day-the-clock-jumped'
+		]);
+	});
+
+	it('sorts explicitly when asked, keeps curation otherwise', async () => {
+		const { items } = await mockApi.getPosts();
+		expect(items.map((p) => p.slug)[0]).toBe('observability-is-a-contract'); // curated, not sorted
+		const quick = (await mockApi.getPosts({ sort: 'quickest' })).items.map((p) => p.readTime);
+		expect([...quick].sort((a, b) => a - b)).toEqual(quick);
+		const old = (await mockApi.getPosts({ sort: 'oldest' })).items.map((p) => p.date);
+		expect([...old].sort()).toEqual(old);
+	});
+
+	it('filters by inclusive read-time window', async () => {
+		const { items, total } = await mockApi.getPosts({ readMin: 10, readMax: 12 });
+		expect(total).toBe(items.length);
+		expect(items.every((p) => p.readTime >= 10 && p.readTime <= 12)).toBe(true);
+	});
+
+	it('search honors sort override over relevance', async () => {
+		const relevance = await mockApi.searchPosts('observability');
+		const newest = await mockApi.searchPosts('observability', { sort: 'newest' });
+		expect(newest.total).toBe(relevance.total);
+		const dates = newest.items.map((p) => p.date);
+		expect([...dates].sort().reverse()).toEqual(dates);
+	});
+
+	it('narrows search results with tag facets', async () => {
+		const all = await mockApi.searchPosts('observability');
+		const scoped = await mockApi.searchPosts('observability', { tags: ['logging'] });
+		expect(scoped.total).toBeGreaterThan(0);
+		expect(scoped.total).toBeLessThanOrEqual(all.total);
 	});
 
 	it('searches with ranking, totals, and pagination', async () => {
@@ -126,5 +180,24 @@ describe('getPhotos', () => {
 		expect(featured).not.toBeNull();
 		expect(featured?.src).toMatch(/^https:\/\//);
 		expect(featured?.alt).not.toBe('');
+	});
+});
+
+describe('listTags', () => {
+	it('serves a non-empty, count-sorted cloud with sane entries', async () => {
+		const tags = await mockApi.listTags();
+		expect(tags.length).toBeGreaterThan(0);
+		expect(tags.every((t) => t.name.length > 0 && t.posts >= 1)).toBe(true);
+		const posts = tags.map((t) => t.posts);
+		expect([...posts].sort((a, b) => b - a)).toEqual(posts);
+	});
+
+	it('every tag name resolves against the real corpus tags', async () => {
+		const slugs = (await mockApi.getPosts()).items.map((p) => p.slug);
+		const corpus = new Set(
+			(await Promise.all(slugs.map((s) => mockApi.getPost(s)))).flatMap((p) => p.tags)
+		);
+		const tags = await mockApi.listTags();
+		expect(tags.every((t) => corpus.has(t.name))).toBe(true);
 	});
 });

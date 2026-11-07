@@ -1,6 +1,13 @@
 <script lang="ts">
 	import PostCard from '#lib/components/PostCard.svelte';
+	import ProfileVisual from '#lib/components/ProfileVisual.svelte';
+	import IdentityCard from '#lib/components/rail/IdentityCard.svelte';
+	import RailDrawer from '#lib/components/rail/RailDrawer.svelte';
+	import RevealPast from '#lib/components/rail/RevealPast.svelte';
+	import SearchPill from '#lib/components/rail/SearchPill.svelte';
 	import SectionLabel from '#lib/components/SectionLabel.svelte';
+	import Sidebar from '#lib/components/rail/Sidebar.svelte';
+	import TopicCloud from '#lib/components/rail/TopicCloud.svelte';
 	import type { PageData } from './$types';
 
 	interface Props {
@@ -14,113 +21,104 @@
 	<title>gofar; — essays by Faiz Ainur Rofiq</title>
 </svelte:head>
 
-<!-- Hero: display serif headline, "currently" line, featured photograph -->
+<!-- Hero: display serif headline, "currently" line, ASCII profile portrait -->
 <section
-	class="fade-up mx-auto grid w-full max-w-3xl items-center gap-8 md:grid-cols-[minmax(0,1fr)_240px]"
+	id="hero"
+	class="fade-up mx-auto flex w-full max-w-page flex-col gap-6 md:grid md:grid-cols-[minmax(0,1fr)_288px] md:items-start md:gap-x-8 md:gap-y-6 lg:grid-cols-[minmax(0,1fr)_320px]"
 >
-	<div class="flex flex-col gap-6">
+	<!-- Mobile: micro two-column header (avatar beside the greeting). At md the
+	     wrapper dissolves (display: contents) and both children join the main
+	     grid — the portrait takes the right column, vertically centered. -->
+	<div class="flex items-center gap-4 md:contents">
+		<div class="md:col-start-2 md:row-span-4 md:row-start-1 md:self-center">
+			<ProfileVisual />
+		</div>
 		<p class="text-sm font-medium tracking-wide text-primary">Hello, I&rsquo;m Faiz.</p>
-		<h1 class="font-brand text-5xl leading-[1.05] font-semibold tracking-tight md:text-6xl">
-			I write about systems that keep <em class="italic">working</em> under pressure<span
-				class="text-brand">;</span
-			>
-		</h1>
-		<p class="max-w-2xl text-lg leading-relaxed text-muted-foreground">
-			Backend engineer exploring distributed systems, high-throughput applications, and the quiet
-			details behind reliable software.
-		</p>
-		<!-- Static until the BE grows a status endpoint. -->
-		<p class="text-xs text-muted-foreground">
-			currently — building queue-depth metrics<span class="text-brand">;</span> reading The Design
-			of Everyday Things<span class="text-brand">;</span> running postgres on k3s<span
-				class="text-brand">;</span
-			>
-		</p>
 	</div>
-	{#if data.featured}
-		<a
-			href="/gallery"
-			class="group hidden md:block"
-			aria-label="Featured photograph — view the gallery"
+	<h1 class="font-brand text-5xl leading-[1.05] font-semibold tracking-tight md:text-6xl">
+		I write about systems that keep <em class="italic">working</em> under pressure<span
+			class="text-brand">;</span
 		>
-			<img
-				src={data.featured.src}
-				alt={data.featured.alt}
-				width={data.featured.width}
-				height={data.featured.height}
-				class="aspect-[4/5] w-60 rounded-lg border border-border object-cover grayscale transition duration-500 group-hover:grayscale-0 lg:w-64"
-			/>
-		</a>
-	{:else}
-		<svg
-			viewBox="0 0 400 280"
-			fill="none"
-			stroke="currentColor"
-			aria-hidden="true"
-			class="hidden w-56 text-muted-foreground/40 md:block"
+	</h1>
+	<p class="max-w-2xl text-lg leading-relaxed text-muted-foreground">
+		Backend engineer exploring distributed systems, high-throughput applications, and the quiet
+		details behind reliable software.
+	</p>
+	<!-- Static until the BE grows a status endpoint. -->
+	<p class="max-w-2xl text-xs text-muted-foreground">
+		currently — building queue-depth metrics<span class="text-brand">;</span> reading The Design of
+		Everyday Things<span class="text-brand">;</span> running postgres on k3s<span class="text-brand"
+			>;</span
 		>
-			<circle cx="316" cy="58" r="26" stroke-width="2" />
-			<path
-				d="M12 236 L104 128 L156 184 L238 84 L388 236"
-				stroke-width="2.5"
-				stroke-linejoin="round"
-			/>
-			<path
-				d="M12 264 L88 192 L148 244 L226 160 L300 232 L388 264"
-				stroke-width="2"
-				stroke-linejoin="round"
-				opacity="0.6"
-			/>
-		</svg>
-	{/if}
+	</p>
 </section>
 
 <!-- Writing: the full list, paginated — /articles and /search reuse these rows -->
-<section id="writing" class="fade-up mx-auto flex w-full max-w-3xl flex-col gap-6">
+<section id="writing" class="fade-up mx-auto flex w-full max-w-page flex-col gap-6">
 	<SectionLabel title="Writing" />
-	<!-- Re-mounts when the page changes so the list fades in on Newer/Older. -->
-	{#key data.page}
-		<div class="fade-in flex flex-col gap-6">
-			<div>
-				{#each data.posts as post (post.slug)}
-					<PostCard {post} />
-				{/each}
+	<div class="grid gap-12 lg:grid-cols-[minmax(0,1fr)_272px]">
+		<!-- Re-mounts when the page changes so the list fades in on Newer/Older. -->
+		{#key data.page}
+			<div class="fade-in flex flex-col gap-6">
+				<div>
+					{#each data.posts as post (post.slug)}
+						<PostCard {post} />
+					{/each}
+				</div>
+
+				{#if data.posts.length === 0}
+					<p class="py-6 text-sm text-muted-foreground">Nothing published yet.</p>
+				{:else if data.pages > 1}
+					<nav
+						class="flex items-center justify-between text-sm text-muted-foreground"
+						aria-label="Pagination"
+					>
+						{#if data.page > 1}
+							<a
+								href="/?page={data.page - 1}"
+								rel="prev"
+								class="font-medium text-primary transition-colors hover:text-foreground"
+							>
+								← Newer
+							</a>
+						{:else}
+							<span aria-hidden="true" class="opacity-40">← Newer</span>
+						{/if}
+
+						<p>Page {data.page} of {data.pages}</p>
+
+						{#if data.page < data.pages}
+							<a
+								href="/?page={data.page + 1}"
+								rel="next"
+								class="font-medium text-primary transition-colors hover:text-foreground"
+							>
+								Older →
+							</a>
+						{:else}
+							<span aria-hidden="true" class="opacity-40">Older →</span>
+						{/if}
+					</nav>
+				{/if}
 			</div>
+		{/key}
 
-			{#if data.posts.length === 0}
-				<p class="py-6 text-sm text-muted-foreground">Nothing published yet.</p>
-			{:else if data.pages > 1}
-				<nav
-					class="flex items-center justify-between text-sm text-muted-foreground"
-					aria-label="Pagination"
-				>
-					{#if data.page > 1}
-						<a
-							href="/?page={data.page - 1}"
-							rel="prev"
-							class="font-medium text-primary transition-colors hover:text-foreground"
-						>
-							← Newer
-						</a>
-					{:else}
-						<span aria-hidden="true" class="opacity-40">← Newer</span>
-					{/if}
-
-					<p>Page {data.page} of {data.pages}</p>
-
-					{#if data.page < data.pages}
-						<a
-							href="/?page={data.page + 1}"
-							rel="next"
-							class="font-medium text-primary transition-colors hover:text-foreground"
-						>
-							Older →
-						</a>
-					{:else}
-						<span aria-hidden="true" class="opacity-40">Older →</span>
-					{/if}
-				</nav>
-			{/if}
-		</div>
-	{/key}
+		<Sidebar label="About this site">
+			<!-- Search and identity hide while the hero is still on screen; topics persist. -->
+			<RevealPast watch="hero">
+				<SearchPill />
+			</RevealPast>
+			<TopicCloud tags={data.tags} />
+			<RevealPast watch="hero">
+				<IdentityCard />
+			</RevealPast>
+		</Sidebar>
+	</div>
 </section>
+
+<!-- Phones/tablets: identity + topics ride the floating bottom-sheet drawer;
+     search is the BottomNav FAB's job, so no pill in the sheet. -->
+<RailDrawer label="About this site" variant="identity">
+	<IdentityCard />
+	<TopicCloud tags={data.tags} />
+</RailDrawer>

@@ -168,6 +168,230 @@ Companion to `DESIGN.md` in this directory. Each milestone ends with a verifiabl
 
 ---
 
+## Hero identity — ASCII profile reveal (2026-11-07)
+
+1. **The hero image became brand, not content**: the `/gallery`-linked BE-sourced "featured
+   photograph" is replaced by a static identity asset — the author portrait shown as ASCII
+   art, revealing the original BW photograph on hover/focus/tap. New `ProfileVisual`
+   component + `static/profile/` derivatives. Rationale: the profile picture is inseparable
+   from the FE's identity (like the `gofar;` wordmark), so it must not 404 with the API, and
+   the home load loses a fetch. `BlogApi.getFeaturedPhoto()` **stays** in the contract/mock
+   (mirror of `GET /api/photos/featured` for lumen) — no FE consumer for now.
+2. **Reveal mechanics**: two stacked `<picture>` layers (AVIF→WebP, 512² square crops of the
+   3:4 masters, Lanczos-scaled — point-sampling moiré'd the glyph grid); only `opacity`
+   transitions (500ms, composited per the mobile budget), `prefers-reduced-motion` ⇒ instant.
+   Hover is CSS-only (`group-hover` — Tailwind v4 gates it to hover-capable devices); the
+   block is a `type="button"` — keyboard focus reveals (`group-focus-visible`, the
+   `aria-label` carries the single portrait description) and on touch a tap toggles it,
+   same `(hover: none)`-gated pattern as the code-tools tap-reveal; the toggle state sticks
+   until tapped again (the handler blurs so focus can't pin it open).
+   Light/dark: the terminal-green ASCII tile is intentionally theme-agnostic; `border-border`
+   frames it on either canvas.
+3. **Responsive**: the portrait was desktop-only before — now visible everywhere:
+   `w-40` above the greeting on mobile (`order-first`), `md:w-60` in the right grid column
+   (`md:order-last`), square with the same `rounded-lg` corner treatment. The SVG fallback
+   branch is gone (static asset ⇒ always present).
+
+**Verify:** hover/keyboard/tap reveal in both themes; no `data.featured` references left on
+home; gate clean (`lint`/`check`/`test:unit`/`build`).
+
+**Refined (same round) — theme-following blend:** the opaque terminal-green tile was traded
+for canvas unity. The ASCII layer is now a **luminance-baked alpha mask**
+(`ascii-glyphs-512.webp`, lossless 22KB — 45% black cutoff kills the downscale wash; alpha
+carries the glyph density) painted via `background-color: var(--ascii-ink)` — `--foreground`
+in light (true monochrome), sampled sage `#d8e0d6` in dark. Chosen over two baked theme-assets
+so the color stays a CSS token (the diagram-subsystem rule: art carries no palette) and the
+theme flip is pure CSS — correct pre-paint (`data-theme` from the cookie), on toggle, and
+with JS off. Consequence accepted: dark-mode glyphs are one hue modulated by opacity
+(per-glyph _hue_ variance flattens; density depth survives). The `border-border` frame is
+gone — frameless ASCII merges with the hero text; `rounded-lg` remains as the clip for the
+opaque photo reveal. **Post-check fix**: the transparent glyphs exposed the one-way fade —
+an always-opaque photo under the ASCII double-exposed the resting state (loud in light mode,
+invisible in dark). The reveal is now a proper **two-way crossfade** (photo
+`opacity-0 → group-hover/tap → 100`, ASCII the inverse, shared `.fade` reduced-motion
+selector).
+
+**Re-tuned after visual QA:** the first mask was too timid and the frame too small against
+the headline block. Alpha recipe went from `-level 45%` (sparse, washed) to
+`-level 15%,80% -gamma 2.4` — note ImageMagick gamma is `1/g`, so gamma>1 LIFTS (an early
+`gamma 0.45` darkened the alpha to blank). Coverage ~7x; the figure now reads as a portrait.
+Explored hard for a smaller encoding (lossy WebP grew on alpha noise; AVIF q10 = 14KB but
+banding plus a no-`<picture>`-fallback story for `mask-image`; posterize/blur all lost) —
+shipped the honest **lossless WebP at 640px (~96KB, cached forever)**; 512 would land under
+1:1 device pixels at 320 CSS px. Frame: `w-40→w-48` mobile, `md:w-72 lg:w-80` desktop, grid
+columns `240→288/320` so the square holds proportion with the Fraunces headline. Headline
+and intro type untouched by request.
+
+**Grid alignment follow-up:** growing the image column inside a 768px container had squeezed
+the headline to five lines. The home hero, the Writing feed and `/search` now ride the
+documented page grid (`max-w-page` 1120, DESIGN §4 — the 3xl blocks were the deviation, the
+gallery masonry never had one), so nav = content = footer edges align and the headline
+settles back to ~3 lines at a ~736px column. The wide rail keeps an editorial measure:
+`PostCard` text caps at `72ch` (thumbnail pinned right with `ml-auto`), hero intro/currently
+at `max-w-2xl`. The article body deliberately keeps its 3xl reading measure. Rendering
+typography, not data shaping — the no-FE-processing rule stands. Note: the Flowstep screens
+(1/5) predate this and now show the old narrow feed; re-cut when the screens get revisited.
+
+**The writing rail:** the wide feed left a dead right margin (most visible in dark mode),
+so `#writing` became `lg:grid-cols-[minmax(0,1fr)_272px]` with a sticky `HomeRail` —
+identity card (the hero ASCII mask at 64px postage, static), a search pill (dispatches
+`gofar:open-search`; the Navbar keeps palette ownership and focus return), and the
+`topics;` cloud. The cloud rides a real contract addition, not FE counting:
+`BlogApi.listTags()` ↔ `GET /api/tags` returning `Tag[] = { name, posts }`, BE-sorted and
+BE-curated (the mock fixture is hand-authored, mirroring the corpus the way the feed order
+does); rows link to `/search?tag=…`. Rail hidden below `lg`; the hero's `currently;` line
+stays put. Mirror updated in `../lumen/DESIGN.md` as its own commit (+2 tests → 34 total).
+
+**Rail kit, sticky fix, and search facets (2026-11-07):** the first rail never stuck — a
+`position: sticky` grid child is stretched to row height by default, so it had no scroll
+room; `lg:self-start` is the whole fix. The kit answer to plug-and-play: `rail/Sidebar`
+(shell, knows nothing about content) + `IdentityCard` / `SearchPill` / `TopicCloud` /
+`TopicFilter` / `DateRange` / `RevealPast` / `FilterPanel` — pages compose cards in one line
+each; `HomeRail` retired. `RevealPast` gates identity+search by an IntersectionObserver on
+`#hero`: children hide while the hero is in view, reversibly; server-rendered VISIBLE so
+JS-off shows everything (accepted: one soft fade-out at hydration on fresh loads). The
+search page rides the same grid: facets are repeatable `?tag=` (OR) + inclusive
+`from`/`to`, all URL-truth; `FilterPanel` buffers checkbox/date picks locally and commits
+with an `apply;` button (page `key`-remounts it on navigation so the buffer always reseeds
+from applied truth); applied facets echo as removable chips above the results; mobile gets
+the same panel in a native `<details>` disclosure. The date control is fully custom —
+mono-chip presets (7/30/90/all) + a popover calendar (Fraunces month header, JetBrains
+digits, Monday-first, brand-violet endpoints, in-range tint, Esc/outside-click close with
+focus return; non-modal by choice: the feed stays browsable, so no focus trap).
+Multi-tag/dates/combined-search is a contract change, done properly: `getPosts`/
+`searchPosts` opts gained `tags: string[]` (OR) + `from`/`to` — mock filters via one shared
+`matches()` predicate, `+page.server.ts` validates dates by regex and dedupes tags,
+kit-v3 `goto` uses `{ replace: true, reset: false }` (noScroll/replaceState are gone),
+lumen mirror carries the params (+3 tests → 37; gates green; preview curls proved the OR
+union, the date-window slice, chips and the disclosure).
+
+**Rail round 2 — honest collapse, ordering, archive, sort + length facets:**
+`RevealPast` stopped reserving space (the hidden cards left a hole above `topics;`): the
+wrapper is now a `grid-template-rows: 1fr ↔ 0fr` transition around an `overflow-hidden`
+inner — real collapse, still reversible, reduced-motion snaps. Home rail order: search →
+topics → identity (the two gated cards now collapse at the rail's top and bottom).
+DateRange's trigger went compact-mono (`2026-11-09 → 11-14`, year once; long-form stays in
+the popover footer + day labels) because `Nov 14, 2026` truncated at 272px. `/search` with
+no params is now **the archive** — the redirect to home is gone (removing the last chip or
+reset+apply stays put; title `archive · gofar;`). Sort + reading-time arrived as contract
+params: `sort=newest|oldest|quickest|longest|relevance` (absent = curation; relevance is
+the implicit q-default — its chip lights without shipping the param) and inclusive
+`readMin`/`readMax` minutes; mock grew a shared `sorted()` step (relevance overridden on
+demand). New kit cards `SortPicker` (chip rows, `aria-pressed`) and `ReadRange` (dual
+handles = two stacked native range inputs over one custom violet track — keyboard and
+screen-reader semantics for free, cross-clamped, bounds 0–30 with both ends meaning
+"any"); both join the `FilterPanel` buffer under the same `apply;`. Chips row gained
+removable `10–12 min` and `newest` entries; pagination links carry the whole `current`
+selection. The server validates (`sort` whitelist, ints 1–29 survive, regex dates) and
+never bounces (`page>` clamp only). Kit stays plug-and-play: four cards in, one line each.
+(+3 tests → 40; preview curls: rail order byte-offsets, 2× collapse wrappers, archive
+title/header, `sort=quickest` ascending read-times, read+sort chips, order/length cards in
+both rail instances.)
+
+**Rail round 3 — bug fixes + the signature goes everywhere:** (a) the read-time fill never
+painted — `width: {pct()}%` double-percented into invalid CSS; one stray `%` removed and the
+violet line now spans between the handles. (b) the mobile `filter;` summary had the
+semicolon orphaned mid-pill — the bare text and `;` span were two flex items under
+`justify-between`; bound into one span, chevron `flex-1`-pushed (the wordmark already taught
+this pattern). (c) mobile hero re-composed into a micro two-column: `w-24` portrait beside
+the greeting (`md:contents` dissolves the row at `md`, the portrait takes the right column
+via explicit `row-span-4 self-center` placement, and the `order-first/last` dance dies with
+it). (d) `rail/IdentityCard` auto-mounts on EVERY article from the page template — right
+rail under the TOC (`lg+`, hairline divider, TOC capped at `50svh` scroll so the sticky
+stack can't overflow the viewport) and end-of-body `lg:hidden` on mobile/tablet; the
+markdown pipeline never sees it, so no post can forget it. Same component, dual mount —
+the kit proving its plug-and-play claim.
+
+**Round 4 — the phone is the customer:** (a) The 360px article clipping was grid math:
+a 12-column grid with `gap-8` spends 352px on gaps _before_ any track — wider than the
+viewport itself, so every spanning child ran past the right padding. The 12-column
+machinery now exists only at `lg` (`grid-cols-1 lg:grid-cols-12`, same for the article
+aside). (b) `Clear` stays in search context → `/search` (the archive), never home.
+(c) The hamburger retires for an **icon-only `BottomNav`**: Home · Gallery · ⟨elevated
+center Search FAB, phone-only⟩ · About · theme slot — glassy bar (z-20, h-14 +
+safe-area), active tab = brand-violet icon + `aria-current`; mobile header is now
+wordmark-only; the page container gains `pb-24 lg:pb-12` clearance; the FAB and its center
+slot disappear at md where the header pill takes over; `ThemeToggle` dual-mounts
+(`hidden lg:flex` header + bar slot). (d) `rail/RailDrawer`: assistant-style floating
+trigger (z-20, `bottom-[calc(4.5rem+env(safe-area-inset-bottom))]` clears the bar) opening
+a modal bottom sheet (z-25 — grab handle, the established dim+blur scrim, slide-up,
+Esc/backdrop/X close with `focusOnMount` + focus return, closes on navigation,
+reduced-motion instant). Home mounts identity+search+topics ungated (a sheet has no hero to
+gate against); the search page moves its keyed `FilterPanel` into the drawer and the
+`<details>` bar retires. Fixed z ladder: bar/FAB 20 → sheet 25 → palette & lightbox 30.
+40 tests, gates green; preview curls proved the nav markup, drawer trigger, Clear target,
+single-col article grid, generated z-25/size-13/safe-area utilities. Flowstep debt grew —
+screens 1/5/2/6 still show hamburger-era chrome.
+
+**Round 5 — bar balance + scroll manners:** the BottomNav leaned off-center because its
+five cells had three different sizing rules (tabs `grow`, FAB slot fixed `w-14`, theme
+wrapper intrinsic ~36px) — unequal boxes shifted the center cell left of true center and
+gave three different icon gaps. All cells are `flex-1` now: exact 10/30/50/70/90 rhythm,
+the elevated FAB mathematically centered, `justify-around` deleted (it was doing nothing
+once grow ate the free space). Added scroll auto-hide via a singleton rune store
+(`#lib/scroll-chrome.svelte.ts`, one passive listener started from the root layout): hide
+on deliberate scroll-down (8px hysteresis), instant reveal on scroll-up, 600ms idle
+re-reveal when stopping anywhere, always visible near the top, `focusin` forces shown
+(no stranded keyboard focus), composited translate+fade 200ms, reduced-motion instant.
+Per the owner's call only the bar participates — the floating drawer FAB keeps its post.
+Drag-to-dismiss for the sheet followed the same day: pointer events on the grab band
+(touch-action:none so page scroll never fights the gesture), the panel follows the finger
+1:1 downward with 15% rubber-band upward, and release decides by distance (≥ min(140px,
+40% height)) or fling velocity (>0.45 px/ms) — glide off + close on transitionend, else
+spring back. The svelte slide outro still runs on a panel already translated out of view,
+so the sheet vanishes under the fading scrim with no double motion; reduced-motion closes
+instantly. No per-page wiring needed — the behavior lives inside RailDrawer itself.
+
+**FAB/pill consistency:** the mobile search entry point had two personalities — the nav FAB
+navigated to `/search`, the home sheet's pill opened the palette. Resolved per the owner's
+rule: the FAB is now a context-aware button (no link) — on `/search` it focuses + selects
+`#search-input` (and the browser scrolls you back to it), everywhere else it dispatches the
+same `gofar:open-search` event the desktop rail pill uses; `aria-haspopup="dialog"` only
+when it actually opens a dialog. The sheet's SearchPill retired as redundant (identity +
+topics only; the desktop rail keeps its pill since there is no FAB at lg). `/search` stays
+reachable/shareable as before — the palette's "see all" is the deep-link path.
+
+**Scroll-top pill (all views):** the chrome store grew a second, position-based signal
+(`scrolled: y > 400`) — deliberately independent of the bar's direction/idle choreography.
+`ScrollTopButton` mounts once in the layout, so every page gets it automatically. Same
+round glassy family as the drawer trigger, z-20 (the sheet still covers it), parked
+directly above the drawer-FAB slot on phones (right-edge column; identical spot on
+pages without a drawer for muscle memory) and at a plain bottom-right from lg. Hidden
+state is `inert` + pointer-events-none, fades/slides 200ms (reduced-motion instant), and
+the smooth scroll itself makes it fade away mid-flight — the threshold flips before the
+top lands.
+
+**Floating-column rhythm:** the first pill position (9.5rem everywhere) read wrong twice
+over — a dead gap above the bar on drawerless pages (article/gallery/about float nothing in
+the lower slot) and airy 32px spacing between the two pills on home/search. Now the column
+has explicit numbers: 16px bar clearance (trigger at 4.5rem), 12px inter-pill gap (pill at
+8.25rem when a drawer trigger exists, else the pill itself takes the 4.5rem slot). The
+route list lives in the layout (`stacked` prop) — meaningful consistency ("above whatever
+floats below you"), not coordinate consistency.
+
+**About-tab icon — `Feather`, recorded rationale:** `CircleUser` was ambiguous on two
+axes — every app trains "person glyph = my account", and the home drawer's ASCII doorknob
+(a literal portrait) already owns "the human". The About page now reaches by the pen, not
+the face: a feather, which fits the wordmark's pen-name identity and keeps the doorknob
+unique. Do not swap it back to a person glyph.
+
+**Float — cutout reveal (same round):** the photo layer lost its rectangle. ImageMagick
+border-flood was tried first and rejected by QA: at fuzz 18 the wall-shadow gaps survived
+disconnected AND the bright face got eaten through a temple/hair-highlight bridge to the
+wall. Escalated to `rembg` (isnet-general-use) in a throwaway `/tmp` venv — system python
+untouched, model cached at `~/.rembg`. Full-res matte, then the SAME `+0+300` north square
+crop as before; edge QA clean (hair wisps kept, no halo, the white Triple-F logo survives
+because flood/AI both see it enclosed by the black tee). New `photo-640.{avif,webp}` =
+12/26KB (smaller than the opaque 512s — flat transparent corners compress to nothing). The
+subject now floats on the page canvas, so dark mode needed help: `--photo-glow` — `none`
+light, `drop-shadow(0 0 18px color-mix(in oklab, var(--brand) 45%, transparent))` dark,
+applied as a static `filter` (only opacity still animates). Bonus discovery from the mid-
+crossfade render: the ASCII figure registers with the photo after all (the earlier
+"head-left" mismatch was a montage-scaling illusion) — the fade reads as a dissolve of one
+person, not two.
+
+---
+
 ## Milestone 7 — Responsive + a11y polish
 
 1. Screenshot-diff QA against **all 8 Flowstep screens** (theme × viewport).
