@@ -23,7 +23,7 @@
 
 <button
 	type="button"
-	class="group relative block aspect-square w-48 overflow-hidden rounded-lg text-left md:w-72 lg:w-80"
+	class="group relative block aspect-square w-24 overflow-hidden rounded-lg text-left md:w-72 lg:w-80"
 	aria-label="Portrait of Faiz Ainur Rofiq rendered in ASCII characters. Activate to reveal the photograph."
 	onclick={tap}
 >

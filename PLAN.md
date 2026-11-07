@@ -288,6 +288,20 @@ never bounces (`page>` clamp only). Kit stays plug-and-play: four cards in, one 
 title/header, `sort=quickest` ascending read-times, read+sort chips, order/length cards in
 both rail instances.)
 
+**Rail round 3 — bug fixes + the signature goes everywhere:** (a) the read-time fill never
+painted — `width: {pct()}%` double-percented into invalid CSS; one stray `%` removed and the
+violet line now spans between the handles. (b) the mobile `filter;` summary had the
+semicolon orphaned mid-pill — the bare text and `;` span were two flex items under
+`justify-between`; bound into one span, chevron `flex-1`-pushed (the wordmark already taught
+this pattern). (c) mobile hero re-composed into a micro two-column: `w-24` portrait beside
+the greeting (`md:contents` dissolves the row at `md`, the portrait takes the right column
+via explicit `row-span-4 self-center` placement, and the `order-first/last` dance dies with
+it). (d) `rail/IdentityCard` auto-mounts on EVERY article from the page template — right
+rail under the TOC (`lg+`, hairline divider, TOC capped at `50svh` scroll so the sticky
+stack can't overflow the viewport) and end-of-body `lg:hidden` on mobile/tablet; the
+markdown pipeline never sees it, so no post can forget it. Same component, dual mount —
+the kit proving its plug-and-play claim.
+
 **Float — cutout reveal (same round):** the photo layer lost its rectangle. ImageMagick
 border-flood was tried first and rejected by QA: at fuzz 18 the wall-shadow gaps survived
 disconnected AND the bright face got eaten through a temple/hair-highlight bridge to the

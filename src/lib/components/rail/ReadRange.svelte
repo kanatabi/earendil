@@ -50,7 +50,7 @@
 		></div>
 		<div
 			class="pointer-events-none absolute top-1/2 h-1.5 -translate-y-1/2 rounded-full bg-brand"
-			style="left: {pct(lo)}; width: {pct(hi - lo)}%"
+			style="left: {pct(lo)}; width: {pct(hi - lo)}"
 		></div>
 		<input
 			type="range"

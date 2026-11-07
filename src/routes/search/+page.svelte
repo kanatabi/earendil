@@ -140,9 +140,9 @@
 		<!-- Mobile facets live in a native disclosure: works JS-off, keyboard free. -->
 		<details class="group/mfilters lg:hidden">
 			<summary
-				class="flex cursor-pointer list-none items-center justify-between gap-3 rounded-full border border-border px-4 py-2 font-mono text-sm text-muted-foreground transition-colors hover:text-foreground [&::-webkit-details-marker]:hidden"
+				class="flex cursor-pointer list-none items-center gap-3 rounded-full border border-border px-4 py-2 font-mono text-sm text-muted-foreground transition-colors hover:text-foreground [&::-webkit-details-marker]:hidden"
 			>
-				filter<span class="text-brand">;</span>
+				<span class="flex-1">filter<span class="text-brand">;</span></span>
 				<ChevronRight
 					class="size-3.5 transition-transform duration-200 group-open/mfilters:rotate-90"
 				/>

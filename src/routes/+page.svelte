@@ -23,30 +23,33 @@
 <!-- Hero: display serif headline, "currently" line, ASCII profile portrait -->
 <section
 	id="hero"
-	class="fade-up mx-auto grid w-full max-w-page items-center gap-8 md:grid-cols-[minmax(0,1fr)_288px] lg:grid-cols-[minmax(0,1fr)_320px]"
+	class="fade-up mx-auto flex w-full max-w-page flex-col gap-6 md:grid md:grid-cols-[minmax(0,1fr)_288px] md:items-start md:gap-x-8 md:gap-y-6 lg:grid-cols-[minmax(0,1fr)_320px]"
 >
-	<div class="order-first md:order-last">
-		<ProfileVisual />
-	</div>
-	<div class="flex flex-col gap-6">
+	<!-- Mobile: micro two-column header (avatar beside the greeting). At md the
+	     wrapper dissolves (display: contents) and both children join the main
+	     grid — the portrait takes the right column, vertically centered. -->
+	<div class="flex items-center gap-4 md:contents">
+		<div class="md:col-start-2 md:row-span-4 md:row-start-1 md:self-center">
+			<ProfileVisual />
+		</div>
 		<p class="text-sm font-medium tracking-wide text-primary">Hello, I&rsquo;m Faiz.</p>
-		<h1 class="font-brand text-5xl leading-[1.05] font-semibold tracking-tight md:text-6xl">
-			I write about systems that keep <em class="italic">working</em> under pressure<span
-				class="text-brand">;</span
-			>
-		</h1>
-		<p class="max-w-2xl text-lg leading-relaxed text-muted-foreground">
-			Backend engineer exploring distributed systems, high-throughput applications, and the quiet
-			details behind reliable software.
-		</p>
-		<!-- Static until the BE grows a status endpoint. -->
-		<p class="max-w-2xl text-xs text-muted-foreground">
-			currently — building queue-depth metrics<span class="text-brand">;</span> reading The Design
-			of Everyday Things<span class="text-brand">;</span> running postgres on k3s<span
-				class="text-brand">;</span
-			>
-		</p>
 	</div>
+	<h1 class="font-brand text-5xl leading-[1.05] font-semibold tracking-tight md:text-6xl">
+		I write about systems that keep <em class="italic">working</em> under pressure<span
+			class="text-brand">;</span
+		>
+	</h1>
+	<p class="max-w-2xl text-lg leading-relaxed text-muted-foreground">
+		Backend engineer exploring distributed systems, high-throughput applications, and the quiet
+		details behind reliable software.
+	</p>
+	<!-- Static until the BE grows a status endpoint. -->
+	<p class="max-w-2xl text-xs text-muted-foreground">
+		currently — building queue-depth metrics<span class="text-brand">;</span> reading The Design of
+		Everyday Things<span class="text-brand">;</span> running postgres on k3s<span class="text-brand"
+			>;</span
+		>
+	</p>
 </section>
 
 <!-- Writing: the full list, paginated — /articles and /search reuse these rows -->
