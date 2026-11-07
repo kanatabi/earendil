@@ -4,6 +4,7 @@
 	import favicon from '#lib/assets/favicon.svg';
 	import BottomNav from '#lib/components/BottomNav.svelte';
 	import Navbar from '#lib/components/Navbar.svelte';
+	import ScrollTopButton from '#lib/components/ScrollTopButton.svelte';
 	import Footer from '#lib/components/Footer.svelte';
 	import { startScrollChrome } from '#lib/scroll-chrome.svelte.ts';
 	import type { LayoutProps } from './$types';
@@ -96,4 +97,5 @@
 	</div>
 	<!-- Icon-only primary bar for phones/tablets; retires at lg for the header. -->
 	<BottomNav {theme} onToggle={toggleTheme} />
+	<ScrollTopButton />
 </div>

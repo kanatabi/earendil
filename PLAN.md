@@ -351,6 +351,16 @@ when it actually opens a dialog. The sheet's SearchPill retired as redundant (id
 topics only; the desktop rail keeps its pill since there is no FAB at lg). `/search` stays
 reachable/shareable as before — the palette's "see all" is the deep-link path.
 
+**Scroll-top pill (all views):** the chrome store grew a second, position-based signal
+(`scrolled: y > 400`) — deliberately independent of the bar's direction/idle choreography.
+`ScrollTopButton` mounts once in the layout, so every page gets it automatically. Same
+round glassy family as the drawer trigger, z-20 (the sheet still covers it), parked
+directly above the drawer-FAB slot on phones (right-edge column; identical spot on
+pages without a drawer for muscle memory) and at a plain bottom-right from lg. Hidden
+state is `inert` + pointer-events-none, fades/slides 200ms (reduced-motion instant), and
+the smooth scroll itself makes it fade away mid-flight — the threshold flips before the
+top lands.
+
 **Float — cutout reveal (same round):** the photo layer lost its rectangle. ImageMagick
 border-flood was tried first and rejected by QA: at fuzz 18 the wall-shadow gaps survived
 disconnected AND the bright face got eaten through a temple/hair-highlight bridge to the

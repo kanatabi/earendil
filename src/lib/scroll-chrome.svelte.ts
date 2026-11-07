@@ -7,11 +7,14 @@
  * hysteresis so jitter can't flicker); scroll-UP reveals instantly; stopping
  * anywhere reveals after a short idle beat, so the bar is never withheld.
  */
-export const chrome = $state({ visible: true });
+export const chrome = $state({ visible: true, scrolled: false });
 
 const TOP_PX = 100;
 const HYSTERESIS_PX = 8;
 const IDLE_MS = 600;
+// Position rule (independent from the bar's direction choreography): deep
+// enough that "back to the top" is a real need.
+const DEEP_PX = 400;
 
 export function startScrollChrome(): () => void {
 	let lastY = window.scrollY;
@@ -19,6 +22,7 @@ export function startScrollChrome(): () => void {
 
 	const onScroll = () => {
 		const y = window.scrollY;
+		chrome.scrolled = y > DEEP_PX;
 		if (y <= TOP_PX || y < lastY - HYSTERESIS_PX) chrome.visible = true;
 		else if (y > lastY + HYSTERESIS_PX) chrome.visible = false;
 		clearTimeout(idle);
