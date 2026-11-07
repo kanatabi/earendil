@@ -1,6 +1,8 @@
 <script lang="ts">
 	import { SvelteDate } from 'svelte/reactivity';
 	import { CalendarDays, ChevronLeft, ChevronRight } from 'lucide-svelte';
+	import CardTitle from '../CardTitle.svelte';
+	import Pill from '../Pill.svelte';
 
 	interface Props {
 		from?: string;
@@ -122,30 +124,20 @@
 </script>
 
 <div class="relative flex flex-col gap-3" bind:this={root}>
-	<p class="text-xs font-medium tracking-widest text-muted-foreground uppercase">dates</p>
+	<CardTitle title="dates" />
 
 	<div class="flex flex-wrap gap-2">
 		{#each presets as days (days)}
-			<button
-				type="button"
-				onclick={() => setPreset(days)}
-				class="rounded-full border px-3 py-1 font-mono text-xs transition-colors {presetActive(days)
-					? 'border-brand bg-brand/10 text-foreground'
-					: 'border-border text-muted-foreground hover:border-muted-foreground hover:text-foreground'}"
-			>
+			<Pill active={presetActive(days)} onclick={() => setPreset(days)}>
 				{days}d<span class="text-brand">;</span>
-			</button>
+			</Pill>
 		{/each}
-		<button
-			type="button"
+		<Pill
+			active={!((from || to) && !presets.some((p) => presetActive(p)))}
 			onclick={() => onChange(undefined, undefined)}
-			class="rounded-full border px-3 py-1 font-mono text-xs transition-colors {(from || to) &&
-			!presets.some((p) => presetActive(p))
-				? 'border-border text-muted-foreground hover:border-muted-foreground hover:text-foreground'
-				: 'border-brand bg-brand/10 text-foreground'}"
 		>
 			all<span class="text-brand">;</span>
-		</button>
+		</Pill>
 	</div>
 
 	<button

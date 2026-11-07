@@ -1,4 +1,6 @@
 <script lang="ts">
+	import CardTitle from '../CardTitle.svelte';
+
 	interface Props {
 		min?: number;
 		max?: number;
@@ -39,7 +41,7 @@
 
 <div class="flex flex-col gap-3">
 	<div class="flex items-baseline justify-between gap-3">
-		<p class="text-xs font-medium tracking-widest text-muted-foreground uppercase">length</p>
+		<CardTitle title="length" />
 		<p class="font-mono text-xs text-foreground">{readout}<span class="text-brand">;</span></p>
 	</div>
 

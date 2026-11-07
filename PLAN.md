@@ -375,6 +375,184 @@ axes — every app trains "person glyph = my account", and the home drawer's ASC
 the face: a feather, which fits the wordmark's pen-name identity and keeps the doorknob
 unique. Do not swap it back to a person glyph.
 
+**About page — base structure (2026-11-07):** from a two-paragraph stub to a real identity
+page. Content moved to `#lib/content/about.ts` — typed, FE-owned brand copy (like the
+hero's `currently` line), with every invented bio/role/link marked `PLACEHOLDER` for the
+owner to edit in one file. Composition: header, floating BW cutout portrait (reuses
+`photo-640` + the `--photo-glow` dark halo — the hero reveal's end-state as a static
+signature) beside the bio, a **scroll-following experience timeline**, and an `elsewhere;`
+row. The rail: new `scrollRail` action — one passive rAF-throttled scroll listener maps
+"how far the block crossed the 55%-viewport anchor" onto the violet fill's height (two-way:
+retreats on scroll-up, per the owner), dots light as the fill passes their center; markup
+defaults to the FULLY-DRAWN rail so no-JS and reduced-motion readers see the finished
+state and the action only ever retreats it (synchronous measure at mount = no visible
+reset). Chose rect-based math over `animation-timeline: scroll()` — Firefox still has no
+baseline support. GitHub stats/sparkline block: designed (chips + 12-week commits,
+server-side, optional `GITHUB_TOKEN`, graceful null) but HELD per the owner.
+
+**About page — CV content, research, and the gofar line:** `about.ts` rewritten from the
+real CV (Gojek/Tokopedia/JalanMimpi entries, 3-paragraph bio with the 2021 Vue/Strapi →
+self-hosted SvelteKit lineage line, education with the Catena thesis + UI Robotics Team,
+`research` block for the two published blockchain papers — labeled research, not
+publications, at the owner's humility call; `stack` as three opinionated anchors (go /
+queues / dashboards) + four grouped mono lists; `elsewhere` gained email/RG-profile and the
+kanatabi GitHub; phone kept off). The rail became the **gofar line**: dashed `--border`
+route ahead, solid violet traveled, and a semicolon marker riding the fill head — the
+`scrollRail` action already computed the fraction, so the marker is one more style set.
+Markup defaults = the FINISHED journey (fill full, `;` at the end) so no-JS/reduced-motion
+readers see a completed route. Motif borrowed in spirit from a friend's journey-path blog
+but re-authored in-house: the boat became OUR punctuation; the full wavy SVG voyage
+(Tier A) is parked as a candidate round pending how the semicolon glide feels in person.
+`venue` strings and the Instagram URL remain marked PLACEHOLDER for the owner; the footer's
+Instagram→LinkedIn placeholder is the same known family. (No logic tests; 40 pass.)
+
+**About round 2 — depth:** experience entries grew into rich paragraphs (the CV's bullets
+woven to prose — GoMart's polyglot load path, the SSE pipeline "so affiliates watched their
+numbers move", the 41/31 internship origin). Education became a **static hairline tree** —
+degree as root, thesis + robotics on CSS-elbow branches, the thesis node lit violet (the
+traveled branch) linking to `#research`; deliberately un-animated, the journey motion stays
+exclusive to the career rail. Research rows gained **abstracts + keywords transcribed from
+the local paper PDFs** (`pdftotext`, lightly grammar-normalized, claims untouched) —
+abstracts tucked in a native `<details>` (`abstract;` summary, JS-off friendly), keyword
+rows rendered mono outside so the scannable surface stays open. The Stack anchors were
+**merged into the groups** as annotated first items (`go, the default answer until proven
+otherwise · …`) — the orphan three-line philosophy zone confused even its own author;
+opinions now ride inside the facts. Mobile portrait centers (`justify-self-center
+md:justify-self-start`), text stays left. (40 tests pass; preview curls confirmed both
+details blocks, keyword lines, tree markup, merged stack, centering.)
+
+**About round 3 — three visual bugs from the owner's screenshots:** (1) timeline card
+hairlines were `li` border-t spanning the full container — straight THROUGH the rail
+channel; the separator is now an absolutely-positioned span starting at the text gutter
+(`left-10`), so no line ever crosses the journey (rail + `;` marker screenshot). (2) the
+education tree looked disconnected: each branch trunk only spanned its own li's box,
+leaving the padding gap between branches uncovered, and the root stub was 4px short of
+the heading; trunks are now full-height (`bottom: 0`, last stops at its elbow) and the
+stub meets both seams — corner-to-corner hairlines. (3) the `abstract;` toggle read as
+plain text, not a control — now the house pill affordance (`rounded-full border px-3 py-1`
+
+- ChevronRight rotating via `group-open:`, same grammar as the filter presets and the
+  retired mobile disclosure), native `<details>` semantics preserved.
+
+**About round 4 — research block polish:** venue dropped entirely (field gone, not hidden
+— meta row is year + keywords); the **paper title became the link** (scholarly convention)
+wearing the house underline-grow grammar with an ↗ and sr-only "(opens in a new tab)",
+while a matching `pdf ↗` pill stays for explicitness; the `abstract` label and keyword
+rows shed their brand semicolons (UI labels, not prose voice); the abstract disclosure
+**glides open** via a one-shot `grid-template-rows 0fr→1fr` + opacity keyframe on
+`details[open] .abs-body` (RevealPast's collapse grammar) — closing stays instant, the
+honest tradeoff of keeping native `<details>` and JS-off readability over a JS-controlled
+symmetric disclosure; reduced-motion disables it.
+
+**Chrome startup sync fix:** `startScrollChrome` only ever wrote state from a
+scroll _event_ — landing on a restored or deep scroll position fires none after the
+layout effect attaches, so the scroll-top pill stayed hidden and the bar's baseline
+stale until the first manual scroll (the owner's "no longer visible" report, plus the
+bar not hiding). The listener now runs `onScroll()` once at startup; verified compiled
+(`n();window.addEventListener(...)`). If symptoms persist on a stale dev server, the
+culprit is the runtime, not the code — the bundle was audit-verified single-store,
+reactive, and wired end-to-end.
+
+**Chrome follow-up — self-attaching store:** the symptom survived the startup sync on the owner's dev+ngrok runtime, and the dev-served
+modules audited clean (runes compiled, effect present, single store instance), so the
+remaining suspects were runtime effects that never fire (stale HMR graphs after branch
+switches are a classic). Killed the dependency entirely: the scroll listener now attaches
+at module-eval time inside scroll-chrome.svelte.ts (typeof-window guarded, runs once per
+client graph, before first paint), and the layout effect + startScrollChrome export are
+gone. Nothing can forget to start it now.
+
+**About desktop rail + watermark:** the narrative column (72ch) inside the 1120 grid left a
+dead right margin at lg; the kit answered it. Section is now
+`lg:grid-cols-[minmax(0,1fr)_272px]` with a sticky `Sidebar` rail: the promoted portrait
+(272px) wrapped in `RevealPast watch="identity-photo"` — the rail face appears exactly when
+the inline twin scrolls away (owner's twist on the home gating, component reused verbatim),
+then the new `rail/FactCard` for `facts;` and `colophon;` (source → earendil ↗), and
+`elsewhere;` into the rail with a `lg:hidden` body-end twin (the accepted dual-mount). A
+6%-opacity ASCII-glyph watermark (same mask asset, `--ascii-ink`, theme-aware, static,
+bottom-right) fills the corner the rail leaves empty. No new scroll machinery anywhere: one
+reused component, one presentational card, one static mask.
+
+**Social links, canonized + iconographic:** one true list now lives in
+`content/social.ts` (kanatabi GitHub, in/faizainur LinkedIn, ResearchGate profile, mailto,
+and the real instagram.com/faizarq — which also cured the footer's Instagram→LinkedIn
+copy-paste placeholder); `about.ts` re-exports it and zero live PLACEHOLDER marks remain.
+The footer trades words for inline brand marks: paths vendored from Simple Icons (CC0;
+LinkedIn pinned from the pre-removal v11.3.0 tag) via `lib/brand-icons.ts`, rendered with
+currentColor — theme-aware, no third-party requests — on size-9 targets with aria-label,
+external links `_blank rel=noopener`; the Mail glyph (lucide) and ResearchGate ride the
+shared list automatically.
+
+**About round 5 — full-figure portrait + hosting-honest copy:** the About mounts traded the
+square `photo-640` for a freshly matted UNCROPPED portrait (rembg isnet, cached model;
+trim to content bbox + 2% margin keeps the crossed arms, the photo's own bottom cut is
+inherent to the master; 600x790 AVIF/WebP, 19/51KB). Inline beside the bio is width-sized
+(`w-40 md:w-48`, h-auto, native ratio for CLS); the rail figure caps at 300px
+(`max-h-[300px] object-contain`) so facts/colophon/elsewhere stay high in the sticky column.
+The hero keeps the square cutout — it is registered against the ASCII composition; two
+derivatives, two jobs. Second half: public copy no longer claims a hosting choice
+(homelab-vs-VPS genuinely undecided): footer reads `Built with SvelteKit · no trackers;`,
+the colophon's `hosts — self-managed k3s` row is deleted, the bio's lineage line became
+"wherever its server ends up living, I will be the one running it" (promises WHO, not
+WHERE), and the hero's `currently` line says `running postgres myself;`. Internal docs keep
+their K3s engineering records — those speak to the builder, not visitors. DESIGN's footer
+copy spec synced.
+
+**Tree/rail dialect unification (zoomed QA):** the Education tree read jaggy and foreign —
+1px strokes whose 0.5px-centered junctions (elbows at `top:50%` unshifted vs dots with
+translateY) smeared at zoom, beside a rail speaking 2px/8px. One vocabulary now: 2px strokes,
+a single `--stem-x: 9px` centerline all stems/elbows/nodes derive from (integer boundaries;
+coincidentally the rail's own stem+dots center on 9 — one axis system for both structures),
+transform-centering on every junction, and the rail's COLOR grammar: violet = traveled — root
+stub and the Catena branch render `--brand` (trunk via two-stop gradient: violet above the
+elbow, grey continuing to Robotics), the thesis dot lit like a rail waypoint. Follow-up zoom:
+the elbow landed flush on the text edge (28px padding) — shortened to 1rem (ends 24px) with
+the indent at 2rem, leaving a deliberate 8px gap; connector meets copy, never touches it.
+
+**Watermark round + kit consolidation (reuse review):** asked "where else does the ghost
+fit?", the answer was everywhere it makes emptiness mean something — and building it
+exposed that ten rounds had quietly re-printed the same code: the mask URL in 4 components,
+the card kicker in 6, the pill grammar in ~8 places, the search event string in 3. Two
+commits: (1) PURE REFACTOR — `--ascii-mask` token (URL now exists once in CSS),
+`Watermark.svelte` (decorative ghost; caller owns geometry), `CardTitle`, `Pill`
+(aria-pressed toggle chip) + `PillLink` (owns the external-link pattern: ↗, target/rel,
+sr-only), `OPEN_SEARCH_EVENT` constant; all existing consumers swapped with zero visual
+delta (deliberate exceptions kept custom: the calendar trigger dialog affordance, the
+SearchPill fake-input, the primary-action apply button, and the native `<summary>`).
+(2) PLACEMENTS — `/search` gains the corner ghost (About-sibling anatomy) and the bare
+"No posts matched" line became a ghost-field empty state with a `clear filters;` (or
+`back home;`) pill; a REAL root `+error.svelte` finally replaces SvelteKit's bare 500/400
+page (status-aware house voice, ghost field, pills, no raw server details), and the posts
+error variant joins the pattern; articles end with a 4%-opacity ghost after Further
+reading (lg-only, never under prose — documented rule); About grew the last missing mobile
+parity piece, a `RailDrawer` carrying facts+colophon. Audit verdict elsewhere: scroll-chrome,
+Sidebar/RevealPast/FactCard seams, social module — already shaped right. 47 tests; preview
+proved 404 copy, both error variants, empty state, corner ghost, article whisper, about
+drawer, and exactly ONE occurrence of the asset URL in compiled CSS. Follow-up taste fix: the article end-credit was sized smaller (28vw) than the corner ghosts — conflating size with loudness; all watermarks now share the family geometry (45vw cap 560px) and ONLY opacity varies per placement (4% under prose, 6-8% on sparse pages).
+
+Correction the owner caught by looking: the article ghost was mounted IN-FLOW
+(`mx-auto aspect-square`), so it reserved a 560px square of page height — a banner
+wearing a watermark's costume, and the "empty space" at every article's end. It is now
+the same corner treatment as the family: `absolute bottom-0 right-0` inside the
+relative article (the blank zone under the sticky TOC rail), `-z-10` so it sits behind
+ALL content, zero scroll length added. The reuse lesson, written down: Watermark's
+"caller owns geometry" seam means callers must keep it OUT of flow — the component
+cannot enforce it; the pattern must.
+
+**Watermarks go universal (owner call: all pages, mobile included):** dropped every
+`hidden lg:block` gate, added `-z-10` to the about/search ghosts — exposing a latent flaw
+they had always carried: as bare absolute siblings they painted ABOVE non-positioned text
+(desktop hid it by placing them over empty corners; phones would not). The "never tints
+prose" promise is now structural — z-order, not breakpoint. New mounts complete the set:
+home writing (5%, quietest — hover bands + long copy), gallery (4% behind the masonry
+tail). Opacity per surface is now the only per-placement variable: 4% article/gallery,
+5% home, 6% about/search corners, 7–8% error/empty bands.
+
+Sizing follow-up (owner: "the watermark is very small?"): right — `min(45vw,560px)`
+self-adapts _downward_ on phones (176px at 390) and the corner stamp read accidental.
+Geometry rule now: corners `w-[75vw] max-w-[560px] lg:w-[min(45vw,560px)]` — mobile gets a
+deliberate majority of the width (≈293px, an atmosphere) while desktop is untouched;
+centered bands go `min(85vw,…)`, empty-state `min(80vw,360px)`. Opacity policy unchanged.
+
 **Float — cutout reveal (same round):** the photo layer lost its rectangle. ImageMagick
 border-flood was tried first and rejected by QA: at fuzz 18 the wall-shadow gaps survived
 disconnected AND the bright face got eaten through a temple/hair-highlight bridge to the

@@ -1,4 +1,6 @@
 <script lang="ts">
+	import CardTitle from '../CardTitle.svelte';
+	import Pill from '../Pill.svelte';
 	import type { SortValue } from '#lib/api/index.ts';
 
 	interface Props {
@@ -20,32 +22,17 @@
 </script>
 
 <div class="flex flex-col gap-3">
-	<p class="text-xs font-medium tracking-widest text-muted-foreground uppercase">order</p>
+	<CardTitle title="order" />
 	<div class="flex flex-wrap gap-2">
 		{#if showRelevance}
-			<button
-				type="button"
-				onclick={() => onChange('relevance')}
-				aria-pressed={value === 'relevance'}
-				class="rounded-full border px-3 py-1 font-mono text-xs transition-colors {value ===
-				'relevance'
-					? 'border-brand bg-brand/10 text-foreground'
-					: 'border-border text-muted-foreground hover:border-muted-foreground hover:text-foreground'}"
-			>
+			<Pill active={value === 'relevance'} onclick={() => onChange('relevance')}>
 				relevance<span class="text-brand">;</span>
-			</button>
+			</Pill>
 		{/if}
 		{#each options as opt (opt.v)}
-			<button
-				type="button"
-				onclick={() => onChange(opt.v)}
-				aria-pressed={value === opt.v}
-				class="rounded-full border px-3 py-1 font-mono text-xs transition-colors {value === opt.v
-					? 'border-brand bg-brand/10 text-foreground'
-					: 'border-border text-muted-foreground hover:border-muted-foreground hover:text-foreground'}"
-			>
+			<Pill active={value === opt.v} onclick={() => onChange(opt.v)}>
 				{opt.label}<span class="text-brand">;</span>
-			</button>
+			</Pill>
 		{/each}
 	</div>
 </div>

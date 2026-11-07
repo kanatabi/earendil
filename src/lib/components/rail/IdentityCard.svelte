@@ -21,8 +21,8 @@
 
 <style>
 	.glyph {
-		-webkit-mask-image: url('/profile/ascii-glyphs-640.webp');
-		mask-image: url('/profile/ascii-glyphs-640.webp');
+		-webkit-mask-image: var(--ascii-mask);
+		mask-image: var(--ascii-mask);
 		-webkit-mask-size: cover;
 		mask-size: cover;
 		-webkit-mask-repeat: no-repeat;

@@ -629,3 +629,60 @@ export function tocSpy(node: HTMLElement) {
 		}
 	};
 }
+
+/**
+ * Scroll-following timeline rail: a violet fill tracks how far the block has
+ * crossed an anchor line at 55% of the viewport — growing DOWN as you scroll
+ * and RETREATING as you scroll back (a live scrubber, per the design call).
+ * Each .rail-dot lights when the fill passes its center, and the .rail-mark
+ * (a traveling semicolon — the gofar line) rides the fill head. The rail base
+ * renders as dashes ahead; the solid violet is what has been traveled.
+ *
+ * Defaults matter: the markup renders fully-drawn (fill at height 100%, dots
+ * lit), so no-JS and `prefers-reduced-motion` readers see the finished rail —
+ * the action only ever *retreats* it to the true scroll position, set
+ * synchronously at mount so there is no visible reset.
+ */
+export function scrollRail(node: HTMLElement) {
+	const fill = node.querySelector<HTMLElement>('.rail-fill');
+	const dots = [...node.querySelectorAll<HTMLElement>('.rail-dot')];
+	const mark = node.querySelector<HTMLElement>('.rail-mark');
+	if (!fill || dots.length === 0) return;
+	if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+	const measure = () => {
+		const box = node.getBoundingClientRect();
+		if (box.height === 0) return;
+		const anchor = window.innerHeight * 0.55;
+		const f = Math.min(1, Math.max(0, (anchor - box.top) / box.height));
+		fill.style.height = `${(f * 100).toFixed(2)}%`;
+		// The gofar marker rides the fill head — the semicolon traveling the route.
+		if (mark) mark.style.top = `${(f * 100).toFixed(2)}%`;
+		for (const dot of dots) {
+			const r = dot.getBoundingClientRect();
+			const center = (r.top - box.top + r.height / 2) / box.height;
+			dot.toggleAttribute('data-rail-off', f < center);
+		}
+	};
+
+	let ticking = false;
+	const onScroll = () => {
+		if (ticking) return;
+		ticking = true;
+		requestAnimationFrame(() => {
+			ticking = false;
+			measure();
+		});
+	};
+
+	measure(); // synchronous at mount: snap the rail to the true position
+	window.addEventListener('scroll', onScroll, { passive: true });
+	window.addEventListener('resize', onScroll, { passive: true });
+
+	return {
+		destroy() {
+			window.removeEventListener('scroll', onScroll);
+			window.removeEventListener('resize', onScroll);
+		}
+	};
+}

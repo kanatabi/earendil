@@ -6,7 +6,6 @@
 	import Navbar from '#lib/components/Navbar.svelte';
 	import ScrollTopButton from '#lib/components/ScrollTopButton.svelte';
 	import Footer from '#lib/components/Footer.svelte';
-	import { startScrollChrome } from '#lib/scroll-chrome.svelte.ts';
 	import type { LayoutProps } from './$types';
 
 	let { data, children }: LayoutProps = $props();
@@ -65,8 +64,8 @@
 		else apply();
 	}
 
-	// One scroll listener drives the mobile chrome (bottom bar) visibility.
-	$effect(() => startScrollChrome());
+	// Chrome scroll wiring self-attaches when the scroll-chrome module is first
+	// imported (BottomNav + ScrollTopButton pull it into the graph).
 
 	// Pages that float a drawer trigger — the scroll-top pill stacks above it.
 	const drawerStacked = $derived(

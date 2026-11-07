@@ -10,6 +10,7 @@
 	import ImageLightbox from '#lib/components/ImageLightbox.svelte';
 	import type { LightboxImage } from '#lib/components/ImageLightbox.svelte';
 	import IdentityCard from '#lib/components/rail/IdentityCard.svelte';
+	import Watermark from '#lib/components/Watermark.svelte';
 	import type { PageData } from './$types';
 
 	interface Props {
@@ -38,7 +39,7 @@
 
 <!-- Twelve columns only exist at lg: a 12-col grid with gap-8 spends 11 gaps
      (352px) — wider than a 360px viewport — and every spanning child clipped. -->
-<article class="fade-up grid grid-cols-1 gap-8 lg:grid-cols-12">
+<article class="fade-up relative grid grid-cols-1 gap-8 lg:grid-cols-12">
 	<aside class="grid grid-cols-1 gap-6 lg:col-span-9 lg:grid-cols-12 lg:gap-6">
 		<div class="hidden pt-2 lg:col-span-2 lg:block">
 			<div class="sticky top-6 text-xs text-muted-foreground">
@@ -134,6 +135,16 @@
 			{/if}
 		</div>
 	</aside>
+
+	<!-- End credit: a true watermark — corner ghost in the blank zone under
+	     the sticky TOC rail, exactly where About and search park theirs.
+	     absolute → zero scroll length added; 4% opacity keeps it a whisper.
+	     All widths now — -z-10 puts it behind every glyph, which is the real
+	     promise of "never tints prose". -->
+	<Watermark
+		class="pointer-events-none absolute right-0 bottom-0 -z-10 aspect-square w-[75vw] max-w-[560px] lg:w-[min(45vw,560px)]"
+		opacity={0.04}
+	/>
 </article>
 
 {#if zoomed}

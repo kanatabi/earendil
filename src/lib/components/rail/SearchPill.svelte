@@ -1,10 +1,11 @@
 <script lang="ts">
 	import { Search } from 'lucide-svelte';
+	import { OPEN_SEARCH_EVENT } from '#lib/ui-events.ts';
 
 	// The palette lives in the Navbar (⌘K binding + focus return); the pill
 	// rings it through a window event — no lifted state across the shell.
 	function openSearch() {
-		window.dispatchEvent(new Event('gofar:open-search'));
+		window.dispatchEvent(new Event(OPEN_SEARCH_EVENT));
 	}
 </script>
 

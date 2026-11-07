@@ -2,6 +2,7 @@
 	import ImageLightbox from './ImageLightbox.svelte';
 	import type { LightboxImage } from './ImageLightbox.svelte';
 	import SectionLabel from './SectionLabel.svelte';
+	import Watermark from './Watermark.svelte';
 	import type { Photo } from '#lib/api/index.ts';
 
 	interface Props {
@@ -13,7 +14,13 @@
 	let selected = $state<LightboxImage | null>(null);
 </script>
 
-<section class="fade-up flex flex-col gap-6">
+<section class="fade-up relative flex flex-col gap-6">
+	<!-- 4% corner ghost, behind the masonry's tail at every width — photos own
+	     the page; the brand just lives in the margin. -->
+	<Watermark
+		class="pointer-events-none absolute right-0 bottom-0 -z-10 aspect-square w-[75vw] max-w-[560px] lg:w-[min(45vw,560px)]"
+		opacity={0.04}
+	/>
 	<SectionLabel title="Photography" />
 	<!-- CSS-columns masonry: mixed aspect ratios never force rows to align (Pinterest-style). -->
 	<div class="columns-2 gap-4 md:columns-3">
