@@ -18,7 +18,7 @@
 	<!-- 4% corner ghost, behind the masonry's tail at every width — photos own
 	     the page; the brand just lives in the margin. -->
 	<Watermark
-		class="pointer-events-none absolute right-0 bottom-0 -z-10 aspect-square w-[min(45vw,560px)]"
+		class="pointer-events-none absolute right-0 bottom-0 -z-10 aspect-square w-[75vw] max-w-[560px] lg:w-[min(45vw,560px)]"
 		opacity={0.04}
 	/>
 	<SectionLabel title="Photography" />

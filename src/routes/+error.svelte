@@ -15,7 +15,7 @@
      the status number is enough for a human and complete for a log. -->
 <section class="fade-up relative mx-auto flex w-full max-w-page items-center justify-center py-24">
 	<Watermark
-		class="pointer-events-none absolute inset-0 m-auto aspect-square w-[min(70vw,480px)]"
+		class="pointer-events-none absolute inset-0 m-auto aspect-square w-[min(85vw,480px)]"
 		opacity={0.08}
 	/>
 	<div class="relative flex flex-col items-center gap-4 text-center">

@@ -59,7 +59,7 @@
 	<!-- Quietest ghost of the family (5%): the feed carries hover bands and long
 	     copy; the corner rides behind everything at all widths. -->
 	<Watermark
-		class="pointer-events-none absolute right-0 bottom-0 -z-10 aspect-square w-[min(45vw,560px)]"
+		class="pointer-events-none absolute right-0 bottom-0 -z-10 aspect-square w-[75vw] max-w-[560px] lg:w-[min(45vw,560px)]"
 		opacity={0.05}
 	/>
 	<SectionLabel title="Writing" />

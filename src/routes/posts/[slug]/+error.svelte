@@ -6,7 +6,7 @@
 
 <section class="fade-up relative flex min-h-48 items-center justify-center py-16">
 	<Watermark
-		class="pointer-events-none absolute inset-0 m-auto aspect-square w-[min(70vw,420px)]"
+		class="pointer-events-none absolute inset-0 m-auto aspect-square w-[min(85vw,420px)]"
 		opacity={0.07}
 	/>
 	<div class="relative flex flex-col items-center gap-4 text-center">

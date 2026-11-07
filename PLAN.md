@@ -547,6 +547,12 @@ home writing (5%, quietest — hover bands + long copy), gallery (4% behind the 
 tail). Opacity per surface is now the only per-placement variable: 4% article/gallery,
 5% home, 6% about/search corners, 7–8% error/empty bands.
 
+Sizing follow-up (owner: "the watermark is very small?"): right — `min(45vw,560px)`
+self-adapts _downward_ on phones (176px at 390) and the corner stamp read accidental.
+Geometry rule now: corners `w-[75vw] max-w-[560px] lg:w-[min(45vw,560px)]` — mobile gets a
+deliberate majority of the width (≈293px, an atmosphere) while desktop is untouched;
+centered bands go `min(85vw,…)`, empty-state `min(80vw,360px)`. Opacity policy unchanged.
+
 **Float — cutout reveal (same round):** the photo layer lost its rectangle. ImageMagick
 border-flood was tried first and rejected by QA: at fuzz 18 the wall-shadow gaps survived
 disconnected AND the bright face got eaten through a temple/hair-highlight bridge to the

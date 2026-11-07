@@ -101,7 +101,7 @@
 	<!-- Same brand ghost as the About page: these two share an anatomy, now an
 	     atmosphere. All widths, -z-10 behind content — z-order keeps copy clean. -->
 	<Watermark
-		class="pointer-events-none absolute right-0 bottom-0 -z-10 aspect-square w-[min(45vw,560px)]"
+		class="pointer-events-none absolute right-0 bottom-0 -z-10 aspect-square w-[75vw] max-w-[560px] lg:w-[min(45vw,560px)]"
 	/>
 	<div class="flex min-w-0 flex-col gap-6">
 		<div class="flex items-center justify-between gap-4 border-t border-border pt-4">
@@ -207,7 +207,7 @@
 							class="relative flex flex-col items-center justify-center gap-3 border-t border-border py-16 text-center"
 						>
 							<Watermark
-								class="pointer-events-none absolute inset-0 m-auto aspect-square w-72"
+								class="pointer-events-none absolute inset-0 m-auto aspect-square w-[min(80vw,360px)]"
 								opacity={0.08}
 							/>
 							<p class="relative text-sm text-muted-foreground">

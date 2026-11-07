@@ -31,7 +31,7 @@
 	     width — but -z-10 so it rides behind ALL content; legibility is guaranteed
 	     by z-order, not by a breakpoint. -->
 	<Watermark
-		class="pointer-events-none absolute right-0 bottom-0 -z-10 aspect-square w-[min(45vw,560px)]"
+		class="pointer-events-none absolute right-0 bottom-0 -z-10 aspect-square w-[75vw] max-w-[560px] lg:w-[min(45vw,560px)]"
 	/>
 
 	<div class="grid w-full gap-12 lg:grid-cols-[minmax(0,1fr)_272px]">

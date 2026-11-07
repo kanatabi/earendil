@@ -142,7 +142,7 @@
 	     All widths now — -z-10 puts it behind every glyph, which is the real
 	     promise of "never tints prose". -->
 	<Watermark
-		class="pointer-events-none absolute right-0 bottom-0 -z-10 aspect-square w-[min(45vw,560px)]"
+		class="pointer-events-none absolute right-0 bottom-0 -z-10 aspect-square w-[75vw] max-w-[560px] lg:w-[min(45vw,560px)]"
 		opacity={0.04}
 	/>
 </article>
