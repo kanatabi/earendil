@@ -1,6 +1,13 @@
 <script lang="ts">
 	import SectionLabel from '#lib/components/SectionLabel.svelte';
-	import { experience, elsewhere, profile } from '#lib/content/about.ts';
+	import {
+		education,
+		elsewhere,
+		experience,
+		profile,
+		research,
+		stack
+	} from '#lib/content/about.ts';
 	import { scrollRail } from '#lib/actions.ts';
 </script>
 
@@ -40,19 +47,23 @@
 		</div>
 	</div>
 
-	<!-- Experience: a timeline rail that follows the scroll (grows down,
-	     retreats back up); dots light as the violet fill passes them.
-	     Markup default = fully drawn — no-JS and reduced-motion readers see
-	     the finished rail; scrollRail only ever retreats it to reality. -->
+	<!-- Experience: the gofar line. The route ahead is dashed; the traveled
+	     part is solid violet, and a semicolon rides the fill head as you scroll
+	     (it grows down, retreats back up). Markup defaults to the FINISHED
+	     journey — no-JS and reduced-motion readers see the full line with the
+	     marker at the end; scrollRail only ever retreats it to reality. -->
 	<div class="flex flex-col gap-6">
 		<SectionLabel title="Experience" />
 		<div class="relative" use:scrollRail>
-			<span class="rail" aria-hidden="true"><span class="rail-fill"></span></span>
+			<span class="rail" aria-hidden="true">
+				<span class="rail-fill"></span>
+				<span class="rail-mark">;</span>
+			</span>
 			<ol class="flex flex-col">
 				{#each experience as job (job.period + job.company)}
 					<li class="relative border-t border-border py-5 pl-10 first:border-t-0">
 						<span
-							class="rail-dot absolute top-[26px] left-[6px]"
+							class="rail-dot absolute top-[26px] left-[5px]"
 							data-rail-off={undefined}
 							aria-hidden="true"
 						></span>
@@ -71,12 +82,87 @@
 		</div>
 	</div>
 
+	<div class="flex flex-col gap-6">
+		<SectionLabel title="Education" />
+		<div class="max-w-[72ch]">
+			<h3 class="font-brand text-lg font-semibold tracking-tight text-foreground">
+				{education.degree}<span class="font-normal text-muted-foreground">
+					· {education.school}</span
+				>
+			</h3>
+			<p class="mt-1 font-mono text-xs text-muted-foreground">{education.period}</p>
+			<ul class="mt-4 flex flex-col gap-3">
+				{#each education.highlights as item (item.body)}
+					<li class="border-l-2 border-border pl-4 text-sm leading-relaxed text-muted-foreground">
+						{item.body}{#if item.link}
+							(<a href={item.link.href} class="text-primary transition-colors hover:text-foreground"
+								>{item.link.label}</a
+							>){/if}
+					</li>
+				{/each}
+			</ul>
+		</div>
+	</div>
+
+	<div class="flex flex-col gap-6" id="research">
+		<SectionLabel title="Research" />
+		<div class="flex flex-col">
+			{#each research as paper (paper.title)}
+				<article class="border-t border-border py-5 first:border-t-0 first:pt-0">
+					<h3
+						class="max-w-[72ch] font-brand text-base leading-snug font-semibold tracking-tight text-foreground"
+					>
+						{paper.title}
+					</h3>
+					<p class="mt-1.5 font-mono text-xs text-muted-foreground">
+						{paper.year} · {paper.venue}
+					</p>
+					<p class="mt-2 max-w-[72ch] text-sm leading-relaxed text-muted-foreground">
+						{paper.note}
+					</p>
+					<a
+						href={paper.href}
+						target="_blank"
+						rel="noopener noreferrer"
+						class="mt-2 inline-block font-mono text-xs text-primary transition-colors hover:text-foreground"
+					>
+						paper<span class="text-brand">↗</span>
+					</a>
+				</article>
+			{/each}
+		</div>
+	</div>
+
+	<div class="flex flex-col gap-6">
+		<SectionLabel title="Stack" />
+		<div class="flex flex-col gap-6">
+			<ul class="flex flex-col gap-2.5">
+				{#each stack.anchors as anchor (anchor.name)}
+					<li class="flex flex-wrap items-baseline gap-x-3 gap-y-0.5">
+						<span class="font-brand text-lg font-semibold tracking-tight text-foreground"
+							>{anchor.name}<span class="text-brand">;</span></span
+						>
+						<span class="text-sm text-muted-foreground">{anchor.note}</span>
+					</li>
+				{/each}
+			</ul>
+			<div class="flex max-w-[72ch] flex-col gap-2">
+				{#each stack.groups as group (group.label)}
+					<p class="font-mono text-xs leading-relaxed text-muted-foreground">
+						<span class="text-foreground">{group.label} —</span>
+						{group.items.join(' · ')}<span class="text-brand">;</span>
+					</p>
+				{/each}
+			</div>
+		</div>
+	</div>
+
 	<div class="flex flex-col gap-4">
 		<SectionLabel title="Elsewhere" />
 		<p class="flex flex-wrap gap-x-5 gap-y-2 font-mono text-xs text-muted-foreground">
 			{#each elsewhere as link (link.label)}
 				<a href={link.href} class="transition-colors hover:text-foreground"
-					>{link.label.toLowerCase()}<span class="text-brand">;</span></a
+					>{link.label}<span class="text-brand">;</span></a
 				>
 			{/each}
 		</p>
@@ -93,17 +179,37 @@
 		position: absolute;
 		top: 1.25rem;
 		bottom: 1.75rem;
-		left: 9.5px;
-		width: 1px;
-		background: var(--border);
+		left: 8px;
+		width: 2px;
+		/* The route ahead: dashes in the border tone. */
+		background: repeating-linear-gradient(
+			to bottom,
+			var(--border) 0,
+			var(--border) 5px,
+			transparent 5px,
+			transparent 11px
+		);
 	}
 	.rail-fill {
 		position: absolute;
 		inset: 0 0 auto 0;
 		width: 100%;
-		height: 100%; /* markup default = drawn; the action tracks scroll */
+		height: 100%; /* markup default = the whole road traveled */
 		background: var(--brand);
 		transition: height 120ms linear;
+	}
+	.rail-mark {
+		position: absolute;
+		top: 100%; /* markup default: the semicolon rests at journey's end */
+		left: 50%;
+		transform: translate(-50%, -50%);
+		font-family: var(--font-mono);
+		font-size: 0.875rem;
+		font-weight: 600;
+		line-height: 1;
+		color: var(--brand);
+		background: var(--background);
+		padding: 2px 1px;
 	}
 	.rail-dot {
 		width: 0.5rem;

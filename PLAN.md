@@ -390,6 +390,22 @@ reset). Chose rect-based math over `animation-timeline: scroll()` — Firefox st
 baseline support. GitHub stats/sparkline block: designed (chips + 12-week commits,
 server-side, optional `GITHUB_TOKEN`, graceful null) but HELD per the owner.
 
+**About page — CV content, research, and the gofar line:** `about.ts` rewritten from the
+real CV (Gojek/Tokopedia/JalanMimpi entries, 3-paragraph bio with the 2021 Vue/Strapi →
+self-hosted SvelteKit lineage line, education with the Catena thesis + UI Robotics Team,
+`research` block for the two published blockchain papers — labeled research, not
+publications, at the owner's humility call; `stack` as three opinionated anchors (go /
+queues / dashboards) + four grouped mono lists; `elsewhere` gained email/RG-profile and the
+kanatabi GitHub; phone kept off). The rail became the **gofar line**: dashed `--border`
+route ahead, solid violet traveled, and a semicolon marker riding the fill head — the
+`scrollRail` action already computed the fraction, so the marker is one more style set.
+Markup defaults = the FINISHED journey (fill full, `;` at the end) so no-JS/reduced-motion
+readers see a completed route. Motif borrowed in spirit from a friend's journey-path blog
+but re-authored in-house: the boat became OUR punctuation; the full wavy SVG voyage
+(Tier A) is parked as a candidate round pending how the semicolon glide feels in person.
+`venue` strings and the Instagram URL remain marked PLACEHOLDER for the owner; the footer's
+Instagram→LinkedIn placeholder is the same known family. (No logic tests; 40 pass.)
+
 **Float — cutout reveal (same round):** the photo layer lost its rectangle. ImageMagick
 border-flood was tried first and rejected by QA: at fuzz 18 the wall-shadow gaps survived
 disconnected AND the bright face got eaten through a temple/hair-highlight bridge to the
