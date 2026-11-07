@@ -36,8 +36,10 @@
 	<title>{data.post.title} · gofar;</title>
 </svelte:head>
 
-<article class="fade-up grid grid-cols-12 gap-8">
-	<aside class="col-span-12 grid grid-cols-12 gap-6 lg:col-span-9">
+<!-- Twelve columns only exist at lg: a 12-col grid with gap-8 spends 11 gaps
+     (352px) — wider than a 360px viewport — and every spanning child clipped. -->
+<article class="fade-up grid grid-cols-1 gap-8 lg:grid-cols-12">
+	<aside class="grid grid-cols-1 gap-6 lg:col-span-9 lg:grid-cols-12 lg:gap-6">
 		<div class="hidden pt-2 lg:col-span-2 lg:block">
 			<div class="sticky top-6 text-xs text-muted-foreground">
 				<p class="mb-6 font-mono text-xs text-muted-foreground">

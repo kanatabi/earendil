@@ -1,8 +1,6 @@
 <script lang="ts">
 	import { page } from '$app/state';
-	import { cubicOut } from 'svelte/easing';
-	import { fade, slide } from 'svelte/transition';
-	import { Menu, Search, X } from 'lucide-svelte';
+	import { Search } from 'lucide-svelte';
 	import ThemeToggle from './ThemeToggle.svelte';
 	import SearchDialog from './SearchDialog.svelte';
 
@@ -22,17 +20,8 @@
 	const isActive = (href: string) =>
 		href === '/' ? page.url.pathname === '/' : page.url.pathname.startsWith(href);
 
-	let open = $state(false);
 	let searchOpen = $state(false);
 	let searchTrigger: HTMLElement | null = null;
-
-	// Honor reduced-motion: collapse the menu animation to a plain toggle.
-	// (Guarded: $derived also evaluates during SSR, where window is absent.)
-	const reduced = $derived(
-		typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
-	);
-	const slideOpts = $derived({ duration: reduced ? 0 : 180, easing: cubicOut });
-	const fadeOpts = $derived({ duration: reduced ? 0 : 150 });
 
 	function openSearch() {
 		if (searchOpen) return;
@@ -50,18 +39,7 @@
 	// Close on navigation.
 	$effect(() => {
 		void page.url.pathname;
-		open = false;
 		searchOpen = false;
-	});
-
-	// Esc closes the menu while it is open.
-	$effect(() => {
-		if (!open) return;
-		const onKey = (e: KeyboardEvent) => {
-			if (e.key === 'Escape') open = false;
-		};
-		window.addEventListener('keydown', onKey);
-		return () => window.removeEventListener('keydown', onKey);
 	});
 
 	// Global Mod+K / Ctrl+K toggles the search palette.
@@ -86,6 +64,8 @@
 	});
 </script>
 
+<!-- Mobile: wordmark only — primary navigation moved to the BottomNav bar
+     (icon tabs + elevated search + theme slot); the hamburger menu is gone. -->
 <header class="relative border-b border-border">
 	<div class="mx-auto flex w-full max-w-page items-center justify-between px-5 py-4">
 		<a
@@ -123,67 +103,14 @@
 					<span>Search</span>
 					<span class="font-mono text-xs">Mod+K</span>
 				</button>
-				<!-- Mobile: compact icon-only button -->
-				<button
-					type="button"
-					class="flex size-8 items-center justify-center rounded-md border border-border
-						text-muted-foreground transition-colors hover:bg-muted md:hidden"
-					aria-label="Search"
-					onclick={openSearch}
-				>
-					<Search class="size-4" />
-				</button>
-				<ThemeToggle {theme} {onToggle} />
-				<!-- Mobile: hamburger -->
-				<button
-					type="button"
-					class="flex size-8 items-center justify-center rounded-md border border-border
-						text-muted-foreground transition-colors hover:bg-muted md:hidden"
-					aria-label="Open menu"
-					aria-expanded={open}
-					aria-controls="mobile-nav"
-					onclick={() => (open = !open)}
-				>
-					{#if open}
-						<X class="size-4" />
-					{:else}
-						<Menu class="size-4" />
-					{/if}
-				</button>
+				<!-- The toggle keeps a header slot only at lg; below that the
+				     BottomNav owns it at the thumb's rest position. -->
+				<div class="hidden lg:flex">
+					<ThemeToggle {theme} {onToggle} />
+				</div>
 			</div>
 		</div>
 	</div>
-
-	{#if open}
-		<!-- Tap-away layer under the panel; dialog-style dim+blur scrim, fades with the menu -->
-		<div
-			class="fixed inset-0 z-10 bg-background/60 backdrop-blur-[2px] md:hidden"
-			aria-hidden="true"
-			transition:fade={fadeOpts}
-			onclick={() => (open = false)}
-		></div>
-		<nav
-			id="mobile-nav"
-			aria-label="Main navigation"
-			class="absolute inset-x-0 top-full z-20 flex flex-col overflow-hidden border-b border-border bg-background shadow-lg md:hidden"
-			transition:slide|local={slideOpts}
-		>
-			<div class="flex flex-col p-5">
-				{#each links as link (link.href)}
-					<a
-						href={link.href}
-						onclick={() => (open = false)}
-						class="rounded px-3 py-3 text-sm transition-colors {isActive(link.href)
-							? 'font-medium text-foreground'
-							: 'text-muted-foreground hover:text-foreground'}"
-						aria-current={isActive(link.href) ? 'page' : undefined}
-					>
-						{link.label}
-					</a>
-				{/each}
-			</div>
-		</nav>
-	{/if}
 
 	{#if searchOpen}
 		<SearchDialog onClose={closeSearch} />

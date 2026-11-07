@@ -2,6 +2,7 @@
 	import PostCard from '#lib/components/PostCard.svelte';
 	import ProfileVisual from '#lib/components/ProfileVisual.svelte';
 	import IdentityCard from '#lib/components/rail/IdentityCard.svelte';
+	import RailDrawer from '#lib/components/rail/RailDrawer.svelte';
 	import RevealPast from '#lib/components/rail/RevealPast.svelte';
 	import SearchPill from '#lib/components/rail/SearchPill.svelte';
 	import SectionLabel from '#lib/components/SectionLabel.svelte';
@@ -114,3 +115,10 @@
 		</Sidebar>
 	</div>
 </section>
+
+<!-- Phones/tablets: the same cards ride the floating bottom-sheet drawer. -->
+<RailDrawer label="About this site" variant="identity">
+	<IdentityCard />
+	<SearchPill />
+	<TopicCloud tags={data.tags} />
+</RailDrawer>

@@ -2,6 +2,7 @@
 	import './layout.css';
 	import { navigating } from '$app/state';
 	import favicon from '#lib/assets/favicon.svg';
+	import BottomNav from '#lib/components/BottomNav.svelte';
 	import Navbar from '#lib/components/Navbar.svelte';
 	import Footer from '#lib/components/Footer.svelte';
 	import type { LayoutProps } from './$types';
@@ -81,10 +82,14 @@
 <div class="flex min-h-svh flex-col bg-background text-foreground">
 	<div class="route-progress" data-phase={barState} aria-hidden="true"></div>
 	<Navbar {theme} onToggle={toggleTheme} />
-	<div class="mx-auto flex w-full max-w-page grow flex-col gap-12 px-5 py-12 md:px-8">
+	<div
+		class="mx-auto flex w-full max-w-page grow flex-col gap-12 px-5 pt-12 pb-24 md:px-8 lg:pb-12"
+	>
 		<main class="flex flex-1 flex-col gap-12">
 			{@render children()}
 		</main>
 		<Footer />
 	</div>
+	<!-- Icon-only primary bar for phones/tablets; retires at lg for the header. -->
+	<BottomNav {theme} onToggle={toggleTheme} />
 </div>

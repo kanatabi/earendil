@@ -302,6 +302,27 @@ stack can't overflow the viewport) and end-of-body `lg:hidden` on mobile/tablet;
 markdown pipeline never sees it, so no post can forget it. Same component, dual mount —
 the kit proving its plug-and-play claim.
 
+**Round 4 — the phone is the customer:** (a) The 360px article clipping was grid math:
+a 12-column grid with `gap-8` spends 352px on gaps _before_ any track — wider than the
+viewport itself, so every spanning child ran past the right padding. The 12-column
+machinery now exists only at `lg` (`grid-cols-1 lg:grid-cols-12`, same for the article
+aside). (b) `Clear` stays in search context → `/search` (the archive), never home.
+(c) The hamburger retires for an **icon-only `BottomNav`**: Home · Gallery · ⟨elevated
+center Search FAB, phone-only⟩ · About · theme slot — glassy bar (z-20, h-14 +
+safe-area), active tab = brand-violet icon + `aria-current`; mobile header is now
+wordmark-only; the page container gains `pb-24 lg:pb-12` clearance; the FAB and its center
+slot disappear at md where the header pill takes over; `ThemeToggle` dual-mounts
+(`hidden lg:flex` header + bar slot). (d) `rail/RailDrawer`: assistant-style floating
+trigger (z-20, `bottom-[calc(4.5rem+env(safe-area-inset-bottom))]` clears the bar) opening
+a modal bottom sheet (z-25 — grab handle, the established dim+blur scrim, slide-up,
+Esc/backdrop/X close with `focusOnMount` + focus return, closes on navigation,
+reduced-motion instant). Home mounts identity+search+topics ungated (a sheet has no hero to
+gate against); the search page moves its keyed `FilterPanel` into the drawer and the
+`<details>` bar retires. Fixed z ladder: bar/FAB 20 → sheet 25 → palette & lightbox 30.
+40 tests, gates green; preview curls proved the nav markup, drawer trigger, Clear target,
+single-col article grid, generated z-25/size-13/safe-area utilities. Flowstep debt grew —
+screens 1/5/2/6 still show hamburger-era chrome.
+
 **Float — cutout reveal (same round):** the photo layer lost its rectangle. ImageMagick
 border-flood was tried first and rejected by QA: at fuzz 18 the wall-shadow gaps survived
 disconnected AND the bright face got eaten through a temple/hair-highlight bridge to the

@@ -1,9 +1,10 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { SvelteURLSearchParams } from 'svelte/reactivity';
-	import { ChevronRight, Search } from 'lucide-svelte';
+	import { Search } from 'lucide-svelte';
 	import PostCard from '#lib/components/PostCard.svelte';
 	import FilterPanel from '#lib/components/rail/FilterPanel.svelte';
+	import RailDrawer from '#lib/components/rail/RailDrawer.svelte';
 	import Sidebar from '#lib/components/rail/Sidebar.svelte';
 	import type { PageData } from './$types';
 
@@ -107,7 +108,7 @@
 				{data.total === 1 ? 'post' : 'posts'}
 			</p>
 			<a
-				href="/"
+				href="/search"
 				class="shrink-0 text-sm text-muted-foreground transition-colors hover:text-foreground"
 			>
 				Clear
@@ -136,33 +137,6 @@
 				Search
 			</button>
 		</form>
-
-		<!-- Mobile facets live in a native disclosure: works JS-off, keyboard free. -->
-		<details class="group/mfilters lg:hidden">
-			<summary
-				class="flex cursor-pointer list-none items-center gap-3 rounded-full border border-border px-4 py-2 font-mono text-sm text-muted-foreground transition-colors hover:text-foreground [&::-webkit-details-marker]:hidden"
-			>
-				<span class="flex-1">filter<span class="text-brand">;</span></span>
-				<ChevronRight
-					class="size-3.5 transition-transform duration-200 group-open/mfilters:rotate-90"
-				/>
-			</summary>
-			<div class="mt-4 rounded-xl border border-border p-4">
-				{#key applied}
-					<FilterPanel
-						tags={data.tagCloud}
-						selected={data.tags}
-						from={data.from}
-						to={data.to}
-						readMin={data.readMin}
-						readMax={data.readMax}
-						sort={data.sort}
-						hasQuery={!!data.q}
-						onApply={apply}
-					/>
-				{/key}
-			</div>
-		</details>
 
 		<!-- Applied filters echo above the results, each removable in one click. -->
 		{#if hasFilters}
@@ -276,3 +250,20 @@
 		{/key}
 	</Sidebar>
 </section>
+
+<!-- Phones/tablets: the facet panel rides the floating bottom-sheet drawer. -->
+<RailDrawer label="Search filters" variant="filters">
+	{#key applied}
+		<FilterPanel
+			tags={data.tagCloud}
+			selected={data.tags}
+			from={data.from}
+			to={data.to}
+			readMin={data.readMin}
+			readMax={data.readMax}
+			sort={data.sort}
+			hasQuery={!!data.q}
+			onApply={apply}
+		/>
+	{/key}
+</RailDrawer>
