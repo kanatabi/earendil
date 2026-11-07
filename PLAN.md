@@ -547,6 +547,23 @@ home writing (5%, quietest — hover bands + long copy), gallery (4% behind the 
 tail). Opacity per surface is now the only per-placement variable: 4% article/gallery,
 5% home, 6% about/search corners, 7–8% error/empty bands.
 
+**Polish round + lumen reconciliation (main merged as PR #2):** (a) the `all` date chip
+double-highlighted beside presets — its active condition inherited a double negation
+("active unless in a custom range" → preset selections aren't custom → two chips lit);
+now `active={!from && !to}`: exactly one chip lights, custom ranges light none (the
+trigger pill owns that state). (b) the wordmark `;` pattern applied where it was missed:
+Pill children are flex `gap-2`, so bare `label` + `;`-span drifted apart — date and sort
+chips wrap their label+`;` in one span (75d; / all; / relevance;). (c) the About headline
+was still stub-era sans at 4xl/5xl while home's hero is Fraunces 5xl/6xl — About now
+takes the exact home-hero type chain; article titles stay deliberately smaller _serif_.
+(d) full contract audit earendil↔lumen: params/tags/Tag/sort/read semantics confirmed in
+sync; the real drift was lumen §3 still prescribing publish-time SVG rendering (Route A,
+rejected!) with a `content_rendered` column — its own stale-flag, now RESOLVED by the
+owner: §3 rewritten to Route B (raw fences are the contract; the backend carries them
+untouched; one payload serves both themes), intro/§2/PostDetail/§6 corrected, featured +
+feed.xml comments aligned to FE reality. Lesson recorded: a mirror flag marked "stale"
+is a promise to reconcile, not a substitute for it.
+
 Sizing follow-up (owner: "the watermark is very small?"): right — `min(45vw,560px)`
 self-adapts _downward_ on phones (176px at 390) and the corner stamp read accidental.
 Geometry rule now: corners `w-[75vw] max-w-[560px] lg:w-[min(45vw,560px)]` — mobile gets a
