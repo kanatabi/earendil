@@ -30,6 +30,12 @@ export function startScrollChrome(): () => void {
 		lastY = y;
 	};
 
+	// Sync once at startup: restored or deep scroll positions do not
+	// necessarily fire a scroll event after the effect attaches — without
+	// this, the pill stays hidden (and the bar's baseline stale) until the
+	// first manual scroll.
+	onScroll();
+
 	window.addEventListener('scroll', onScroll, { passive: true });
 	return () => {
 		window.removeEventListener('scroll', onScroll);
