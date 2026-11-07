@@ -195,6 +195,18 @@ Companion to `DESIGN.md` in this directory. Each milestone ends with a verifiabl
 **Verify:** hover/keyboard/tap reveal in both themes; no `data.featured` references left on
 home; gate clean (`lint`/`check`/`test:unit`/`build`).
 
+**Refined (same round) — theme-following blend:** the opaque terminal-green tile was traded
+for canvas unity. The ASCII layer is now a **luminance-baked alpha mask**
+(`ascii-glyphs-512.webp`, lossless 22KB — 45% black cutoff kills the downscale wash; alpha
+carries the glyph density) painted via `background-color: var(--ascii-ink)` — `--foreground`
+in light (true monochrome), sampled sage `#d8e0d6` in dark. Chosen over two baked theme-assets
+so the color stays a CSS token (the diagram-subsystem rule: art carries no palette) and the
+theme flip is pure CSS — correct pre-paint (`data-theme` from the cookie), on toggle, and
+with JS off. Consequence accepted: dark-mode glyphs are one hue modulated by opacity
+(per-glyph _hue_ variance flattens; density depth survives). The `border-border` frame is
+gone — frameless ASCII merges with the hero text; `rounded-lg` remains as the clip for the
+opaque photo reveal.
+
 ---
 
 ## Milestone 7 — Responsive + a11y polish

@@ -17,6 +17,8 @@
 	--border: #e4e4e7;
 	/* Brand accent — the semicolon in the wordmark, nothing else. */
 	--brand: #7c3aed;
+	/* Hero ASCII portrait — ink follows the theme (monochrome in light mode). */
+	--ascii-ink: var(--foreground);
 	/* Diagram palette — source of truth for client-rendered mermaid (Route B). */
 	--diagram-bg: #ffffff;
 	--diagram-surface: #f4f4f5;
@@ -39,6 +41,8 @@
 	--accent: #27272a;
 	--border: #27272a;
 	--brand: #a78bfa;
+	/* Terminal sage, sampled from the ASCII master's bright glyphs. */
+	--ascii-ink: #d8e0d6;
 	--diagram-bg: #131316;
 	--diagram-surface: #27272a;
 	--diagram-ink: #fafafa;

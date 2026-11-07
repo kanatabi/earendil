@@ -4,6 +4,8 @@
 	// group-hover variant), on keyboard focus, or on tap — touch has no hover, so
 	// there a tap toggles the reveal and the state STICKS until tapped again.
 	// Only opacity animates: composited, safe on the mobile perf budget (AGENTS §6).
+	// The ASCII is a luminance-baked alpha mask painted with --ascii-ink, so it
+	// follows the theme (monochrome ink / terminal sage) and blends into the canvas.
 	let revealed = $state(false);
 
 	function tap(e: MouseEvent) {
@@ -18,7 +20,7 @@
 
 <button
 	type="button"
-	class="group relative block aspect-square w-40 overflow-hidden rounded-lg border border-border text-left md:w-60"
+	class="group relative block aspect-square w-40 overflow-hidden rounded-lg text-left md:w-60"
 	aria-label="Portrait of Faiz Ainur Rofiq rendered in ASCII characters. Activate to reveal the photograph."
 	onclick={tap}
 >
@@ -33,22 +35,25 @@
 			fetchpriority="high"
 		/>
 	</picture>
-	<picture>
-		<source type="image/avif" srcset="/profile/ascii-512.avif" />
-		<img
-			class="ascii absolute inset-0 h-full w-full object-cover transition-opacity duration-500 group-hover:opacity-0 group-focus-visible:opacity-0 {revealed
-				? 'opacity-0'
-				: 'opacity-100'}"
-			src="/profile/ascii-512.webp"
-			alt=""
-			width="512"
-			height="512"
-			fetchpriority="high"
-		/>
-	</picture>
+	<div
+		class="ascii absolute inset-0 transition-opacity duration-500 group-hover:opacity-0 group-focus-visible:opacity-0 {revealed
+			? 'opacity-0'
+			: 'opacity-100'}"
+		aria-hidden="true"
+	></div>
 </button>
 
 <style>
+	.ascii {
+		-webkit-mask-image: url('/profile/ascii-glyphs-512.webp');
+		mask-image: url('/profile/ascii-glyphs-512.webp');
+		-webkit-mask-size: 100% 100%;
+		mask-size: 100% 100%;
+		-webkit-mask-repeat: no-repeat;
+		mask-repeat: no-repeat;
+		background-color: var(--ascii-ink);
+	}
+
 	@media (prefers-reduced-motion: reduce) {
 		.ascii {
 			transition-duration: 0ms;
