@@ -461,6 +461,17 @@ at module-eval time inside scroll-chrome.svelte.ts (typeof-window guarded, runs 
 client graph, before first paint), and the layout effect + startScrollChrome export are
 gone. Nothing can forget to start it now.
 
+**About desktop rail + watermark:** the narrative column (72ch) inside the 1120 grid left a
+dead right margin at lg; the kit answered it. Section is now
+`lg:grid-cols-[minmax(0,1fr)_272px]` with a sticky `Sidebar` rail: the promoted portrait
+(272px) wrapped in `RevealPast watch="identity-photo"` — the rail face appears exactly when
+the inline twin scrolls away (owner's twist on the home gating, component reused verbatim),
+then the new `rail/FactCard` for `facts;` and `colophon;` (source → earendil ↗), and
+`elsewhere;` into the rail with a `lg:hidden` body-end twin (the accepted dual-mount). A
+6%-opacity ASCII-glyph watermark (same mask asset, `--ascii-ink`, theme-aware, static,
+bottom-right) fills the corner the rail leaves empty. No new scroll machinery anywhere: one
+reused component, one presentational card, one static mask.
+
 **Float — cutout reveal (same round):** the photo layer lost its rectangle. ImageMagick
 border-flood was tried first and rejected by QA: at fuzz 18 the wall-shadow gaps survived
 disconnected AND the bright face got eaten through a temple/hair-highlight bridge to the

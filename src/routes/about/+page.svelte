@@ -1,202 +1,254 @@
 <script lang="ts">
 	import { ChevronRight } from 'lucide-svelte';
 	import SectionLabel from '#lib/components/SectionLabel.svelte';
+	import RevealPast from '#lib/components/rail/RevealPast.svelte';
+	import FactCard from '#lib/components/rail/FactCard.svelte';
+	import Sidebar from '#lib/components/rail/Sidebar.svelte';
+	import { scrollRail } from '#lib/actions.ts';
 	import {
+		colophon,
 		education,
 		elsewhere,
 		experience,
+		facts,
 		profile,
 		research,
 		stack
 	} from '#lib/content/about.ts';
-	import { scrollRail } from '#lib/actions.ts';
 </script>
 
 <svelte:head>
 	<title>about · gofar;</title>
 </svelte:head>
 
-<section class="fade-up mx-auto flex w-full max-w-page flex-col gap-12">
-	<div class="flex flex-col gap-6">
-		<p class="text-sm font-medium tracking-wide text-primary">About</p>
-		<h1 class="max-w-3xl text-4xl leading-tight font-semibold tracking-tight md:text-5xl">
-			{profile.tagline}
-		</h1>
-		<!-- Identity block: the same floating cutout that ends the hero reveal. -->
-		<div class="grid items-start gap-8 md:grid-cols-[192px_minmax(0,1fr)] md:gap-10">
-			<picture class="justify-self-center md:justify-self-start">
-				<source type="image/avif" srcset="/profile/photo-640.avif" />
-				<img
-					class="photo size-40 rounded-lg object-cover md:size-48"
-					src="/profile/photo-640.webp"
-					alt="Black-and-white portrait of {profile.name}"
-					width="640"
-					height="640"
-				/>
-			</picture>
-			<div class="flex max-w-2xl flex-col gap-4">
-				{#each profile.bio as para (para)}
-					<p class="text-lg leading-relaxed text-muted-foreground">{para}</p>
-				{/each}
-				<p class="font-mono text-xs text-muted-foreground">
-					see also —
-					<a href="/gallery" class="text-primary transition-colors hover:text-foreground"
-						>the gallery<span class="text-brand">;</span></a
-					>
+<section class="fade-up relative mx-auto flex w-full max-w-page">
+	<!-- Brand texture in the dead corner: the hero's ASCII glyphs, painted with the
+	     same --ascii-ink (theme-aware) at whisper opacity, behind everything. -->
+	<span
+		class="watermark pointer-events-none absolute right-0 bottom-0 hidden lg:block"
+		aria-hidden="true"
+	></span>
+
+	<div class="grid w-full gap-12 lg:grid-cols-[minmax(0,1fr)_272px]">
+		<div class="flex min-w-0 flex-col gap-12">
+			<div class="flex flex-col gap-6">
+				<p class="text-sm font-medium tracking-wide text-primary">About</p>
+				<h1 class="max-w-3xl text-4xl leading-tight font-semibold tracking-tight md:text-5xl">
+					{profile.tagline}
+				</h1>
+				<!-- Identity block: the same floating cutout that ends the hero reveal.
+				     The id marks it for the rail portrait's RevealPast gate below. -->
+				<div class="grid items-start gap-8 md:grid-cols-[192px_minmax(0,1fr)] md:gap-10">
+					<picture id="identity-photo" class="justify-self-center md:justify-self-start">
+						<source type="image/avif" srcset="/profile/photo-640.avif" />
+						<img
+							class="photo size-40 rounded-lg object-cover md:size-48"
+							src="/profile/photo-640.webp"
+							alt="Black-and-white portrait of {profile.name}"
+							width="640"
+							height="640"
+						/>
+					</picture>
+					<div class="flex max-w-2xl flex-col gap-4">
+						{#each profile.bio as para (para)}
+							<p class="text-lg leading-relaxed text-muted-foreground">{para}</p>
+						{/each}
+						<p class="font-mono text-xs text-muted-foreground">
+							see also —
+							<a href="/gallery" class="text-primary transition-colors hover:text-foreground"
+								>the gallery<span class="text-brand">;</span></a
+							>
+						</p>
+					</div>
+				</div>
+			</div>
+
+			<!-- Experience: the gofar line. The route ahead is dashed; the traveled
+			     part is solid violet, and a semicolon rides the fill head as you scroll
+			     (it grows down, retreats back up). Markup defaults to the FINISHED
+			     journey — no-JS and reduced-motion readers see the full line with the
+			     marker at the end; scrollRail only ever retreats it to reality. -->
+			<div class="flex flex-col gap-6">
+				<SectionLabel title="Experience" />
+				<div class="relative" use:scrollRail>
+					<span class="rail" aria-hidden="true">
+						<span class="rail-fill"></span>
+						<span class="rail-mark">;</span>
+					</span>
+					<ol class="flex flex-col">
+						{#each experience as job, i (job.period + job.company)}
+							<li class="relative py-5 pl-10">
+								<!-- Card hairline starts at the text gutter (left-10): it must
+							     never cross the rail channel, unlike the old li border-t. -->
+								{#if i > 0}
+									<span class="absolute top-0 right-0 left-10 h-px bg-border" aria-hidden="true"
+									></span>
+								{/if}
+								<span
+									class="rail-dot absolute top-[26px] left-[5px]"
+									data-rail-off={undefined}
+									aria-hidden="true"
+								></span>
+								<p class="font-mono text-xs text-muted-foreground">{job.period}</p>
+								<h3
+									class="mt-1 max-w-[72ch] font-brand text-lg font-semibold tracking-tight text-foreground"
+								>
+									{job.role}<span class="font-normal text-muted-foreground"> · {job.company}</span>
+								</h3>
+								<p class="mt-1 max-w-[72ch] text-sm leading-relaxed text-muted-foreground">
+									{job.blurb}
+								</p>
+							</li>
+						{/each}
+					</ol>
+				</div>
+			</div>
+
+			<!-- Education: a static tree — the degree is the root, the thesis and
+			     robotics hang beneath it on hairline elbows. The thesis node is lit
+			     violet: the traveled branch, linking down to the research block. -->
+			<div class="flex flex-col gap-6">
+				<SectionLabel title="Education" />
+				<div class="max-w-[72ch]">
+					<h3 class="font-brand text-lg font-semibold tracking-tight text-foreground">
+						{education.degree}<span class="font-normal text-muted-foreground">
+							· {education.school}</span
+						>
+					</h3>
+					<p class="mt-1 font-mono text-xs text-muted-foreground">{education.period}</p>
+					<ul class="tree">
+						{#each education.highlights as item (item.body)}
+							<li>
+								<span class="node {item.active ? 'node-lit' : ''}" aria-hidden="true"
+								></span>{item.body}{#if item.link}
+									(<a
+										href={item.link.href}
+										class="text-primary transition-colors hover:text-foreground"
+										>{item.link.label}</a
+									>){/if}
+							</li>
+						{/each}
+					</ul>
+				</div>
+			</div>
+
+			<div class="flex flex-col gap-6" id="research">
+				<SectionLabel title="Research" />
+				<div class="flex flex-col">
+					{#each research as paper (paper.title)}
+						<article class="border-t border-border py-5 first:border-t-0 first:pt-0">
+							<!-- The title IS the link (scholarly convention), wearing the house
+					underline-grow grammar of the article rows; the ↗ says "leaves". -->
+							<h3
+								class="group max-w-[72ch] font-brand text-base leading-snug font-semibold tracking-tight text-foreground"
+							>
+								<a
+									href={paper.href}
+									target="_blank"
+									rel="noopener noreferrer"
+									class="relative inline after:absolute after:-bottom-0.5 after:left-0 after:h-px after:w-0 after:bg-brand after:transition-[width] after:duration-200 hover:after:w-full"
+								>
+									{paper.title}
+									<span aria-hidden="true" class="align-top text-xs text-muted-foreground">↗</span>
+									<span class="sr-only">(opens in a new tab)</span>
+								</a>
+							</h3>
+							<p class="mt-1.5 font-mono text-xs text-muted-foreground">{paper.year}</p>
+							<p class="mt-1 max-w-[72ch] font-mono text-xs text-muted-foreground">
+								{paper.keywords.join(' · ')}
+							</p>
+							<p class="mt-2 max-w-[72ch] text-sm leading-relaxed text-muted-foreground">
+								{paper.note}
+							</p>
+							<!-- Native <details> (JS-off keeps the content readable); the body
+					     glides open via a grid-rows keyframe — closing stays instant:
+					     the honest tradeoff of animating unmount without JS. -->
+							<details class="group mt-3 max-w-[72ch]">
+								<summary
+									class="flex w-fit cursor-pointer list-none items-center gap-2 rounded-full border border-border px-3 py-1 font-mono text-xs text-muted-foreground transition-colors hover:border-muted-foreground hover:text-foreground [&::-webkit-details-marker]:hidden"
+								>
+									abstract
+									<ChevronRight
+										class="size-3 transition-transform duration-200 group-open:rotate-90 motion-reduce:transition-none"
+									/>
+								</summary>
+								<div class="abs-body">
+									<p
+										class="mt-2 min-h-0 overflow-hidden text-sm leading-relaxed text-muted-foreground first-letter:font-brand first-letter:font-semibold"
+									>
+										{paper.abstract}
+									</p>
+								</div>
+							</details>
+							<a
+								href={paper.href}
+								target="_blank"
+								rel="noopener noreferrer"
+								class="mt-3 inline-flex w-fit items-center gap-2 rounded-full border border-border px-3 py-1 font-mono text-xs text-muted-foreground transition-colors hover:border-muted-foreground hover:text-foreground"
+							>
+								pdf<span aria-hidden="true">↗</span><span class="sr-only">(opens in a new tab)</span
+								>
+							</a>
+						</article>
+					{/each}
+				</div>
+			</div>
+
+			<!-- Stack: opinions ride inside the groups as annotated first items. -->
+			<div class="flex flex-col gap-6">
+				<SectionLabel title="Stack" />
+				<div class="flex max-w-[72ch] flex-col gap-2">
+					{#each stack.groups as group (group.label)}
+						<p class="font-mono text-xs leading-relaxed text-muted-foreground">
+							<span class="text-foreground">{group.label} —</span>
+							{group.items.join(' · ')}<span class="text-brand">;</span>
+						</p>
+					{/each}
+				</div>
+			</div>
+
+			<!-- Mobile keeps the elsewhere strip at the bottom; lg moves it into the rail. -->
+			<div class="flex flex-col gap-4 lg:hidden">
+				<SectionLabel title="Elsewhere" />
+				<p class="flex flex-wrap gap-x-5 gap-y-2 font-mono text-xs text-muted-foreground">
+					{#each elsewhere as link (link.label)}
+						<a href={link.href} class="transition-colors hover:text-foreground"
+							>{link.label}<span class="text-brand">;</span></a
+						>
+					{/each}
 				</p>
 			</div>
 		</div>
-	</div>
 
-	<!-- Experience: the gofar line. The route ahead is dashed; the traveled
-	     part is solid violet, and a semicolon rides the fill head as you scroll
-	     (it grows down, retreats back up). Markup defaults to the FINISHED
-	     journey — no-JS and reduced-motion readers see the full line with the
-	     marker at the end; scrollRail only ever retreats it to reality. -->
-	<div class="flex flex-col gap-6">
-		<SectionLabel title="Experience" />
-		<div class="relative" use:scrollRail>
-			<span class="rail" aria-hidden="true">
-				<span class="rail-fill"></span>
-				<span class="rail-mark">;</span>
-			</span>
-			<ol class="flex flex-col">
-				{#each experience as job, i (job.period + job.company)}
-					<li class="relative py-5 pl-10">
-						<!-- Card hairline starts at the text gutter (left-10): it must
-						     never cross the rail channel, unlike the old li border-t. -->
-						{#if i > 0}
-							<span class="absolute top-0 right-0 left-10 h-px bg-border" aria-hidden="true"></span>
-						{/if}
-						<span
-							class="rail-dot absolute top-[26px] left-[5px]"
-							data-rail-off={undefined}
-							aria-hidden="true"
-						></span>
-						<p class="font-mono text-xs text-muted-foreground">{job.period}</p>
-						<h3
-							class="mt-1 max-w-[72ch] font-brand text-lg font-semibold tracking-tight text-foreground"
+		<!-- Desktop rail (kit): the portrait reappears only once its inline twin
+		     has scrolled away (RevealPast, same gate as home), then the scannable
+		     cards. Sticky/fixed behavior all lives in the shell. -->
+		<Sidebar label="About the author">
+			<RevealPast watch="identity-photo">
+				<picture class="block">
+					<source type="image/avif" srcset="/profile/photo-640.avif" />
+					<img
+						class="photo w-full rounded-lg object-cover"
+						src="/profile/photo-640.webp"
+						alt=""
+						width="640"
+						height="640"
+					/>
+				</picture>
+			</RevealPast>
+			<FactCard title="facts" rows={facts} />
+			<FactCard title="colophon" rows={colophon} />
+			<div class="flex flex-col gap-3">
+				<p class="text-xs font-medium tracking-widest text-muted-foreground uppercase">elsewhere</p>
+				<p class="flex flex-wrap gap-x-4 gap-y-1.5 font-mono text-xs text-muted-foreground">
+					{#each elsewhere as link (link.label)}
+						<a href={link.href} class="transition-colors hover:text-foreground"
+							>{link.label}<span class="text-brand">;</span></a
 						>
-							{job.role}<span class="font-normal text-muted-foreground"> · {job.company}</span>
-						</h3>
-						<p class="mt-1 max-w-[72ch] text-sm leading-relaxed text-muted-foreground">
-							{job.blurb}
-						</p>
-					</li>
-				{/each}
-			</ol>
-		</div>
-	</div>
-
-	<!-- Education: a static tree — the degree is the root, the thesis and
-	     robotics hang beneath it on hairline elbows. The thesis node is lit
-	     violet: the traveled branch, linking down to the research block. -->
-	<div class="flex flex-col gap-6">
-		<SectionLabel title="Education" />
-		<div class="max-w-[72ch]">
-			<h3 class="font-brand text-lg font-semibold tracking-tight text-foreground">
-				{education.degree}<span class="font-normal text-muted-foreground">
-					· {education.school}</span
-				>
-			</h3>
-			<p class="mt-1 font-mono text-xs text-muted-foreground">{education.period}</p>
-			<ul class="tree">
-				{#each education.highlights as item (item.body)}
-					<li>
-						<span class="node {item.active ? 'node-lit' : ''}" aria-hidden="true"
-						></span>{item.body}{#if item.link}
-							(<a href={item.link.href} class="text-primary transition-colors hover:text-foreground"
-								>{item.link.label}</a
-							>){/if}
-					</li>
-				{/each}
-			</ul>
-		</div>
-	</div>
-
-	<div class="flex flex-col gap-6" id="research">
-		<SectionLabel title="Research" />
-		<div class="flex flex-col">
-			{#each research as paper (paper.title)}
-				<article class="border-t border-border py-5 first:border-t-0 first:pt-0">
-					<!-- The title IS the link (scholarly convention), wearing the house
-					     underline-grow grammar of the article rows; the ↗ says "leaves". -->
-					<h3
-						class="group max-w-[72ch] font-brand text-base leading-snug font-semibold tracking-tight text-foreground"
-					>
-						<a
-							href={paper.href}
-							target="_blank"
-							rel="noopener noreferrer"
-							class="relative inline after:absolute after:-bottom-0.5 after:left-0 after:h-px after:w-0 after:bg-brand after:transition-[width] after:duration-200 hover:after:w-full"
-						>
-							{paper.title}
-							<span aria-hidden="true" class="align-top text-xs text-muted-foreground">↗</span>
-							<span class="sr-only">(opens in a new tab)</span>
-						</a>
-					</h3>
-					<p class="mt-1.5 font-mono text-xs text-muted-foreground">{paper.year}</p>
-					<p class="mt-1 max-w-[72ch] font-mono text-xs text-muted-foreground">
-						{paper.keywords.join(' · ')}
-					</p>
-					<p class="mt-2 max-w-[72ch] text-sm leading-relaxed text-muted-foreground">
-						{paper.note}
-					</p>
-					<!-- Native <details> (JS-off keeps the content readable); the body
-					     glides open via a grid-rows keyframe — closing stays instant:
-					     the honest tradeoff of animating unmount without JS. -->
-					<details class="group mt-3 max-w-[72ch]">
-						<summary
-							class="flex w-fit cursor-pointer list-none items-center gap-2 rounded-full border border-border px-3 py-1 font-mono text-xs text-muted-foreground transition-colors hover:border-muted-foreground hover:text-foreground [&::-webkit-details-marker]:hidden"
-						>
-							abstract
-							<ChevronRight
-								class="size-3 transition-transform duration-200 group-open:rotate-90 motion-reduce:transition-none"
-							/>
-						</summary>
-						<div class="abs-body">
-							<p
-								class="mt-2 min-h-0 overflow-hidden text-sm leading-relaxed text-muted-foreground first-letter:font-brand first-letter:font-semibold"
-							>
-								{paper.abstract}
-							</p>
-						</div>
-					</details>
-					<a
-						href={paper.href}
-						target="_blank"
-						rel="noopener noreferrer"
-						class="mt-3 inline-flex w-fit items-center gap-2 rounded-full border border-border px-3 py-1 font-mono text-xs text-muted-foreground transition-colors hover:border-muted-foreground hover:text-foreground"
-					>
-						pdf<span aria-hidden="true">↗</span><span class="sr-only">(opens in a new tab)</span>
-					</a>
-				</article>
-			{/each}
-		</div>
-	</div>
-
-	<!-- Stack: opinions ride inside the groups as annotated first items. -->
-	<div class="flex flex-col gap-6">
-		<SectionLabel title="Stack" />
-		<div class="flex max-w-[72ch] flex-col gap-2">
-			{#each stack.groups as group (group.label)}
-				<p class="font-mono text-xs leading-relaxed text-muted-foreground">
-					<span class="text-foreground">{group.label} —</span>
-					{group.items.join(' · ')}<span class="text-brand">;</span>
+					{/each}
 				</p>
-			{/each}
-		</div>
-	</div>
-
-	<div class="flex flex-col gap-4">
-		<SectionLabel title="Elsewhere" />
-		<p class="flex flex-wrap gap-x-5 gap-y-2 font-mono text-xs text-muted-foreground">
-			{#each elsewhere as link (link.label)}
-				<a href={link.href} class="transition-colors hover:text-foreground"
-					>{link.label}<span class="text-brand">;</span></a
-				>
-			{/each}
-		</p>
+			</div>
+		</Sidebar>
 	</div>
 </section>
 
@@ -204,6 +256,19 @@
 	.photo {
 		/* Dark mode: same brand-violet halo that keeps the hero cutout readable. */
 		filter: var(--photo-glow);
+	}
+
+	.watermark {
+		width: min(45vw, 560px);
+		aspect-ratio: 1;
+		background-color: var(--ascii-ink);
+		opacity: 0.06;
+		-webkit-mask-image: url('/profile/ascii-glyphs-640.webp');
+		mask-image: url('/profile/ascii-glyphs-640.webp');
+		-webkit-mask-size: cover;
+		mask-size: cover;
+		-webkit-mask-repeat: no-repeat;
+		mask-repeat: no-repeat;
 	}
 
 	.rail {

@@ -35,6 +35,12 @@ export interface StackGroup {
 	items: string[];
 }
 
+export interface FactRow {
+	label: string;
+	value: string;
+	href?: string;
+}
+
 export const profile = {
 	name: 'Faiz Ainur Rofiq',
 	tagline: 'Backend engineer & occasional photographer.',
@@ -175,6 +181,25 @@ export const stack: { groups: StackGroup[] } = {
 		}
 	]
 };
+
+export const facts: FactRow[] = [
+	{ label: 'based', value: 'depok · jakarta metro' },
+	{ label: 'shipped since', value: '2020' },
+	{ label: 'focus', value: 'distributed systems · observability' },
+	{ label: 'spoken', value: 'indonesia · english' }
+];
+
+/** The site's own colophon — the infra-blogger's quiet brag. */
+export const colophon: FactRow[] = [
+	{ label: 'engine', value: 'sveltekit · svelte 5' },
+	{ label: 'hosts', value: 'self-managed k3s' },
+	{ label: 'privacy', value: 'no trackers; one cookie, for the theme' },
+	{
+		label: 'source',
+		value: 'earendil ↗',
+		href: 'https://github.com/kanatabi/earendil'
+	}
+];
 
 export const elsewhere = [
 	{ label: 'github', href: 'https://github.com/kanatabi' },
