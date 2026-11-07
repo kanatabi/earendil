@@ -1,5 +1,6 @@
 <script lang="ts">
 	import PostCard from '#lib/components/PostCard.svelte';
+	import ProfileVisual from '#lib/components/ProfileVisual.svelte';
 	import SectionLabel from '#lib/components/SectionLabel.svelte';
 	import type { PageData } from './$types';
 
@@ -14,10 +15,13 @@
 	<title>gofar; — essays by Faiz Ainur Rofiq</title>
 </svelte:head>
 
-<!-- Hero: display serif headline, "currently" line, featured photograph -->
+<!-- Hero: display serif headline, "currently" line, ASCII profile portrait -->
 <section
 	class="fade-up mx-auto grid w-full max-w-3xl items-center gap-8 md:grid-cols-[minmax(0,1fr)_240px]"
 >
+	<div class="order-first md:order-last">
+		<ProfileVisual />
+	</div>
 	<div class="flex flex-col gap-6">
 		<p class="text-sm font-medium tracking-wide text-primary">Hello, I&rsquo;m Faiz.</p>
 		<h1 class="font-brand text-5xl leading-[1.05] font-semibold tracking-tight md:text-6xl">
@@ -37,42 +41,6 @@
 			>
 		</p>
 	</div>
-	{#if data.featured}
-		<a
-			href="/gallery"
-			class="group hidden md:block"
-			aria-label="Featured photograph — view the gallery"
-		>
-			<img
-				src={data.featured.src}
-				alt={data.featured.alt}
-				width={data.featured.width}
-				height={data.featured.height}
-				class="aspect-[4/5] w-60 rounded-lg border border-border object-cover grayscale transition duration-500 group-hover:grayscale-0 lg:w-64"
-			/>
-		</a>
-	{:else}
-		<svg
-			viewBox="0 0 400 280"
-			fill="none"
-			stroke="currentColor"
-			aria-hidden="true"
-			class="hidden w-56 text-muted-foreground/40 md:block"
-		>
-			<circle cx="316" cy="58" r="26" stroke-width="2" />
-			<path
-				d="M12 236 L104 128 L156 184 L238 84 L388 236"
-				stroke-width="2.5"
-				stroke-linejoin="round"
-			/>
-			<path
-				d="M12 264 L88 192 L148 244 L226 160 L300 232 L388 264"
-				stroke-width="2"
-				stroke-linejoin="round"
-				opacity="0.6"
-			/>
-		</svg>
-	{/if}
 </section>
 
 <!-- Writing: the full list, paginated — /articles and /search reuse these rows -->

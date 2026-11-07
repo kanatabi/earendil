@@ -168,6 +168,35 @@ Companion to `DESIGN.md` in this directory. Each milestone ends with a verifiabl
 
 ---
 
+## Hero identity — ASCII profile reveal (2026-11-07)
+
+1. **The hero image became brand, not content**: the `/gallery`-linked BE-sourced "featured
+   photograph" is replaced by a static identity asset — the author portrait shown as ASCII
+   art, revealing the original BW photograph on hover/focus/tap. New `ProfileVisual`
+   component + `static/profile/` derivatives. Rationale: the profile picture is inseparable
+   from the FE's identity (like the `gofar;` wordmark), so it must not 404 with the API, and
+   the home load loses a fetch. `BlogApi.getFeaturedPhoto()` **stays** in the contract/mock
+   (mirror of `GET /api/photos/featured` for lumen) — no FE consumer for now.
+2. **Reveal mechanics**: two stacked `<picture>` layers (AVIF→WebP, 512² square crops of the
+   3:4 masters, Lanczos-scaled — point-sampling moiré'd the glyph grid); only `opacity`
+   transitions (500ms, composited per the mobile budget), `prefers-reduced-motion` ⇒ instant.
+   Hover is CSS-only (`group-hover` — Tailwind v4 gates it to hover-capable devices); the
+   block is a `type="button"` — keyboard focus reveals (`group-focus-visible`, the
+   `aria-label` carries the single portrait description) and on touch a tap toggles it,
+   same `(hover: none)`-gated pattern as the code-tools tap-reveal; the toggle state sticks
+   until tapped again (the handler blurs so focus can't pin it open).
+   Light/dark: the terminal-green ASCII tile is intentionally theme-agnostic; `border-border`
+   frames it on either canvas.
+3. **Responsive**: the portrait was desktop-only before — now visible everywhere:
+   `w-40` above the greeting on mobile (`order-first`), `md:w-60` in the right grid column
+   (`md:order-last`), square with the same `rounded-lg` corner treatment. The SVG fallback
+   branch is gone (static asset ⇒ always present).
+
+**Verify:** hover/keyboard/tap reveal in both themes; no `data.featured` references left on
+home; gate clean (`lint`/`check`/`test:unit`/`build`).
+
+---
+
 ## Milestone 7 — Responsive + a11y polish
 
 1. Screenshot-diff QA against **all 8 Flowstep screens** (theme × viewport).
