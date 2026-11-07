@@ -342,6 +342,15 @@ spring back. The svelte slide outro still runs on a panel already translated out
 so the sheet vanishes under the fading scrim with no double motion; reduced-motion closes
 instantly. No per-page wiring needed — the behavior lives inside RailDrawer itself.
 
+**FAB/pill consistency:** the mobile search entry point had two personalities — the nav FAB
+navigated to `/search`, the home sheet's pill opened the palette. Resolved per the owner's
+rule: the FAB is now a context-aware button (no link) — on `/search` it focuses + selects
+`#search-input` (and the browser scrolls you back to it), everywhere else it dispatches the
+same `gofar:open-search` event the desktop rail pill uses; `aria-haspopup="dialog"` only
+when it actually opens a dialog. The sheet's SearchPill retired as redundant (identity +
+topics only; the desktop rail keeps its pill since there is no FAB at lg). `/search` stays
+reachable/shareable as before — the palette's "see all" is the deep-link path.
+
 **Float — cutout reveal (same round):** the photo layer lost its rectangle. ImageMagick
 border-flood was tried first and rejected by QA: at fuzz 18 the wall-shadow gaps survived
 disconnected AND the bright face got eaten through a temple/hair-highlight bridge to the

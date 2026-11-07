@@ -123,6 +123,7 @@
 				<!-- The tag filter is dropped on a new query — search is the intent switch. -->
 				<input
 					type="search"
+					id="search-input"
 					name="q"
 					value={data.q ?? ''}
 					placeholder="Search posts…"

@@ -31,6 +31,21 @@
 		tabs.find((t) => t.href === href)?.match(page.url.pathname) ?? false;
 
 	const searchActive = $derived(page.url.pathname.startsWith('/search'));
+
+	// Context-aware FAB (the pill in the home sheet retired as redundant):
+	// on /search it returns you to the field — the browser scrolls it back
+	// into view — everywhere else it rings the palette through the same
+	// window event the rail SearchPill uses, so the Navbar's focus-return
+	// contract applies unchanged.
+	function tapSearch() {
+		if (searchActive) {
+			const el = document.getElementById('search-input');
+			el?.focus();
+			if (el instanceof HTMLInputElement) el.select();
+		} else {
+			window.dispatchEvent(new Event('gofar:open-search'));
+		}
+	}
 </script>
 
 <!-- One UI-flavored primary bar below lg: five EQUAL flex-1 cells (exact
@@ -66,15 +81,17 @@
 		{/each}
 
 		<div class="relative flex flex-1 items-center justify-center md:hidden">
-			<a
-				href="/search"
-				aria-label="Search"
+			<button
+				type="button"
+				onclick={tapSearch}
+				aria-label={searchActive ? 'Search field' : 'Search'}
+				aria-haspopup={searchActive ? undefined : 'dialog'}
 				class="absolute -top-5 flex size-13 items-center justify-center rounded-full border bg-card shadow-lg transition-colors {searchActive
 					? 'border-brand/60 text-brand'
 					: 'border-border text-muted-foreground hover:text-foreground'}"
 			>
 				<Search class="size-5" />
-			</a>
+			</button>
 		</div>
 
 		{#each tabs.slice(2) as tab (tab.href)}

@@ -116,9 +116,9 @@
 	</div>
 </section>
 
-<!-- Phones/tablets: the same cards ride the floating bottom-sheet drawer. -->
+<!-- Phones/tablets: identity + topics ride the floating bottom-sheet drawer;
+     search is the BottomNav FAB's job, so no pill in the sheet. -->
 <RailDrawer label="About this site" variant="identity">
 	<IdentityCard />
-	<SearchPill />
 	<TopicCloud tags={data.tags} />
 </RailDrawer>
