@@ -43,3 +43,6 @@ export interface PostListResponse {
 export interface SuggestResponse {
 	results: PostSummary[];
 }
+
+/** URL-safe sort values; relevance only applies to search, absent = BE curation. */
+export type SortValue = 'newest' | 'oldest' | 'quickest' | 'longest' | 'relevance';

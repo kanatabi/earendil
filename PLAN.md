@@ -265,6 +265,29 @@ kit-v3 `goto` uses `{ replace: true, reset: false }` (noScroll/replaceState are 
 lumen mirror carries the params (+3 tests → 37; gates green; preview curls proved the OR
 union, the date-window slice, chips and the disclosure).
 
+**Rail round 2 — honest collapse, ordering, archive, sort + length facets:**
+`RevealPast` stopped reserving space (the hidden cards left a hole above `topics;`): the
+wrapper is now a `grid-template-rows: 1fr ↔ 0fr` transition around an `overflow-hidden`
+inner — real collapse, still reversible, reduced-motion snaps. Home rail order: search →
+topics → identity (the two gated cards now collapse at the rail's top and bottom).
+DateRange's trigger went compact-mono (`2026-11-09 → 11-14`, year once; long-form stays in
+the popover footer + day labels) because `Nov 14, 2026` truncated at 272px. `/search` with
+no params is now **the archive** — the redirect to home is gone (removing the last chip or
+reset+apply stays put; title `archive · gofar;`). Sort + reading-time arrived as contract
+params: `sort=newest|oldest|quickest|longest|relevance` (absent = curation; relevance is
+the implicit q-default — its chip lights without shipping the param) and inclusive
+`readMin`/`readMax` minutes; mock grew a shared `sorted()` step (relevance overridden on
+demand). New kit cards `SortPicker` (chip rows, `aria-pressed`) and `ReadRange` (dual
+handles = two stacked native range inputs over one custom violet track — keyboard and
+screen-reader semantics for free, cross-clamped, bounds 0–30 with both ends meaning
+"any"); both join the `FilterPanel` buffer under the same `apply;`. Chips row gained
+removable `10–12 min` and `newest` entries; pagination links carry the whole `current`
+selection. The server validates (`sort` whitelist, ints 1–29 survive, regex dates) and
+never bounces (`page>` clamp only). Kit stays plug-and-play: four cards in, one line each.
+(+3 tests → 40; preview curls: rail order byte-offsets, 2× collapse wrappers, archive
+title/header, `sort=quickest` ascending read-times, read+sort chips, order/length cards in
+both rail instances.)
+
 **Float — cutout reveal (same round):** the photo layer lost its rectangle. ImageMagick
 border-flood was tried first and rejected by QA: at fuzz 18 the wall-shadow gaps survived
 disconnected AND the bright face got eaten through a temple/hair-highlight bridge to the

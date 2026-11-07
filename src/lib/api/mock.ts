@@ -1,5 +1,5 @@
 import { ApiError, type BlogApi } from './client';
-import type { Photo, PostDetail, PostSummary, Tag } from './types';
+import type { Photo, PostDetail, PostSummary, SortValue, Tag } from './types';
 
 // Home-rail tag cloud. A hand-written fixture, not a derived view: the real BE
 // counts and curates (order, which tags make the cut); the FE renders this as-is.
@@ -617,18 +617,57 @@ function summarize(post: PostDetail): PostSummary {
 	};
 }
 
-// The facet predicate both list endpoints share: OR across tags, inclusive date window.
-function matches(post: PostDetail, tags?: string[], from?: string, to?: string) {
+// The facet predicate both list endpoints share: OR across tags, inclusive date and
+// read-time windows.
+function matches(
+	post: PostDetail,
+	tags?: string[],
+	from?: string,
+	to?: string,
+	readMin?: number,
+	readMax?: number
+) {
 	if (tags && tags.length > 0 && !post.tags.some((t) => tags.includes(t))) return false;
 	const day = post.date.slice(0, 10);
 	if (from && day < from) return false;
 	if (to && day > to) return false;
+	if (readMin !== undefined && post.readTime < readMin) return false;
+	if (readMax !== undefined && post.readTime > readMax) return false;
 	return true;
 }
 
+// Explicit re-ordering; absent/unknown sorts leave the given order intact
+// (the curation order on /api/posts, the relevance order on search).
+function sorted<T extends { date: string; readTime: number }>(list: T[], sort?: SortValue): T[] {
+	switch (sort) {
+		case 'newest':
+			return [...list].sort((a, b) => b.date.localeCompare(a.date));
+		case 'oldest':
+			return [...list].sort((a, b) => a.date.localeCompare(b.date));
+		case 'quickest':
+			return [...list].sort((a, b) => a.readTime - b.readTime);
+		case 'longest':
+			return [...list].sort((a, b) => b.readTime - a.readTime);
+		default:
+			return list;
+	}
+}
+
 export const mockApi: BlogApi = {
-	async getPosts({ offset = 0, limit = posts.length, tags, from, to } = {}) {
-		const source = posts.filter((p) => matches(p, tags, from, to));
+	async getPosts({
+		offset = 0,
+		limit = posts.length,
+		tags,
+		from,
+		to,
+		readMin,
+		readMax,
+		sort
+	} = {}) {
+		const source = sorted(
+			posts.filter((p) => matches(p, tags, from, to, readMin, readMax)),
+			sort
+		);
 		return { total: source.length, items: source.slice(offset, offset + limit).map(summarize) };
 	},
 
@@ -647,22 +686,28 @@ export const mockApi: BlogApi = {
 		return { results };
 	},
 
-	async searchPosts(q, { offset = 0, limit = 10, tags, from, to } = {}) {
+	async searchPosts(q, { offset = 0, limit = 10, tags, from, to, readMin, readMax, sort } = {}) {
 		const needle = q.toLowerCase().trim();
 		if (!needle) return { total: 0, items: [] };
 		const scored = posts
-			.filter((p) => matches(p, tags, from, to))
+			.filter((p) => matches(p, tags, from, to, readMin, readMax))
 			.map((p) => ({
 				post: p,
 				score:
 					`${p.title} ${p.subtitle} ${p.preview} ${p.tags.join(' ')}`.toLowerCase().split(needle)
 						.length - 1
 			}))
-			.filter((s) => s.score > 0)
-			.sort((a, b) => b.score - a.score);
+			.filter((s) => s.score > 0);
+		const ranked =
+			sort && sort !== 'relevance'
+				? sorted(
+						scored.map((s) => s.post),
+						sort
+					)
+				: scored.sort((a, b) => b.score - a.score).map((s) => s.post);
 		return {
-			total: scored.length,
-			items: scored.slice(offset, offset + limit).map((s) => summarize(s.post))
+			total: ranked.length,
+			items: ranked.slice(offset, offset + limit).map(summarize)
 		};
 	},
 

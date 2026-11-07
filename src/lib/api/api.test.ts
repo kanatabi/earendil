@@ -63,6 +63,29 @@ describe('getPosts', () => {
 		]);
 	});
 
+	it('sorts explicitly when asked, keeps curation otherwise', async () => {
+		const { items } = await mockApi.getPosts();
+		expect(items.map((p) => p.slug)[0]).toBe('observability-is-a-contract'); // curated, not sorted
+		const quick = (await mockApi.getPosts({ sort: 'quickest' })).items.map((p) => p.readTime);
+		expect([...quick].sort((a, b) => a - b)).toEqual(quick);
+		const old = (await mockApi.getPosts({ sort: 'oldest' })).items.map((p) => p.date);
+		expect([...old].sort()).toEqual(old);
+	});
+
+	it('filters by inclusive read-time window', async () => {
+		const { items, total } = await mockApi.getPosts({ readMin: 10, readMax: 12 });
+		expect(total).toBe(items.length);
+		expect(items.every((p) => p.readTime >= 10 && p.readTime <= 12)).toBe(true);
+	});
+
+	it('search honors sort override over relevance', async () => {
+		const relevance = await mockApi.searchPosts('observability');
+		const newest = await mockApi.searchPosts('observability', { sort: 'newest' });
+		expect(newest.total).toBe(relevance.total);
+		const dates = newest.items.map((p) => p.date);
+		expect([...dates].sort().reverse()).toEqual(dates);
+	});
+
 	it('narrows search results with tag facets', async () => {
 		const all = await mockApi.searchPosts('observability');
 		const scoped = await mockApi.searchPosts('observability', { tags: ['logging'] });

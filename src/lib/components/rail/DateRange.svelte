@@ -31,13 +31,16 @@
 		});
 	}
 
+	// Compact for the 272px rail: ISO-ish, year printed once when unambiguous.
 	const summary = $derived(
 		from && to
-			? `${display(from)} → ${display(to)}`
+			? from.slice(0, 4) === to.slice(0, 4)
+				? `${from} → ${to.slice(5)}`
+				: `${from} → ${to}`
 			: from
-				? `from ${display(from)}`
+				? `≥ ${from}`
 				: to
-					? `until ${display(to)}`
+					? `≤ ${to}`
 					: 'any date'
 	);
 
@@ -155,7 +158,7 @@
 	>
 		<CalendarDays class="size-4 shrink-0 text-muted-foreground" />
 		<span
-			class="min-w-0 grow truncate text-left {from || to
+			class="min-w-0 grow truncate text-left font-mono text-xs {from || to
 				? 'text-foreground'
 				: 'text-muted-foreground'}">{summary}<span class="text-brand">;</span></span
 		>
@@ -231,7 +234,11 @@
 			<p
 				class="mt-3 border-t border-border pt-2 text-center font-mono text-[11px] text-muted-foreground"
 			>
-				{from && !to ? 'pick the end date' : summary}
+				{from && !to
+					? 'pick the end date'
+					: from
+						? `${display(from)} → ${to ? display(to) : '…'}`
+						: 'any date'}
 			</p>
 		</div>
 	{/if}

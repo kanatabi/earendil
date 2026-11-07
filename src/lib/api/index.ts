@@ -12,5 +12,6 @@ export type {
 	SuggestResponse,
 	Photo,
 	PhotoListResponse,
+	SortValue,
 	Tag
 } from './types';

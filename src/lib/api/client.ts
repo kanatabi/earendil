@@ -4,6 +4,7 @@ import type {
 	PhotoListResponse,
 	PostDetail,
 	PostListResponse,
+	SortValue,
 	SuggestResponse,
 	Tag
 } from './types';
@@ -17,13 +18,27 @@ export interface BlogApi {
 		/** Inclusive YYYY-MM-DD window on the post date. */
 		from?: string;
 		to?: string;
+		/** Inclusive minute window on read time. */
+		readMin?: number;
+		readMax?: number;
+		/** Explicit re-ordering; absent keeps the BE's curation order. */
+		sort?: SortValue;
 	}): Promise<PostListResponse>;
 	getPost(slug: string): Promise<PostDetail>;
 	suggestPosts(q: string, limit?: number): Promise<SuggestResponse>;
 	/** Ranked, paginated full-text search — the /search page (suggest is the palette's capped launcher). */
 	searchPosts(
 		q: string,
-		opts?: { offset?: number; limit?: number; tags?: string[]; from?: string; to?: string }
+		opts?: {
+			offset?: number;
+			limit?: number;
+			tags?: string[];
+			from?: string;
+			to?: string;
+			readMin?: number;
+			readMax?: number;
+			sort?: SortValue;
+		}
 	): Promise<PostListResponse>;
 	getPhotos(opts?: { limit?: number }): Promise<PhotoListResponse>;
 	/** The homepage hero photo — curation is the BE's call; null when unset. */
@@ -62,6 +77,9 @@ function createFetchApi(base: string): BlogApi {
 			for (const t of opts?.tags ?? []) params.append('tag', t);
 			if (opts?.from) params.set('from', opts.from);
 			if (opts?.to) params.set('to', opts.to);
+			if (opts?.readMin !== undefined) params.set('readMin', String(opts.readMin));
+			if (opts?.readMax !== undefined) params.set('readMax', String(opts.readMax));
+			if (opts?.sort) params.set('sort', opts.sort);
 			const query = params.toString();
 			return get<PostListResponse>(`/api/posts${query ? `?${query}` : ''}`);
 		},
@@ -80,6 +98,9 @@ function createFetchApi(base: string): BlogApi {
 			for (const t of opts?.tags ?? []) params.append('tag', t);
 			if (opts?.from) params.set('from', opts.from);
 			if (opts?.to) params.set('to', opts.to);
+			if (opts?.readMin !== undefined) params.set('readMin', String(opts.readMin));
+			if (opts?.readMax !== undefined) params.set('readMax', String(opts.readMax));
+			if (opts?.sort) params.set('sort', opts.sort);
 			return get<PostListResponse>(`/api/search?${params}`);
 		},
 		getPhotos(opts) {

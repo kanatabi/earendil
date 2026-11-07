@@ -100,12 +100,14 @@
 		{/key}
 
 		<Sidebar label="About this site">
-			<!-- Identity + search hide while the hero is still on screen. -->
+			<!-- Search and identity hide while the hero is still on screen; topics persist. -->
 			<RevealPast watch="hero">
-				<IdentityCard />
 				<SearchPill />
 			</RevealPast>
 			<TopicCloud tags={data.tags} />
+			<RevealPast watch="hero">
+				<IdentityCard />
+			</RevealPast>
 		</Sidebar>
 	</div>
 </section>

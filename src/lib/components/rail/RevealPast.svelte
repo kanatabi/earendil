@@ -25,11 +25,21 @@
 	});
 </script>
 
+<!-- Collapses for real (1fr ↔ 0fr): a reserved-space fade left a hole in the
+     rail while the cards were invisible. -->
 <div
-	class="flex flex-col gap-8 transition duration-300 ease-out motion-reduce:transition-none {!shown &&
-		'pointer-events-none -translate-y-2 opacity-0'}"
+	class="grid transition-[grid-template-rows] duration-300 ease-out motion-reduce:transition-none"
+	style="grid-template-rows: {shown ? '1fr' : '0fr'}"
 	aria-hidden={!shown}
 	inert={!shown}
 >
-	{@render children()}
+	<div class="min-h-0 overflow-hidden">
+		<div
+			class="flex flex-col gap-8 transition-opacity duration-300 ease-out motion-reduce:transition-none {shown
+				? 'opacity-100'
+				: 'opacity-0'}"
+		>
+			{@render children()}
+		</div>
+	</div>
 </div>

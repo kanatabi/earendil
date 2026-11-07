@@ -15,35 +15,73 @@
 
 	// One rendered line: a multi-line <title> template leaks its indentation
 	// into the SSR HTML (ugly for crawlers and tab strips alike).
+	// An unfiltered /search is the archive, not an error — no redirect home.
 	let pageTitle = $derived(
 		data.q
 			? `search: ${data.q}`
 			: data.tags.length
 				? `posts tagged ${data.tags.join(' + ')}`
-				: 'search'
+				: 'archive'
 	);
 
 	// The URL is the single source of truth for applied filters; the rail's
 	// buffer only reaches it through apply() (or a chip's ×, which is a link).
-	function buildQs(sel: { tags: string[]; from?: string; to?: string }, page = 1): string {
+	interface Sel {
+		tags: string[];
+		from?: string;
+		to?: string;
+		readMin?: number;
+		readMax?: number;
+		sort?: string;
+	}
+
+	function buildQs(sel: Sel, page = 1): string {
 		const params = new SvelteURLSearchParams();
 		if (data.q) params.set('q', data.q);
 		for (const t of sel.tags) params.append('tag', t);
 		if (sel.from) params.set('from', sel.from);
 		if (sel.to) params.set('to', sel.to);
+		if (sel.readMin) params.set('readMin', String(sel.readMin));
+		if (sel.readMax) params.set('readMax', String(sel.readMax));
+		if (sel.sort) params.set('sort', sel.sort);
 		if (page > 1) params.set('page', String(page));
 		return params.toString();
 	}
 
-	function apply(sel: { tags: string[]; from?: string; to?: string }) {
+	function apply(sel: Sel) {
 		const qs = buildQs(sel);
 		goto(`/search${qs ? `?${qs}` : ''}`, { replace: true, reset: false });
 	}
 
-	const applied = $derived(`${data.tags.join(',')}|${data.from ?? ''}|${data.to ?? ''}`);
-	const hasFilters = $derived(applied !== '||');
+	const current = $derived<Sel>({
+		tags: data.tags,
+		from: data.from,
+		to: data.to,
+		readMin: data.readMin,
+		readMax: data.readMax,
+		sort: data.sort
+	});
+
+	const applied = $derived(
+		`${current.tags.join(',')}|${current.from ?? ''}|${current.to ?? ''}|${current.readMin ?? ''}|${current.readMax ?? ''}|${current.sort ?? ''}`
+	);
+	const hasFilters = $derived(
+		current.tags.length > 0 ||
+			!!current.from ||
+			!!current.to ||
+			!!current.readMin ||
+			!!current.readMax ||
+			!!current.sort
+	);
 
 	const dateLabel = $derived([data.from ?? '…', data.to ?? '…'].join(' → '));
+	const readLabel = $derived(
+		data.readMin && data.readMax
+			? `${data.readMin}–${data.readMax} min`
+			: data.readMin
+				? `≥ ${data.readMin} min`
+				: `≤ ${data.readMax} min`
+	);
 </script>
 
 <svelte:head>
@@ -63,7 +101,7 @@
 				{:else if data.tags.length}
 					Tagged {data.tags.map((t) => `“${t}”`).join(' + ')}
 				{:else}
-					All matching posts
+					All posts
 				{/if}
 				· {data.total}
 				{data.total === 1 ? 'post' : 'posts'}
@@ -116,6 +154,10 @@
 						selected={data.tags}
 						from={data.from}
 						to={data.to}
+						readMin={data.readMin}
+						readMax={data.readMax}
+						sort={data.sort}
+						hasQuery={!!data.q}
 						onApply={apply}
 					/>
 				{/key}
@@ -127,11 +169,7 @@
 			<div class="flex flex-wrap items-center gap-2">
 				{#each data.tags as t (t)}
 					<a
-						href="/search?{buildQs({
-							tags: data.tags.filter((x) => x !== t),
-							from: data.from,
-							to: data.to
-						})}"
+						href="/search?{buildQs({ ...current, tags: data.tags.filter((x) => x !== t) })}"
 						class="flex items-center gap-1.5 rounded-full border border-brand/40 bg-brand/10 px-3 py-1 font-mono text-xs text-foreground transition-colors hover:border-brand"
 					>
 						{t}
@@ -141,12 +179,32 @@
 				{/each}
 				{#if data.from || data.to}
 					<a
-						href="/search?{buildQs({ tags: data.tags })}"
+						href="/search?{buildQs({ ...current, from: undefined, to: undefined })}"
 						class="flex items-center gap-1.5 rounded-full border border-brand/40 bg-brand/10 px-3 py-1 font-mono text-xs text-foreground transition-colors hover:border-brand"
 					>
 						{dateLabel}
 						<span aria-hidden="true" class="text-muted-foreground">×</span>
 						<span class="sr-only">remove date filter</span>
+					</a>
+				{/if}
+				{#if data.readMin || data.readMax}
+					<a
+						href="/search?{buildQs({ ...current, readMin: undefined, readMax: undefined })}"
+						class="flex items-center gap-1.5 rounded-full border border-brand/40 bg-brand/10 px-3 py-1 font-mono text-xs text-foreground transition-colors hover:border-brand"
+					>
+						{readLabel}
+						<span aria-hidden="true" class="text-muted-foreground">×</span>
+						<span class="sr-only">remove reading-time filter</span>
+					</a>
+				{/if}
+				{#if data.sort}
+					<a
+						href="/search?{buildQs({ ...current, sort: undefined })}"
+						class="flex items-center gap-1.5 rounded-full border border-brand/40 bg-brand/10 px-3 py-1 font-mono text-xs text-foreground transition-colors hover:border-brand"
+					>
+						{data.sort}
+						<span aria-hidden="true" class="text-muted-foreground">×</span>
+						<span class="sr-only">reset sort order</span>
 					</a>
 				{/if}
 			</div>
@@ -173,10 +231,7 @@
 					>
 						{#if data.page > 1}
 							<a
-								href="/search?{buildQs(
-									{ tags: data.tags, from: data.from, to: data.to },
-									data.page - 1
-								)}"
+								href="/search?{buildQs(current, data.page - 1)}"
 								rel="prev"
 								class="font-medium text-primary transition-colors hover:text-foreground"
 							>
@@ -190,10 +245,7 @@
 
 						{#if data.page < data.pages}
 							<a
-								href="/search?{buildQs(
-									{ tags: data.tags, from: data.from, to: data.to },
-									data.page + 1
-								)}"
+								href="/search?{buildQs(current, data.page + 1)}"
 								rel="next"
 								class="font-medium text-primary transition-colors hover:text-foreground"
 							>
@@ -215,6 +267,10 @@
 				selected={data.tags}
 				from={data.from}
 				to={data.to}
+				readMin={data.readMin}
+				readMax={data.readMax}
+				sort={data.sort}
+				hasQuery={!!data.q}
 				onApply={apply}
 			/>
 		{/key}
