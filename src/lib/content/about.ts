@@ -192,7 +192,6 @@ export const facts: FactRow[] = [
 export const colophon: FactRow[] = [
 	{ label: 'engine', value: 'sveltekit · svelte 5' },
 	{ label: 'privacy', value: 'no trackers; one cookie, for the theme' },
-	{ label: 'privacy', value: 'no trackers; one cookie, for the theme' },
 	{
 		label: 'source',
 		value: 'earendil ↗',
