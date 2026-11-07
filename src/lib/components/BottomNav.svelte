@@ -2,6 +2,7 @@
 	import { page } from '$app/state';
 	import { CircleUser, House, Images, Search } from 'lucide-svelte';
 	import ThemeToggle from './ThemeToggle.svelte';
+	import { chrome } from '#lib/scroll-chrome.svelte.ts';
 
 	interface Props {
 		theme: 'light' | 'dark';
@@ -32,17 +33,23 @@
 	const searchActive = $derived(page.url.pathname.startsWith('/search'));
 </script>
 
-<!-- One UI-flavored primary bar below lg: icon-only tabs, an elevated center
-     search on phones (the header pill takes over at md), and the theme slot at
-     the thumb's rest position. The mobile header is just the wordmark; the
-     hamburger is gone. z-20: under the rail sheet (z-25) and the
-     palette/lightbox (z-30). -->
+<!-- One UI-flavored primary bar below lg: five EQUAL flex-1 cells (exact
+     10/30/50/70/90 icon rhythm, the elevated FAB mathematically centered),
+     icon-only, active = brand violet. Phones keep the center search FAB; at
+     md the slot retires with it (header pill takes over). Scroll choreography
+     from the shared chrome store: hidden on deliberate scroll-down, back on
+     scroll-up or a short idle beat; focusin forces it visible so keyboard
+     focus is never stranded off-screen. z-20: under the rail sheet (z-25) and
+     the palette/lightbox (z-30). -->
 <nav
 	aria-label="Primary navigation"
-	class="fixed inset-x-0 bottom-0 z-20 border-t border-border bg-card/85 backdrop-blur lg:hidden"
+	onfocusin={() => (chrome.visible = true)}
+	class="fixed inset-x-0 bottom-0 z-20 border-t border-border bg-card/85 backdrop-blur transition duration-200 ease-out motion-reduce:transition-none lg:hidden {chrome.visible
+		? 'translate-y-0 opacity-100'
+		: 'pointer-events-none translate-y-full opacity-0'}"
 >
 	<div
-		class="mx-auto flex h-14 w-full max-w-page items-stretch justify-around px-4 pb-[env(safe-area-inset-bottom)]"
+		class="mx-auto flex h-14 w-full max-w-page items-stretch px-4 pb-[env(safe-area-inset-bottom)]"
 	>
 		{#each tabs.slice(0, 2) as tab (tab.href)}
 			{@const Icon = tab.icon}
@@ -50,7 +57,7 @@
 				href={tab.href}
 				aria-label={tab.label}
 				aria-current={isActive(tab.href) ? 'page' : undefined}
-				class="flex min-w-12 grow items-center justify-center transition-colors {isActive(tab.href)
+				class="flex min-w-0 flex-1 items-center justify-center transition-colors {isActive(tab.href)
 					? 'text-brand'
 					: 'text-muted-foreground hover:text-foreground'}"
 			>
@@ -58,7 +65,7 @@
 			</a>
 		{/each}
 
-		<div class="relative flex w-14 shrink-0 items-center justify-center md:hidden">
+		<div class="relative flex flex-1 items-center justify-center md:hidden">
 			<a
 				href="/search"
 				aria-label="Search"
@@ -76,7 +83,7 @@
 				href={tab.href}
 				aria-label={tab.label}
 				aria-current={isActive(tab.href) ? 'page' : undefined}
-				class="flex min-w-12 grow items-center justify-center transition-colors {isActive(tab.href)
+				class="flex min-w-0 flex-1 items-center justify-center transition-colors {isActive(tab.href)
 					? 'text-brand'
 					: 'text-muted-foreground hover:text-foreground'}"
 			>
@@ -84,7 +91,7 @@
 			</a>
 		{/each}
 
-		<div class="flex items-center justify-center">
+		<div class="flex flex-1 items-center justify-center">
 			<ThemeToggle {theme} {onToggle} />
 		</div>
 	</div>

@@ -5,6 +5,7 @@
 	import BottomNav from '#lib/components/BottomNav.svelte';
 	import Navbar from '#lib/components/Navbar.svelte';
 	import Footer from '#lib/components/Footer.svelte';
+	import { startScrollChrome } from '#lib/scroll-chrome.svelte.ts';
 	import type { LayoutProps } from './$types';
 
 	let { data, children }: LayoutProps = $props();
@@ -62,6 +63,9 @@
 		if (document.startViewTransition) document.startViewTransition(apply);
 		else apply();
 	}
+
+	// One scroll listener drives the mobile chrome (bottom bar) visibility.
+	$effect(() => startScrollChrome());
 </script>
 
 <svelte:head>

@@ -323,6 +323,18 @@ gate against); the search page moves its keyed `FilterPanel` into the drawer and
 single-col article grid, generated z-25/size-13/safe-area utilities. Flowstep debt grew —
 screens 1/5/2/6 still show hamburger-era chrome.
 
+**Round 5 — bar balance + scroll manners:** the BottomNav leaned off-center because its
+five cells had three different sizing rules (tabs `grow`, FAB slot fixed `w-14`, theme
+wrapper intrinsic ~36px) — unequal boxes shifted the center cell left of true center and
+gave three different icon gaps. All cells are `flex-1` now: exact 10/30/50/70/90 rhythm,
+the elevated FAB mathematically centered, `justify-around` deleted (it was doing nothing
+once grow ate the free space). Added scroll auto-hide via a singleton rune store
+(`#lib/scroll-chrome.svelte.ts`, one passive listener started from the root layout): hide
+on deliberate scroll-down (8px hysteresis), instant reveal on scroll-up, 600ms idle
+re-reveal when stopping anywhere, always visible near the top, `focusin` forces shown
+(no stranded keyboard focus), composited translate+fade 200ms, reduced-motion instant.
+Per the owner's call only the bar participates — the floating drawer FAB keeps its post.
+
 **Float — cutout reveal (same round):** the photo layer lost its rectangle. ImageMagick
 border-flood was tried first and rejected by QA: at fuzz 18 the wall-shadow gaps survived
 disconnected AND the bright face got eaten through a temple/hair-highlight bridge to the
