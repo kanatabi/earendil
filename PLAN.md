@@ -369,6 +369,12 @@ has explicit numbers: 16px bar clearance (trigger at 4.5rem), 12px inter-pill ga
 route list lives in the layout (`stacked` prop) — meaningful consistency ("above whatever
 floats below you"), not coordinate consistency.
 
+**About-tab icon — `Feather`, recorded rationale:** `CircleUser` was ambiguous on two
+axes — every app trains "person glyph = my account", and the home drawer's ASCII doorknob
+(a literal portrait) already owns "the human". The About page now reaches by the pen, not
+the face: a feather, which fits the wordmark's pen-name identity and keeps the doorknob
+unique. Do not swap it back to a person glyph.
+
 **Float — cutout reveal (same round):** the photo layer lost its rectangle. ImageMagick
 border-flood was tried first and rejected by QA: at fuzz 18 the wall-shadow gaps survived
 disconnected AND the bright face got eaten through a temple/hair-highlight bridge to the

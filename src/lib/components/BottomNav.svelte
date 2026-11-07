@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { page } from '$app/state';
-	import { CircleUser, House, Images, Search } from 'lucide-svelte';
+	import { Feather, House, Images, Search } from 'lucide-svelte';
 	import ThemeToggle from './ThemeToggle.svelte';
 	import { chrome } from '#lib/scroll-chrome.svelte.ts';
 
@@ -22,7 +22,10 @@
 		{
 			href: '/about',
 			label: 'about',
-			icon: CircleUser,
+			// Feather, not a person glyph: "account" icons promise a profile the
+			// site doesn't have, and the ASCII doorknob keeps the monopoly on
+			// "the human". A pen-name blog reaches its author by the pen.
+			icon: Feather,
 			match: (p: string) => p.startsWith('/about')
 		}
 	];
