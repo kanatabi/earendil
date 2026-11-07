@@ -482,6 +482,21 @@ currentColor — theme-aware, no third-party requests — on size-9 targets with
 external links `_blank rel=noopener`; the Mail glyph (lucide) and ResearchGate ride the
 shared list automatically.
 
+**About round 5 — full-figure portrait + hosting-honest copy:** the About mounts traded the
+square `photo-640` for a freshly matted UNCROPPED portrait (rembg isnet, cached model;
+trim to content bbox + 2% margin keeps the crossed arms, the photo's own bottom cut is
+inherent to the master; 600x790 AVIF/WebP, 19/51KB). Inline beside the bio is width-sized
+(`w-40 md:w-48`, h-auto, native ratio for CLS); the rail figure caps at 300px
+(`max-h-[300px] object-contain`) so facts/colophon/elsewhere stay high in the sticky column.
+The hero keeps the square cutout — it is registered against the ASCII composition; two
+derivatives, two jobs. Second half: public copy no longer claims a hosting choice
+(homelab-vs-VPS genuinely undecided): footer reads `Built with SvelteKit · no trackers;`,
+the colophon's `hosts — self-managed k3s` row is deleted, the bio's lineage line became
+"wherever its server ends up living, I will be the one running it" (promises WHO, not
+WHERE), and the hero's `currently` line says `running postgres myself;`. Internal docs keep
+their K3s engineering records — those speak to the builder, not visitors. DESIGN's footer
+copy spec synced.
+
 **Float — cutout reveal (same round):** the photo layer lost its rectangle. ImageMagick
 border-flood was tried first and rejected by QA: at fuzz 18 the wall-shadow gaps survived
 disconnected AND the bright face got eaten through a temple/hair-highlight bridge to the

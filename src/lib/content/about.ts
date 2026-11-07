@@ -46,7 +46,7 @@ export const profile = {
 	tagline: 'Backend engineer & occasional photographer.',
 	bio: [
 		"I build systems that have to keep answering under load — GoMart's features behind the Gojek app, real-time data feeds at Tokopedia — and this blog is where I write down what broke, got fixed, and taught something along the way.",
-		'The pen-word gofar; is a nudge, not a boast: go far. It runs in a lineage, too — my first blog was a Vue front end with a Strapi CMS rented on Vercel and Heroku, back in 2021. This one is SvelteKit, rendered on servers I host myself.',
+		'The pen-word gofar; is a nudge, not a boast: go far. It runs in a lineage, too — my first blog was a Vue front end with a Strapi CMS rented on Vercel and Heroku, back in 2021. This one is SvelteKit — and wherever its server ends up living, I will be the one running it.',
 		'Off the keyboard I chase light — landscapes and streets, mostly at the wrong hours of the day. Some of it ends up in the gallery.'
 	]
 };
@@ -191,7 +191,7 @@ export const facts: FactRow[] = [
 /** The site's own colophon — the infra-blogger's quiet brag. */
 export const colophon: FactRow[] = [
 	{ label: 'engine', value: 'sveltekit · svelte 5' },
-	{ label: 'hosts', value: 'self-managed k3s' },
+	{ label: 'privacy', value: 'no trackers; one cookie, for the theme' },
 	{ label: 'privacy', value: 'no trackers; one cookie, for the theme' },
 	{
 		label: 'source',

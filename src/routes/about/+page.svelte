@@ -40,13 +40,13 @@
 				     The id marks it for the rail portrait's RevealPast gate below. -->
 				<div class="grid items-start gap-8 md:grid-cols-[192px_minmax(0,1fr)] md:gap-10">
 					<picture id="identity-photo" class="justify-self-center md:justify-self-start">
-						<source type="image/avif" srcset="/profile/photo-640.avif" />
+						<source type="image/avif" srcset="/profile/photo-full-600.avif" />
 						<img
-							class="photo size-40 rounded-lg object-cover md:size-48"
-							src="/profile/photo-640.webp"
+							class="photo h-auto w-40 rounded-lg md:w-48"
+							src="/profile/photo-full-600.webp"
 							alt="Black-and-white portrait of {profile.name}"
-							width="640"
-							height="640"
+							width="600"
+							height="790"
 						/>
 					</picture>
 					<div class="flex max-w-2xl flex-col gap-4">
@@ -226,13 +226,13 @@
 		<Sidebar label="About the author">
 			<RevealPast watch="identity-photo">
 				<picture class="block">
-					<source type="image/avif" srcset="/profile/photo-640.avif" />
+					<source type="image/avif" srcset="/profile/photo-full-600.avif" />
 					<img
-						class="photo w-full rounded-lg object-cover"
-						src="/profile/photo-640.webp"
+						class="photo mx-auto block max-h-[300px] w-full rounded-lg object-contain"
+						src="/profile/photo-full-600.webp"
 						alt=""
-						width="640"
-						height="640"
+						width="600"
+						height="790"
 					/>
 				</picture>
 			</RevealPast>

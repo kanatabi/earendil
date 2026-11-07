@@ -37,6 +37,6 @@
 		</nav>
 	</div>
 	<p class="text-xs text-muted-foreground/70">
-		Built with SvelteKit &middot; self-hosted &middot; no trackers<span class="text-brand">;</span>
+		Built with SvelteKit &middot; no trackers<span class="text-brand">;</span>
 	</p>
 </footer>

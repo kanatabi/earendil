@@ -47,7 +47,7 @@
 	<!-- Static until the BE grows a status endpoint. -->
 	<p class="max-w-2xl text-xs text-muted-foreground">
 		currently — building queue-depth metrics<span class="text-brand">;</span> reading The Design of
-		Everyday Things<span class="text-brand">;</span> running postgres on k3s<span class="text-brand"
+		Everyday Things<span class="text-brand">;</span> running postgres myself<span class="text-brand"
 			>;</span
 		>
 	</p>
