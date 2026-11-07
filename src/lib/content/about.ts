@@ -1,8 +1,8 @@
 /**
  * About-page identity content. Brand copy, not blog data — like the hero's
  * `currently` line it is FE-owned until (if ever) the BE absorbs it.
- * Sourced from the owner's CV + the two paper PDFs (Nov 2026); `PLACEHOLDER`
- * marks remain where a fact must come from the human.
+ * Sourced from the owner's CV + the two paper PDFs (Nov 2026); all real now —
+ * social/contact links are canonically kept in `social.ts`.
  */
 
 export interface Experience {
@@ -48,8 +48,7 @@ export const profile = {
 		"I build systems that have to keep answering under load — GoMart's features behind the Gojek app, real-time data feeds at Tokopedia — and this blog is where I write down what broke, got fixed, and taught something along the way.",
 		'The pen-word gofar; is a nudge, not a boast: go far. It runs in a lineage, too — my first blog was a Vue front end with a Strapi CMS rented on Vercel and Heroku, back in 2021. This one is SvelteKit, rendered on servers I host myself.',
 		'Off the keyboard I chase light — landscapes and streets, mostly at the wrong hours of the day. Some of it ends up in the gallery.'
-	],
-	email: 'faiz@ainurrofiq.com'
+	]
 };
 
 /** Newest first — the timeline reads top-down like the feed. */
@@ -201,11 +200,5 @@ export const colophon: FactRow[] = [
 	}
 ];
 
-export const elsewhere = [
-	{ label: 'github', href: 'https://github.com/kanatabi' },
-	{ label: 'linkedin', href: 'https://www.linkedin.com/in/faizainur' },
-	{ label: 'researchgate', href: 'https://www.researchgate.net/profile/Faiz_Rofiq' },
-	{ label: 'email', href: `mailto:${profile.email}` },
-	// PLACEHOLDER(link): real Instagram URL.
-	{ label: 'instagram', href: 'https://www.instagram.com' }
-];
+/** Canonical links live in social.ts; re-exported for existing importers. */
+export { elsewhere } from './social.ts';
