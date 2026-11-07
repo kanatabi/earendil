@@ -1,11 +1,13 @@
 /**
- * Persistent mobile chrome (BottomNav) visibility driven by scroll behavior.
- * Singleton rune module: one passive scroll listener, started once from the
- * root layout, read by any chrome that should get out of the reader's way.
+ * Persistent mobile chrome (BottomNav + ScrollTopButton) visibility driven by
+ * scroll behavior. Singleton rune module: the passive window listener attaches
+ * ITSELF at module-eval time on the client (guarded for SSR) — no reliance on
+ * a component effect firing, and one instance is guaranteed per module graph.
  *
  * Rules: always visible near the top; deliberate scroll-DOWN hides (8px
  * hysteresis so jitter can't flicker); scroll-UP reveals instantly; stopping
- * anywhere reveals after a short idle beat, so the bar is never withheld.
+ * anywhere reveals after a short idle beat, so the bar is never withheld. The
+ * scroll-top pill reads `scrolled` (a pure position rule, >400px deep).
  */
 export const chrome = $state({ visible: true, scrolled: false });
 
@@ -16,7 +18,8 @@ const IDLE_MS = 600;
 // enough that "back to the top" is a real need.
 const DEEP_PX = 400;
 
-export function startScrollChrome(): () => void {
+// Imported once by the client module graph; runs at eval, before first paint.
+if (typeof window !== 'undefined') {
 	let lastY = window.scrollY;
 	let idle: ReturnType<typeof setTimeout> | undefined;
 
@@ -31,14 +34,9 @@ export function startScrollChrome(): () => void {
 	};
 
 	// Sync once at startup: restored or deep scroll positions do not
-	// necessarily fire a scroll event after the effect attaches — without
-	// this, the pill stays hidden (and the bar's baseline stale) until the
-	// first manual scroll.
+	// necessarily fire a scroll event right away — without this the pill
+	// stays hidden (and the bar's baseline stale) until a manual scroll.
 	onScroll();
 
 	window.addEventListener('scroll', onScroll, { passive: true });
-	return () => {
-		window.removeEventListener('scroll', onScroll);
-		clearTimeout(idle);
-	};
 }

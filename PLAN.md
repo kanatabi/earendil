@@ -445,13 +445,21 @@ honest tradeoff of keeping native `<details>` and JS-off readability over a JS-c
 symmetric disclosure; reduced-motion disables it.
 
 **Chrome startup sync fix:** `startScrollChrome` only ever wrote state from a
-scroll *event* — landing on a restored or deep scroll position fires none after the
+scroll _event_ — landing on a restored or deep scroll position fires none after the
 layout effect attaches, so the scroll-top pill stayed hidden and the bar's baseline
 stale until the first manual scroll (the owner's "no longer visible" report, plus the
 bar not hiding). The listener now runs `onScroll()` once at startup; verified compiled
 (`n();window.addEventListener(...)`). If symptoms persist on a stale dev server, the
 culprit is the runtime, not the code — the bundle was audit-verified single-store,
 reactive, and wired end-to-end.
+
+**Chrome follow-up — self-attaching store:** the symptom survived the startup sync on the owner's dev+ngrok runtime, and the dev-served
+modules audited clean (runes compiled, effect present, single store instance), so the
+remaining suspects were runtime effects that never fire (stale HMR graphs after branch
+switches are a classic). Killed the dependency entirely: the scroll listener now attaches
+at module-eval time inside scroll-chrome.svelte.ts (typeof-window guarded, runs once per
+client graph, before first paint), and the layout effect + startScrollChrome export are
+gone. Nothing can forget to start it now.
 
 **Float — cutout reveal (same round):** the photo layer lost its rectangle. ImageMagick
 border-flood was tried first and rejected by QA: at fuzz 18 the wall-shadow gaps survived
