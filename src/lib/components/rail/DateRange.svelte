@@ -129,14 +129,11 @@
 	<div class="flex flex-wrap gap-2">
 		{#each presets as days (days)}
 			<Pill active={presetActive(days)} onclick={() => setPreset(days)}>
-				{days}d<span class="text-brand">;</span>
+				<span>{days}d<span class="text-brand">;</span></span>
 			</Pill>
 		{/each}
-		<Pill
-			active={!((from || to) && !presets.some((p) => presetActive(p)))}
-			onclick={() => onChange(undefined, undefined)}
-		>
-			all<span class="text-brand">;</span>
+		<Pill active={!from && !to} onclick={() => onChange(undefined, undefined)}>
+			<span>all<span class="text-brand">;</span></span>
 		</Pill>
 	</div>
 

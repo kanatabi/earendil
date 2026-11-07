@@ -26,12 +26,12 @@
 	<div class="flex flex-wrap gap-2">
 		{#if showRelevance}
 			<Pill active={value === 'relevance'} onclick={() => onChange('relevance')}>
-				relevance<span class="text-brand">;</span>
+				<span>relevance<span class="text-brand">;</span></span>
 			</Pill>
 		{/if}
 		{#each options as opt (opt.v)}
 			<Pill active={value === opt.v} onclick={() => onChange(opt.v)}>
-				{opt.label}<span class="text-brand">;</span>
+				<span>{opt.label}<span class="text-brand">;</span></span>
 			</Pill>
 		{/each}
 	</div>

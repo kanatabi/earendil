@@ -38,7 +38,9 @@
 		<div class="flex min-w-0 flex-col gap-12">
 			<div class="flex flex-col gap-6">
 				<p class="text-sm font-medium tracking-wide text-primary">About</p>
-				<h1 class="max-w-3xl text-4xl leading-tight font-semibold tracking-tight md:text-5xl">
+				<h1
+					class="max-w-3xl font-brand text-5xl leading-[1.05] font-semibold tracking-tight md:text-6xl"
+				>
 					{profile.tagline}
 				</h1>
 				<!-- Identity block: the same floating cutout that ends the hero reveal.
