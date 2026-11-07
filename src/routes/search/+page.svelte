@@ -99,9 +99,9 @@
 	class="fade-up relative mx-auto grid w-full max-w-page gap-8 lg:grid-cols-[minmax(0,1fr)_272px]"
 >
 	<!-- Same brand ghost as the About page: these two share an anatomy, now an
-	     atmosphere. Below lg the single column needs no backdrop. -->
+	     atmosphere. All widths, -z-10 behind content — z-order keeps copy clean. -->
 	<Watermark
-		class="pointer-events-none absolute right-0 bottom-0 hidden aspect-square w-[min(45vw,560px)] lg:block"
+		class="pointer-events-none absolute right-0 bottom-0 -z-10 aspect-square w-[min(45vw,560px)]"
 	/>
 	<div class="flex min-w-0 flex-col gap-6">
 		<div class="flex items-center justify-between gap-4 border-t border-border pt-4">

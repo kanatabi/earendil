@@ -6,6 +6,7 @@
 	import RevealPast from '#lib/components/rail/RevealPast.svelte';
 	import SearchPill from '#lib/components/rail/SearchPill.svelte';
 	import SectionLabel from '#lib/components/SectionLabel.svelte';
+	import Watermark from '#lib/components/Watermark.svelte';
 	import Sidebar from '#lib/components/rail/Sidebar.svelte';
 	import TopicCloud from '#lib/components/rail/TopicCloud.svelte';
 	import type { PageData } from './$types';
@@ -54,7 +55,13 @@
 </section>
 
 <!-- Writing: the full list, paginated — /articles and /search reuse these rows -->
-<section id="writing" class="fade-up mx-auto flex w-full max-w-page flex-col gap-6">
+<section id="writing" class="fade-up relative mx-auto flex w-full max-w-page flex-col gap-6">
+	<!-- Quietest ghost of the family (5%): the feed carries hover bands and long
+	     copy; the corner rides behind everything at all widths. -->
+	<Watermark
+		class="pointer-events-none absolute right-0 bottom-0 -z-10 aspect-square w-[min(45vw,560px)]"
+		opacity={0.05}
+	/>
 	<SectionLabel title="Writing" />
 	<div class="grid gap-12 lg:grid-cols-[minmax(0,1fr)_272px]">
 		<!-- Re-mounts when the page changes so the list fades in on Newer/Older. -->

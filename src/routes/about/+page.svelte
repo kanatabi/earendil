@@ -27,9 +27,11 @@
 
 <section class="fade-up relative mx-auto flex w-full max-w-page">
 	<!-- Brand texture in the dead corner: the hero's ASCII glyphs, painted with the
-	     same --ascii-ink (theme-aware) at whisper opacity, behind everything. -->
+	     same --ascii-ink (theme-aware) at whisper opacity. Universal now — at every
+	     width — but -z-10 so it rides behind ALL content; legibility is guaranteed
+	     by z-order, not by a breakpoint. -->
 	<Watermark
-		class="pointer-events-none absolute right-0 bottom-0 hidden aspect-square w-[min(45vw,560px)] lg:block"
+		class="pointer-events-none absolute right-0 bottom-0 -z-10 aspect-square w-[min(45vw,560px)]"
 	/>
 
 	<div class="grid w-full gap-12 lg:grid-cols-[minmax(0,1fr)_272px]">

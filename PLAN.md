@@ -538,6 +538,15 @@ ALL content, zero scroll length added. The reuse lesson, written down: Watermark
 "caller owns geometry" seam means callers must keep it OUT of flow — the component
 cannot enforce it; the pattern must.
 
+**Watermarks go universal (owner call: all pages, mobile included):** dropped every
+`hidden lg:block` gate, added `-z-10` to the about/search ghosts — exposing a latent flaw
+they had always carried: as bare absolute siblings they painted ABOVE non-positioned text
+(desktop hid it by placing them over empty corners; phones would not). The "never tints
+prose" promise is now structural — z-order, not breakpoint. New mounts complete the set:
+home writing (5%, quietest — hover bands + long copy), gallery (4% behind the masonry
+tail). Opacity per surface is now the only per-placement variable: 4% article/gallery,
+5% home, 6% about/search corners, 7–8% error/empty bands.
+
 **Float — cutout reveal (same round):** the photo layer lost its rectangle. ImageMagick
 border-flood was tried first and rejected by QA: at fuzz 18 the wall-shadow gaps survived
 disconnected AND the bright face got eaten through a temple/hair-highlight bridge to the

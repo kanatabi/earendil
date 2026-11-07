@@ -138,11 +138,11 @@
 
 	<!-- End credit: a true watermark — corner ghost in the blank zone under
 	     the sticky TOC rail, exactly where About and search park theirs.
-	     absolute → zero scroll length added (the earlier in-flow block reserved
-	     a 560px square of "empty space"); 4% opacity keeps it a whisper, and
-	     the right-column placement keeps it out from under prose. Desktop only. -->
+	     absolute → zero scroll length added; 4% opacity keeps it a whisper.
+	     All widths now — -z-10 puts it behind every glyph, which is the real
+	     promise of "never tints prose". -->
 	<Watermark
-		class="pointer-events-none absolute right-0 bottom-0 -z-10 hidden aspect-square w-[min(45vw,560px)] lg:block"
+		class="pointer-events-none absolute right-0 bottom-0 -z-10 aspect-square w-[min(45vw,560px)]"
 		opacity={0.04}
 	/>
 </article>
