@@ -222,6 +222,21 @@ shipped the honest **lossless WebP at 640px (~96KB, cached forever)**; 512 would
 columns `240→288/320` so the square holds proportion with the Fraunces headline. Headline
 and intro type untouched by request.
 
+**Float — cutout reveal (same round):** the photo layer lost its rectangle. ImageMagick
+border-flood was tried first and rejected by QA: at fuzz 18 the wall-shadow gaps survived
+disconnected AND the bright face got eaten through a temple/hair-highlight bridge to the
+wall. Escalated to `rembg` (isnet-general-use) in a throwaway `/tmp` venv — system python
+untouched, model cached at `~/.rembg`. Full-res matte, then the SAME `+0+300` north square
+crop as before; edge QA clean (hair wisps kept, no halo, the white Triple-F logo survives
+because flood/AI both see it enclosed by the black tee). New `photo-640.{avif,webp}` =
+12/26KB (smaller than the opaque 512s — flat transparent corners compress to nothing). The
+subject now floats on the page canvas, so dark mode needed help: `--photo-glow` — `none`
+light, `drop-shadow(0 0 18px color-mix(in oklab, var(--brand) 45%, transparent))` dark,
+applied as a static `filter` (only opacity still animates). Bonus discovery from the mid-
+crossfade render: the ASCII figure registers with the photo after all (the earlier
+"head-left" mismatch was a montage-scaling illusion) — the fade reads as a dissolve of one
+person, not two.
+
 ---
 
 ## Milestone 7 — Responsive + a11y polish

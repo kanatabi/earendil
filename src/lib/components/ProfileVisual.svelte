@@ -28,15 +28,15 @@
 	onclick={tap}
 >
 	<picture>
-		<source type="image/avif" srcset="/profile/photo-512.avif" />
+		<source type="image/avif" srcset="/profile/photo-640.avif" />
 		<img
-			class="fade absolute inset-0 h-full w-full object-cover transition-opacity duration-500 group-hover:opacity-100 group-focus-visible:opacity-100 {revealed
+			class="fade photo absolute inset-0 h-full w-full object-cover transition-opacity duration-500 group-hover:opacity-100 group-focus-visible:opacity-100 {revealed
 				? 'opacity-100'
 				: 'opacity-0'}"
-			src="/profile/photo-512.webp"
+			src="/profile/photo-640.webp"
 			alt=""
-			width="512"
-			height="512"
+			width="640"
+			height="640"
 			fetchpriority="high"
 		/>
 	</picture>
@@ -49,6 +49,12 @@
 </button>
 
 <style>
+	.photo {
+		/* Violet silhouette glow in dark mode only — the black tee would
+		   otherwise sink into the dark canvas. Token lives in layout.css. */
+		filter: var(--photo-glow);
+	}
+
 	.ascii {
 		-webkit-mask-image: url('/profile/ascii-glyphs-640.webp');
 		mask-image: url('/profile/ascii-glyphs-640.webp');

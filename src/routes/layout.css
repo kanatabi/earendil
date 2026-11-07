@@ -19,6 +19,8 @@
 	--brand: #7c3aed;
 	/* Hero ASCII portrait — ink follows the theme (monochrome in light mode). */
 	--ascii-ink: var(--foreground);
+	/* Photo cutout needs no halo on white — silhouette is already dark-on-light. */
+	--photo-glow: none;
 	/* Diagram palette — source of truth for client-rendered mermaid (Route B). */
 	--diagram-bg: #ffffff;
 	--diagram-surface: #f4f4f5;
@@ -43,6 +45,8 @@
 	--brand: #a78bfa;
 	/* Terminal sage, sampled from the ASCII master's bright glyphs. */
 	--ascii-ink: #d8e0d6;
+	/* Cutout glow: brand violet keeps the dark subject off the dark canvas. */
+	--photo-glow: drop-shadow(0 0 18px color-mix(in oklab, var(--brand) 45%, transparent));
 	--diagram-bg: #131316;
 	--diagram-surface: #27272a;
 	--diagram-ink: #fafafa;
