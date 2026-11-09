@@ -28,8 +28,21 @@ Start the dev server with hot reload (edits appear instantly, no manual refresh)
 
 ```sh
 npm install        # first time only
-npm run dev        # http://localhost:5173
+npm run dev        # http://localhost:5173 — REAL lumen (API_BASE unset = localhost:8080 fallback)
+make dev           # the same, but gated: refuses to start a blind server when lumen isn't answering /readyz
+make help          # contract | check | lint | test | build
 ```
+
+**Real-by-default (owner ruling, 2026-11-09):** the runtime has exactly one
+data source — lumen. Unset `API_BASE` falls back to the dev default
+(`http://localhost:8080`); the cluster overrides via ESO-rendered env, and the
+browser rides `PUBLIC_API_BASE=/` through the `/api/*` SSR proxy because the
+API has no public ingress by design. The fixture corpus is **test-only** now:
+`npm run test:unit` (47 tests vs the twin, zero backend) and the live contract
+acceptance suite stay offline-green because tests import the twin directly —
+that path never shipped to browsers. Start the backend first:
+`cd ../lumen && make dev`. Acceptance check:
+`LUMEN_URL=http://localhost:8080 npx vitest run src/lib/api/contract.spec.ts`.
 
 **On your phone / another machine (responsive QA):** bind to the network and open the printed LAN URL from the terminal:
 

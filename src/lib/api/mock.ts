@@ -1,4 +1,12 @@
 import { ApiError, type BlogApi } from './client';
+/**
+ * TEST-ONLY fixture twin — the reference corpus. NOT a runtime data source
+ * (real-by-default since the 2026-11-09 cutover ruling): the fetch API
+ * (client.ts) never imports this file, so it ships nowhere but the test
+ * runner. Its roles: api.test.ts semantics, contract.spec.ts live-vs-twin
+ * acceptance baseline, and lumen's seed corpus mirror (testdata). The
+ * BlogApi interface it pins is the contract; the shapes move together.
+ */
 import type { Photo, PostDetail, PostSummary, SortValue, Tag } from './types';
 
 // Home-rail tag cloud. A hand-written fixture, not a derived view: the real BE
@@ -76,7 +84,7 @@ const photos: Photo[] = [
 const posts: PostDetail[] = [
 	{
 		slug: 'observability-is-a-contract',
-		title: 'Observability is a contract, not a dashboard',
+		title: 'Observability is a contract, not a dashboard test 2',
 		subtitle: 'Schemas, sampling budgets, and the questions your pager will actually ask',
 		preview:
 			'A long-form field guide to logs, traces, and metrics as promises between teams: what every service owes its operators, how to structure a logging schema that survives contact with reality, why sampling is a product decision, and how to keep cardinality inside a budget instead of a warning. Includes worked examples in Go, YAML, and shell.',

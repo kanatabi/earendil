@@ -13,9 +13,11 @@ the index.
   `INFRA_ARCHITECTURE.md` blueprint (no secrets in Git, one public ingress = this frontend),
   `../AGENTS.md` = workspace-wide non-negotiables (the `omicron` superproject repo,
   GitHub: <https://github.com/kanatabi/omicron>).
-- Content arrives **at runtime from a REST backend**; until the BE exists, the in-repo
-  **mock layer is the data source of truth** (`createApi(undefined)` → fixtures). Dev and
-  tests must work with no cluster and no backend.
+- Content arrives **at runtime from a REST backend** — and the BE EXISTS: the in-repo
+  **real lumen is the data source of truth** (owner ruling 2026-11-09:
+  real-by-default; unset env = the `http://localhost:8080` dev fallback).
+  TESTS must keep working with no cluster and no backend — via the fixture
+  twin imported directly, never via a runtime mock path.
 - Mermaid diagrams render **client-side** (adopted design, "Route B" — see §7).
 - **Brand**: wordmark **`gofar;`** — a pen-word ("go far"; also a legitimate Arabic/Indonesian given name). The legal identity **Faiz Ainur Rofiq** is anchored in the About page, the © footer, and the `Person` JSON-LD in `+layout.svelte` (`alternateName: Gofar`). Primary domain `gofar.id`; `ainurrofiq.com` 301-redirects to it (DESIGN §9).
 - UI source of truth: Flowstep file id in `DESIGN.md` header (8 screens, light/dark ×
@@ -38,14 +40,14 @@ Don't start by grepping everything: DESIGN/PLAN already encode most decisions.
 
 ## 3. Commands
 
-| Need                 | Command                             | Notes                                                    |
-| -------------------- | ----------------------------------- | -------------------------------------------------------- |
-| Dev server           | `npm run dev`                       | mock data by default; `-- --host` for LAN QA             |
-| Type/component check | `npm run check`                     | svelte-check; must be 0/0                                |
-| Lint                 | `npm run lint`                      | `prettier --check . && eslint .` — **run it standalone** |
-| Tests                | `npm run test:unit`                 | vitest, node env (no jsdom) — 4 files / 32 tests         |
-| Format               | `npx prettier --write <paths>`      | then re-run lint                                         |
-| Build / preview      | `npm run build` / `npm run preview` | adapter-node output in `build/`                          |
+| Need                 | Command                             | Notes                                                                                   |
+| -------------------- | ----------------------------------- | --------------------------------------------------------------------------------------- |
+| Dev server           | `npm run dev`                       | REAL lumen default (fallback :8080); `make dev` gates on readyz; `-- --host` for LAN QA |
+| Type/component check | `npm run check`                     | svelte-check; must be 0/0                                                               |
+| Lint                 | `npm run lint`                      | `prettier --check . && eslint .` — **run it standalone**                                |
+| Tests                | `npm run test:unit`                 | vitest, node env (no jsdom) — against the TEST-ONLY twin, zero backend                  |
+| Format               | `npx prettier --write <paths>`      | then re-run lint                                                                        |
+| Build / preview      | `npm run build` / `npm run preview` | adapter-node output in `build/`                                                         |
 
 **Always, after touching `src/`:** `prettier --write` → `npm run lint` → `npm run check` →
 `npm run test:unit` → `npm run build`. Lint must exit 0 on its own — piping through `tail`
@@ -86,8 +88,8 @@ src/routes/api/[...path]/       SAME-ORIGIN PROXY: browser GET /api/… → API_
 src/routes/{,search,gallery,about,posts/[slug]}/  pages; loads call #lib/api/server.ts
 src/lib/api/client.ts           BlogApi interface (CONTRACT SOURCE OF TRUTH) + createApi + ApiError
 src/lib/api/server.ts           server-only api singleton; API_BASE resolution chain
-src/lib/api/index.ts            client-safe entry (mock-aware) — what components import
-src/lib/api/mock.ts             fixture corpus: 12 posts (2 pages), photos, 3 mermaid fences
+src/lib/api/index.ts            client-safe entry (always fetches lumen) — what components import
+src/lib/api/mock.ts             TEST-ONLY twin: 12 posts (2 pages), photos, 3 mermaid fences
 src/lib/markdown/render.ts      markdown-it chain: anchors, ::: grid, task-lists, Shiki fence
                                 override (dual-theme CSS vars), mermaid-fence intercept
 src/lib/actions.ts              ALL post-render interactivity (see §6/§7) + MERMAID_VARS/RAMP
@@ -109,8 +111,12 @@ src/lib/*.test.ts, markdown/*.test.ts, api/*.test.ts   see §8
 3. **The API has no public ingress, ever** (workspace design). Browser→API traffic MUST ride
    `routes/api/[...path]` through the SSR pod. Don't "fix" a failing direct API call by
    exposing the BE.
-4. **Mock-first** — `createApi(undefined)` → fixtures. New endpoints: extend `BlogApi` +
-   `mock.ts` together; contract test (`api.test.ts`) and dev mode must keep working offline.
+4. **Real-first, twin in test scope** (owner ruling 2026-11-09, superseding
+   "mock-first") — the runtime always fetches lumen; `mock.ts` is the TEST-ONLY
+   reference corpus (api.test semantics + contract.spec live-vs-twin baseline +
+   lumen's seed mirror). New endpoints: extend `BlogApi` + the twin together;
+   `npm run test:unit` must keep working with no backend; the runtime import
+   graph must NEVER touch `mock.ts` (bundle size AND honesty).
 5. **Versions are pinned where it matters** (`mermaid` is exact-pin `12.2.0`); upgrading
    mermaid requires re-auditing theming (§7) — v12 changes were the whole theme story.
 6. **Mobile perf budget**: prefer composited animations (opacity/transform on small

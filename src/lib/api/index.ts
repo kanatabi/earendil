@@ -1,7 +1,7 @@
 import { PUBLIC_API_BASE } from '$app/env/public';
-import { createApi } from './client';
+import { createApi, DEV_DEFAULT_API_BASE } from './client';
 
-export const api = createApi(PUBLIC_API_BASE);
+export const api = createApi(PUBLIC_API_BASE || DEV_DEFAULT_API_BASE);
 
 export type { BlogApi } from './client';
 export { ApiError } from './client';
