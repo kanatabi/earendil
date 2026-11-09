@@ -1,4 +1,12 @@
 import { ApiError, type BlogApi } from './client';
+/**
+ * TEST-ONLY fixture twin — the reference corpus. NOT a runtime data source
+ * (real-by-default since the 2026-11-09 cutover ruling): the fetch API
+ * (client.ts) never imports this file, so it ships nowhere but the test
+ * runner. Its roles: api.test.ts semantics, contract.spec.ts live-vs-twin
+ * acceptance baseline, and lumen's seed corpus mirror (testdata). The
+ * BlogApi interface it pins is the contract; the shapes move together.
+ */
 import type { Photo, PostDetail, PostSummary, SortValue, Tag } from './types';
 
 // Home-rail tag cloud. A hand-written fixture, not a derived view: the real BE

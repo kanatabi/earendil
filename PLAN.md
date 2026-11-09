@@ -642,3 +642,16 @@ leak check "failed" the chain by succeeding). Use `;` after counting greps.
 
 **Gate status:** lint / check 0-0 / test:unit 47 / build green on the branch
 `feature/lumen-cutover`; merge = owner (GATE #3).
+
+**Addendum 2026-11-09 — real-by-default (owner ruling, supersedes mock-first).**
+The runtime now has exactly one data source: lumen (`API_BASE` env wins; unset
+falls back to `http://localhost:8080` — same fallback wired into server.ts,
+index.ts, AND the /api proxy so an SSR load and a browser suggest can never
+talk to two different backends). The fixture corpus survives as the TEST-ONLY
+twin — `client.ts` no longer imports it, so it ships nowhere but the test
+runner (bundle honesty + bytes). `dev:lumen` folded away; `make dev` is the
+gated real-mode entry; AGENTS §1/§3/§5/§6 reconciled (the "until the BE
+exists" era is history — it exists and is merged). Verification: check 0/0,
+47 unit green offline (twin via direct imports — the doctrine's test half
+intact), lint green; live feed/suggest/draft-leak proofs re-run against the
+stack. Same ruling mirrored into mellon + root AGENTS the same session.

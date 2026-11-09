@@ -28,18 +28,21 @@ Start the dev server with hot reload (edits appear instantly, no manual refresh)
 
 ```sh
 npm install        # first time only
-npm run dev        # http://localhost:5173 — mock fixtures (offline dev/tests)
-npm run dev:lumen  # http://localhost:5173 — the REAL lumen backend
-make help          # (same repo, Makefile included): make dev|lumen|contract
+npm run dev        # http://localhost:5173 — REAL lumen (API_BASE unset = localhost:8080 fallback)
+make dev           # the same, but gated: refuses to start a blind server when lumen isn't answering /readyz
+make help          # contract | check | lint | test | build
 ```
 
-**Two data modes (by environment, never by code path):** unset = the mock twin
-(no backend needed — dev, tests, CI all run this way); `npm run dev:lumen`
-sets `API_BASE=http://localhost:8080` (server loads call lumen directly) and
-`PUBLIC_API_BASE=/` (browser calls ride same-origin through the `/api/*` SSR
-proxy, because the API has no public ingress by design). Start the backend
-first: `cd ../lumen && make dev`. The acceptance check is the live contract
-suite: `LUMEN_URL=http://localhost:8080 npx vitest run src/lib/api/contract.spec.ts`.
+**Real-by-default (owner ruling, 2026-11-09):** the runtime has exactly one
+data source — lumen. Unset `API_BASE` falls back to the dev default
+(`http://localhost:8080`); the cluster overrides via ESO-rendered env, and the
+browser rides `PUBLIC_API_BASE=/` through the `/api/*` SSR proxy because the
+API has no public ingress by design. The fixture corpus is **test-only** now:
+`npm run test:unit` (47 tests vs the twin, zero backend) and the live contract
+acceptance suite stay offline-green because tests import the twin directly —
+that path never shipped to browsers. Start the backend first:
+`cd ../lumen && make dev`. Acceptance check:
+`LUMEN_URL=http://localhost:8080 npx vitest run src/lib/api/contract.spec.ts`.
 
 **On your phone / another machine (responsive QA):** bind to the network and open the printed LAN URL from the terminal:
 

@@ -1,4 +1,3 @@
-import { mockApi } from './mock';
 import type {
 	Photo,
 	PhotoListResponse,
@@ -57,8 +56,13 @@ export class ApiError extends Error {
 	}
 }
 
-export function createApi(base?: string): BlogApi {
-	if (!base) return mockApi;
+/** The default backend base for LOCAL DEV — the runtime env always wins
+ *  (cluster gets it from ESO-rendered API_BASE); this fallback exists so
+ *  `npm run dev` speaks real lumen out of the box (owner ruling 2026-11-09:
+ *  real-by-default; the fixture corpus survives ONLY as a test double). */
+export const DEV_DEFAULT_API_BASE = 'http://localhost:8080';
+
+export function createApi(base: string): BlogApi {
 	return createFetchApi(base.replace(/\/+$/, ''));
 }
 
