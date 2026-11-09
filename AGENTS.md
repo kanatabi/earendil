@@ -10,7 +10,9 @@ the index.
   containerized on a K3s cluster. The workspace parent (`../` = `omicron`) is the project
   family: **`lumen/`** = the REST backend (its own AGENTS/DESIGN; `../lumen/DESIGN.md` is
   the contract mirror of `src/lib/api/client.ts`), **`vortex/`** = GitOps manifests + the
-  `INFRA_ARCHITECTURE.md` blueprint (no secrets in Git, one public ingress = this frontend),
+  `INFRA_ARCHITECTURE.md` blueprint (no secrets in Git; public surfaces = this
+  frontend + `console.gofar.id` for mellon, never the API — INFRA §2 amendment
+  2026-11-08),
   `../AGENTS.md` = workspace-wide non-negotiables (the `omicron` superproject repo,
   GitHub: <https://github.com/kanatabi/omicron>).
 - Content arrives **at runtime from a REST backend** — and the BE EXISTS: the in-repo
