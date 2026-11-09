@@ -12,7 +12,8 @@ import { describe, expect, it } from 'vitest';
 import { createApi } from './client';
 import { mockApi } from './mock';
 
-const LUMEN_URL = process.env.LUMEN_URL;
+// '' when unset keeps the gate falsy AND the type honest (createApi: string)
+const LUMEN_URL = process.env.LUMEN_URL ?? '';
 const gated = LUMEN_URL ? describe : describe.skip;
 
 if (!LUMEN_URL) {
