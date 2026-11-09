@@ -30,6 +30,7 @@ Start the dev server with hot reload (edits appear instantly, no manual refresh)
 npm install        # first time only
 npm run dev        # http://localhost:5173 — mock fixtures (offline dev/tests)
 npm run dev:lumen  # http://localhost:5173 — the REAL lumen backend
+make help          # (same repo, Makefile included): make dev|lumen|contract
 ```
 
 **Two data modes (by environment, never by code path):** unset = the mock twin
