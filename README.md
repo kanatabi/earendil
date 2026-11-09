@@ -28,8 +28,17 @@ Start the dev server with hot reload (edits appear instantly, no manual refresh)
 
 ```sh
 npm install        # first time only
-npm run dev        # http://localhost:5173
+npm run dev        # http://localhost:5173 — mock fixtures (offline dev/tests)
+npm run dev:lumen  # http://localhost:5173 — the REAL lumen backend
 ```
+
+**Two data modes (by environment, never by code path):** unset = the mock twin
+(no backend needed — dev, tests, CI all run this way); `npm run dev:lumen`
+sets `API_BASE=http://localhost:8080` (server loads call lumen directly) and
+`PUBLIC_API_BASE=/` (browser calls ride same-origin through the `/api/*` SSR
+proxy, because the API has no public ingress by design). Start the backend
+first: `cd ../lumen && make dev`. The acceptance check is the live contract
+suite: `LUMEN_URL=http://localhost:8080 npx vitest run src/lib/api/contract.spec.ts`.
 
 **On your phone / another machine (responsive QA):** bind to the network and open the printed LAN URL from the terminal:
 

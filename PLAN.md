@@ -617,3 +617,28 @@ person, not two.
 - **"Selected writing"**: BE-curated; FE renders payload as-is. **General rule: no FE post-processing of any BE data** (articles, list, search, suggestions). TOC extraction remains a rendering step, not data processing.
   _(Evolved in M3.6: the home "Selected writing" list became the full paginated feed — the no-post-processing rule and BE-curation principle are unchanged: feed order, featured hero photo, and tag sets remain BE decisions.)_
 - **M3.5 round**: 4-link nav (Home/Articles/Gallery/About) + mobile hamburger; contact form removed (spam surface + footer weight); homepage photography demoted to a fixed-height teaser strip (masonry lives on `/gallery`); About is static FE; pagination is Newer/Older, page size 10; article breadcrumb below title/description in M5.
+
+---
+
+## Phase C — lumen cutover (2026-11-09)
+
+**What changed:** nothing in the request-path code — the mock-first design was built
+for exactly this day. The seam (`createApi(process.env.API_BASE || PUBLIC_API_BASE ||
+undefined)`) resolves to the real backend when the environment says so. One new npm
+script (`dev:lumen`) plus README docs; unit tests and plain `npm run dev` stay on the
+mock twin (verified: home 200 offline).
+
+**Proof it's real, not a trick:** twin parity means identical content either way, so
+content diffs prove nothing — the network path does: ① `/api/search/suggest` answers
+through the SSR proxy (that route 503s without `API_BASE` — the proxy is
+environment-gated); ② pointing `API_BASE` at a dead port makes SSR pages **500** —
+the feed is now genuinely lumen-dependent; ③ engine-served search ranks the queue
+post first (rule, not exact order, per the M2.5 contract split). The live contract
+suite (13/13 against `:8080`) is the standing acceptance harness.
+
+**Lessons kept:** `grep -c` exits 1 on zero matches — a QA chain using `&&` after a
+_*should-be-empty*_ assertion breaks precisely when the assertion passes (the draft
+leak check "failed" the chain by succeeding). Use `;` after counting greps.
+
+**Gate status:** lint / check 0-0 / test:unit 47 / build green on the branch
+`feature/lumen-cutover`; merge = owner (GATE #3).
