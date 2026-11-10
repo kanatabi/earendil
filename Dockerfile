@@ -12,8 +12,11 @@ RUN npm run build
 FROM node:22-alpine AS output
 WORKDIR /app
 ENV NODE_ENV=production
-# PORT (listen) and ORIGIN (canonical URL, sent in SSR/CSP contexts) come from the
-# Deployment's env in Git — don't bake the domain in here.
+# PORT (listen) comes from the Deployment's env in Git. The ORIGIN claim this
+# comment used to make was fiction — nothing in src/ reads it (env.ts declares
+# PUBLIC_API_BASE + API_BASE only; canonical URLs derive per-request from the
+# Host); it was dropped from base env + ExternalSecrets 2026-11-10. Either way:
+# don't bake domains in here.
 COPY --from=build /app/build ./build
 EXPOSE 3000
 USER node
