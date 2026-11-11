@@ -16,7 +16,7 @@ export const variables = defineEnvVars({
 		schema: (value) => value,
 		description:
 			'Internal base URL of the backend REST API, SERVER-SIDE ONLY. ' +
-			'In the cluster: http://blog-backend.blog-backend.svc.cluster.local. ' +
+			'In the cluster: http://lumen-http-server.lumen.svc.cluster.local. ' +
 			'Unset falls back to the dev default (http://localhost:8080).'
 	}
 });
