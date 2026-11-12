@@ -1,55 +1,23 @@
 name: release
-# Release-only deploy model: dispatch IS the deploy decision. Merging to main
-# gates (ci.yml) but never ships; a released v-tag is the only thing that can.
-# First release: hand-fire a major → v1.0.0 (anvil's no-tags rule).
+# The deploy pipeline — triggered BY A RELEASED TAG. The approved semver job
+# in ci.yml pushes vX.Y.Z via RELEASE_BOT_PAT specifically so this fires
+# (a GITHUB_TOKEN-pushed tag never cascades — silent no-deploy). The optional
+# manual run re-deploys an EXISTING tag: rollback without a revert.
 on:
+  push:
+    tags: ['/^v[0-9]+\.[0-9]+\.[0-9]+$/']
   workflow_dispatch:
     inputs:
-      bump:
-        description: semver segment to release
-        type: choice
-        options:
-          - patch
-          - minor
-          - major
-        default: patch
+      tag:
+        description: existing v-tag to build + deploy (redeploy / rollback)
+        required: true
+        type: string
 
 permissions:
   contents: read
 
 jobs:
-  gates:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: npm
-      - run: npm ci
-      - run: npm run lint # prettier --check + eslint, standalone per the lesson
-      - run: npm run check # svelte-check must be 0/0
-      - run: npm run test:unit # offline suites — zero-backend by doctrine
-      - run: npm run build
-
-  semver:
-    needs: gates
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write # the action pushes the tag + opens the gh release
-    outputs:
-      version: ${{ steps.rel.outputs.version }}
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0 # semver-release reads the newest v-tag from history
-      - id: rel
-        uses: kanatabi/anvil/actions/semver-release@59e8090cee545241f95c7bb68f7d5a0858033619
-        with:
-          bump: ${{ inputs.bump }}
-
   build:
-    needs: semver
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -57,20 +25,20 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ needs.semver.outputs.version }} # build exactly what was tagged
-      - uses: kanatabi/anvil/actions/publish-image@59e8090cee545241f95c7bb68f7d5a0858033619
+          ref: ${{ inputs.tag || github.ref_name }}
+      - uses: kanatabi/anvil/actions/publish-image@7183eb2808bc82d05eef7cc427c239802463f432 # v2 approval cascade
         with:
           app: earendil
-          tag: ${{ needs.semver.outputs.version }}
+          tag: ${{ inputs.tag || github.ref_name }}
           alias: latest
-          # no version-arg: earendil's node Dockerfile ignores it (Go builds stamp it)
 
   deploy:
-    needs: [semver, build]
+    needs: build
     runs-on: ubuntu-latest
     steps:
-      - uses: kanatabi/anvil/actions/deploy-bump@59e8090cee545241f95c7bb68f7d5a0858033619
+      - name: deploy-bump
+        uses: kanatabi/anvil/actions/deploy-bump@7183eb2808bc82d05eef7cc427c239802463f432 # v2 approval cascade
         with:
           app: earendil
-          tag: ${{ needs.semver.outputs.version }} # release doctrine: pins ride v-tags, never aliases
+          tag: ${{ inputs.tag || github.ref_name }}
           vortex-bot-pat: ${{ secrets.VORTEX_BOT_PAT }}
