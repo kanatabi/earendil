@@ -1,0 +1,104 @@
+name: ci
+# Gates on PRs; main additionally runs THE acceptance test (live-vs-twin
+# contract against real lumen + Postgres + Meilisearch) and publish-and-pin.
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  gates:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run lint          # prettier --check + eslint, standalone per the lesson
+      - run: npm run check         # svelte-check must be 0/0
+      - run: npm run test:unit     # offline suites — zero-backend by doctrine
+      - run: npm run build
+
+  contract:
+    # the program's first rule, executed: lumen serves BlogApi's exact shapes.
+    # Not a mock of a mock — real lumen, real Postgres, real engine, seeded
+    # corpus; the twin is the expected value.
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: gates
+    runs-on: ubuntu-latest
+    services:
+      pg:
+        image: postgres:16.6
+        env:
+          POSTGRES_USER: lumen
+          POSTGRES_PASSWORD: lumen-dev
+          POSTGRES_DB: lumen
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U lumen" --health-interval 5s --health-timeout 5s --health-retries 20
+      meili:
+        image: getmeili/meilisearch:v1.56.1
+        env:
+          MEILI_MASTER_KEY: dev-meili-key
+          MEILI_ENV: development
+        ports: ["7700:7700"]
+        options: >-
+          --health-cmd "curl -sf http://localhost:7700/health || exit 1" --health-interval 5s --health-timeout 5s --health-retries 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: kanatabi/lumen
+          path: .lumen-src
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: .lumen-src/go.mod
+      - name: seed the corpus
+        working-directory: .lumen-src
+        env:
+          LUMEN_DB_URL: postgres://lumen:lumen-dev@localhost:5432/lumen?sslmode=disable
+          LUMEN_MEILI_URL: http://localhost:7700
+          LUMEN_MEILI_KEY: dev-meili-key
+        run: go run ./cmd/seed
+      - name: run lumen (server role)
+        working-directory: .lumen-src
+        env:
+          LUMEN_DB_URL: postgres://lumen:lumen-dev@localhost:5432/lumen?sslmode=disable
+          LUMEN_MEILI_URL: http://localhost:7700
+          LUMEN_MEILI_KEY: dev-meili-key
+          LUMEN_SESSION_JWT_SECRET: contract-session-secret-32-bytes!!
+        run: |
+          go run ./cmd/lumen server &
+          for i in $(seq 1 60); do curl -sf http://localhost:8080/readyz >/dev/null && exit 0; sleep 1; done
+          echo "lumen never became ready"; exit 1
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: live-vs-mock contract suite
+        run: LUMEN_URL=http://localhost:8080 npx vitest run src/lib/api/contract.spec.ts
+
+  ship:
+    needs: [gates, contract]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: short sha
+        id: sid
+        run: echo "short=${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"
+      - name: publish-and-pin
+        uses: kanatabi/anvil/actions/publish-and-pin@50e1257eda6354b4b27d46c9ee75cca62881cdef # v1
+        with:
+          app: earendil
+          tag: sha-${{ steps.sid.outputs.short }}
+          vortex-bot-pat: ${{ secrets.VORTEX_BOT_PAT }}
