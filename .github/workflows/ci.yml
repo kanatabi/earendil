@@ -19,9 +19,9 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
-      - run: npm run lint          # prettier --check + eslint, standalone per the lesson
-      - run: npm run check         # svelte-check must be 0/0
-      - run: npm run test:unit     # offline suites — zero-backend by doctrine
+      - run: npm run lint # prettier --check + eslint, standalone per the lesson
+      - run: npm run check # svelte-check must be 0/0
+      - run: npm run test:unit # offline suites — zero-backend by doctrine
       - run: npm run build
 
   contract:
@@ -38,7 +38,7 @@ jobs:
           POSTGRES_USER: lumen
           POSTGRES_PASSWORD: lumen-dev
           POSTGRES_DB: lumen
-        ports: ["5432:5432"]
+        ports: ['5432:5432']
         options: >-
           --health-cmd "pg_isready -U lumen" --health-interval 5s --health-timeout 5s --health-retries 20
       meili:
@@ -46,7 +46,7 @@ jobs:
         env:
           MEILI_MASTER_KEY: dev-meili-key
           MEILI_ENV: development
-        ports: ["7700:7700"]
+        ports: ['7700:7700']
         options: >-
           --health-cmd "curl -sf http://localhost:7700/health || exit 1" --health-interval 5s --health-timeout 5s --health-retries 20
     steps:
