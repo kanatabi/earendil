@@ -1,0 +1,76 @@
+name: release
+# Release-only deploy model: dispatch IS the deploy decision. Merging to main
+# gates (ci.yml) but never ships; a released v-tag is the only thing that can.
+# First release: hand-fire a major → v1.0.0 (anvil's no-tags rule).
+on:
+  workflow_dispatch:
+    inputs:
+      bump:
+        description: semver segment to release
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
+        default: patch
+
+permissions:
+  contents: read
+
+jobs:
+  gates:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run lint # prettier --check + eslint, standalone per the lesson
+      - run: npm run check # svelte-check must be 0/0
+      - run: npm run test:unit # offline suites — zero-backend by doctrine
+      - run: npm run build
+
+  semver:
+    needs: gates
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # the action pushes the tag + opens the gh release
+    outputs:
+      version: ${{ steps.rel.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # semver-release reads the newest v-tag from history
+      - id: rel
+        uses: kanatabi/anvil/actions/semver-release@59e8090cee545241f95c7bb687d5a0858033619
+        with:
+          bump: ${{ inputs.bump }}
+
+  build:
+    needs: semver
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.semver.outputs.version }} # build exactly what was tagged
+      - uses: kanatabi/anvil/actions/publish-image@59e8090cee545241f95c7bb687d5a0858033619
+        with:
+          app: earendil
+          tag: ${{ needs.semver.outputs.version }}
+          alias: latest
+          # no version-arg: earendil's node Dockerfile ignores it (Go builds stamp it)
+
+  deploy:
+    needs: [semver, build]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: kanatabi/anvil/actions/deploy-bump@59e8090cee545241f95c7bb687d5a0858033619
+        with:
+          app: earendil
+          tag: ${{ needs.semver.outputs.version }} # release doctrine: pins ride v-tags, never aliases
+          vortex-bot-pat: ${{ secrets.VORTEX_BOT_PAT }}
