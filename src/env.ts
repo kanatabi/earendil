@@ -18,5 +18,14 @@ export const variables = defineEnvVars({
 			'Internal base URL of the backend REST API, SERVER-SIDE ONLY. ' +
 			'In the cluster: http://lumen-http-server.lumen.svc.cluster.local. ' +
 			'Unset falls back to the dev default (http://localhost:8080).'
+	},
+	ORIGIN: {
+		// server-only module ($app/env/private); consumed in +layout.server.ts via process.env
+		schema: (value) => value,
+		description:
+			'Canonical public origin of THIS deployment (scheme + host, no trailing slash): ' +
+			'https://gofar.id in production, https://staging.gofar.id in staging. ' +
+			'Consumed by the Person JSON-LD identity anchor so one image serves both envs ' +
+			'(DESIGN §9). Unset = https://gofar.id (current prod behavior preserved).'
 	}
 });
