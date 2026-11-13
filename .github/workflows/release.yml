@@ -3,9 +3,19 @@ name: release
 # in ci.yml pushes vX.Y.Z via RELEASE_BOT_PAT specifically so this fires
 # (a GITHUB_TOKEN-pushed tag never cascades — silent no-deploy). The optional
 # manual run re-deploys an EXISTING tag: rollback without a revert.
-# build+plan are automatic; deploy PARKS on the protected `deploy`
-# environment — the human reads deploy-plan's evidence (pin pre-flight +
-# validated rendered diff, in its log and the step summary) before approving.
+#
+# TWO CHAINS, ONE IMAGE (Phase-11 env model): earendil ships staging and
+# production. A tag push runs plan+deploy for BOTH; each deploy job PARKS
+# on its own protected environment (deploy-staging | deploy-production) —
+# the human reads that chain's deploy-plan evidence (pin pre-flight +
+# validated rendered diff, in its log and the step summary) before
+# approving, and the ladder is the approval ORDER: staging first. Each
+# approval opens ONE bump PR per env (bump/earendil-<env>-<tag>); the
+# env-scoped fence means a staging approval can never touch production's
+# files. workflow_dispatch may target a single env — the ONLY shape in
+# which config-epoch is honored: the epoch TRIOs carry PER-ENV VALUES, so
+# an epoch flip is inherently a one-environment act; with env=all the
+# epoch input is ignored (empty).
 on:
   push:
     # documented glob syntax; push-release.sh is the ONLY tag author (vX.Y.Z enforced)
@@ -16,8 +26,14 @@ on:
         description: existing v-tag to build + deploy (redeploy / rollback)
         required: true
         type: string
+      env:
+        description: which environment chain(s) to run
+        required: true
+        type: choice
+        options: [all, staging, production]
+        default: all
       config-epoch:
-        description: optional — flip the config epoch pair without a new image (number from the portal matrix); leave empty for normal image releases
+        description: optional epoch for the epoch TRIO flip — honored ONLY when env targets one environment (number from the portal matrix for THAT env); leave empty for normal image releases
         required: false
         type: string
         default: ''
@@ -35,33 +51,70 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: ${{ inputs.tag || github.ref_name }}
-      - uses: kanatabi/anvil/actions/publish-image@bdf7a8941214251f9c0b0e6dba1a2bf637bb43ca # v5 epoch-ready
+      - name: publish-image
+        uses: kanatabi/anvil/actions/publish-image@728231b0a8c10eab8739e75a4c5394c8f2b6386c # v6 env-model
         with:
           app: earendil
           tag: ${{ inputs.tag || github.ref_name }}
+          version-arg: ${{ inputs.tag || github.ref_name }}
           alias: latest
 
-  deploy-plan:
+  # ================= staging chain ======================================
+  deploy-plan-staging:
     needs: build
+    if: github.event_name == 'push' || inputs.env == 'all' || inputs.env == 'staging'
     runs-on: ubuntu-latest
     steps:
       - name: plan the bump (evidence only)
-        uses: kanatabi/anvil/actions/deploy-plan@bdf7a8941214251f9c0b0e6dba1a2bf637bb43ca # v5 epoch-ready
+        uses: kanatabi/anvil/actions/deploy-plan@728231b0a8c10eab8739e75a4c5394c8f2b6386c # v6 env-model
         with:
           app: earendil
+          env: staging
           tag: ${{ inputs.tag || github.ref_name }}
-          config-epoch: ${{ inputs.config-epoch }}
           vortex-bot-pat: ${{ secrets.VORTEX_BOT_PAT }}
+          config-epoch: ${{ inputs.env == 'staging' && inputs.config-epoch || '' }}
 
-  deploy:
-    needs: [build, deploy-plan]
+  deploy-staging:
+    needs: [build, deploy-plan-staging]
+    if: github.event_name == 'push' || inputs.env == 'all' || inputs.env == 'staging'
     runs-on: ubuntu-latest
-    environment: deploy
+    environment: deploy-staging
     steps:
       - name: open the bump PR (human-approved)
-        uses: kanatabi/anvil/actions/deploy-bump@bdf7a8941214251f9c0b0e6dba1a2bf637bb43ca # v5 epoch-ready
+        uses: kanatabi/anvil/actions/deploy-bump@728231b0a8c10eab8739e75a4c5394c8f2b6386c # v6 env-model
         with:
           app: earendil
+          env: staging
           tag: ${{ inputs.tag || github.ref_name }}
-          config-epoch: ${{ inputs.config-epoch }}
           vortex-bot-pat: ${{ secrets.VORTEX_BOT_PAT }}
+          config-epoch: ${{ inputs.env == 'staging' && inputs.config-epoch || '' }}
+
+  # ================= production chain ===================================
+  deploy-plan-production:
+    needs: build
+    if: github.event_name == 'push' || inputs.env == 'all' || inputs.env == 'production'
+    runs-on: ubuntu-latest
+    steps:
+      - name: plan the bump (evidence only)
+        uses: kanatabi/anvil/actions/deploy-plan@728231b0a8c10eab8739e75a4c5394c8f2b6386c # v6 env-model
+        with:
+          app: earendil
+          env: production
+          tag: ${{ inputs.tag || github.ref_name }}
+          vortex-bot-pat: ${{ secrets.VORTEX_BOT_PAT }}
+          config-epoch: ${{ inputs.env == 'production' && inputs.config-epoch || '' }}
+
+  deploy-production:
+    needs: [build, deploy-plan-production]
+    if: github.event_name == 'push' || inputs.env == 'all' || inputs.env == 'production'
+    runs-on: ubuntu-latest
+    environment: deploy-production
+    steps:
+      - name: open the bump PR (human-approved)
+        uses: kanatabi/anvil/actions/deploy-bump@728231b0a8c10eab8739e75a4c5394c8f2b6386c # v6 env-model
+        with:
+          app: earendil
+          env: production
+          tag: ${{ inputs.tag || github.ref_name }}
+          vortex-bot-pat: ${{ secrets.VORTEX_BOT_PAT }}
+          config-epoch: ${{ inputs.env == 'production' && inputs.config-epoch || '' }}
