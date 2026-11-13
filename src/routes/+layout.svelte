@@ -43,14 +43,17 @@
 	// generated via stringify — a literal {...} inside {@html `...`} trips the
 	// svelte-eslint-parser template lexer; the closing tag is split so its raw
 	// sequence never appears in this file's source (it would end this block).
-	const personJsonLd =
+	// The url is the deployment's canonical origin (ORIGIN env via +layout.server.ts),
+	// so the staging host self-identifies from one image (DESIGN §9).
+	const personJsonLd = $derived(
 		`<script type="application/ld+json">${JSON.stringify({
 			'@context': 'https://schema.org',
 			'@type': 'Person',
 			name: 'Faiz Ainur Rofiq',
 			alternateName: 'Gofar',
-			url: 'https://gofar.id'
-		})}</scr` + 'ipt>';
+			url: data.origin
+		})}</scr` + 'ipt>'
+	);
 
 	function toggleTheme() {
 		const next = theme === 'dark' ? 'light' : 'dark';

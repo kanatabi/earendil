@@ -171,7 +171,22 @@ Rules: consistent `md`/`lg` breakpoints; differences handled with visibility var
 - **Subdomain plan (under gofar.id):** `www` + apex → this site; `staging.gofar.id` for staging; later `portal.` and a private `cms.` (blog BE). **`cms.` must not be publicly exposed** — FE-to-BE traffic uses in-cluster service URLs for `PUBLIC_API_BASE`.
 - **TLS:** one wildcard cert `*.gofar.id` (cert-manager DNS-01) — new subdomains need no cert ceremony.
 - **Email:** `faiz@gofar.id` via Cloudflare Email Routing (free) — persona domain, real local-part, forwards to any inbox.
-- **Env:** `PUBLIC_API_BASE` (BE base, in-cluster; unset ⇒ mock layer) and `PUBLIC_SITE_URL` (canonical origin for absolute URLs: RSS items, future canonical/OG tags).
+- **Env (runtime only — no build-time inlining: one image runs everywhere):** `API_BASE` (server-side lumen base), `PUBLIC_API_BASE` (browser; `/` in-cluster — rides the same-origin proxy), `ORIGIN` (canonical public origin of THIS deployment; feeds the Person JSON-LD via `+layout.server.ts` → `resolveOrigin` in ``#lib/site.ts`; unset = `https://gofar.id`). Declared in `src/env.ts`.
 - RSS: BE serves `/feed.xml` with absolute links built from `PUBLIC_SITE_URL`.
-- **Infra to-do (vortex GitOps repo + OpenBao, not this repo):** ingress hosts + 301 redirect rule for `ainurrofiq.com → gofar.id`, wildcard cert secret, `PUBLIC_SITE_URL`/origin env values, parent-workspace AGENTS.md domain note.
+- **Infra to-do (vortex GitOps repo + OpenBao, not this repo):** ingress hosts + 301 redirect rule for `ainurrofiq.com → gofar.id`, wildcard cert secret, `ORIGIN` env values (now consumed — see the contract below), parent-workspace AGENTS.md domain note.
 - **Migration notes (checked 2026-10-17):** `fzr.com/.dev/.app/.xyz` taken; `fzr.blog`/`fzr.me` registry-_premium_ (≈IDR 1M/yr — declined); `faizrofiq.com` available, unregistered — optional insurance. Superseded 2026-10-18 by the `gofar.id` strategy (all three `gofar` domains owned).
+
+### Two-env config contract (staging ⇄ production) — wired 2026-11-13
+
+Staging and production blogs are **the same image**; they differ only by seeded
+env values. The FE emits exactly one absolute, host-derived URL today — the
+Person JSON-LD `url` — and it now reads `ORIGIN` (audit finding: everything else
+is relative, request-derived at runtime, or a third-party link).
+
+| Env var           | Consumer                                                     | production seed                       | staging seed                       | unset fallback            |
+| ----------------- | ------------------------------------------------------------ | ------------------------------------- | ---------------------------------- | ------------------------- |
+| `API_BASE`        | `#lib/api/server.ts`, `/api` proxy                           | lumen-production internal service URL | lumen-staging internal service URL | dev default `:8080`       |
+| `PUBLIC_API_BASE` | browser suggest calls (same-origin proxy)                    | `/`                                   | `/`                                | dev default               |
+| `ORIGIN`          | `+layout.server.ts` → `resolveOrigin` → Person JSON-LD `url` | `https://gofar.id`                    | `https://staging.gofar.id`         | `https://gofar.id` (prod) |
+
+What does **not** need env treatment (verified 2026-11-13 audit): no FE sitemap/RSS/canonical/`og:url`/`twitter:url` routes or tags (feed-with-absolute-links is the BE's `/feed.xml`); `static/robots.txt` carries no `Sitemap:` line; heading copy-link uses runtime `location.origin`; the theme cookie sets no `Domain` attr (works on any host); asset URLs are relative (`_app/immutable`); no CSP/cookieTrust host assumptions. Future canonical/OG/RSS-style absolute links on the FE side must read `ORIGIN` (via `resolveOrigin`), never a literal.
