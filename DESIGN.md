@@ -2,9 +2,11 @@
 
 > UI source of truth: Flowstep file `f82d3fbc-3f1e-4f24-ac48-e19143ccb2fa` (8 screens:
 > light/dark × homepage/article × desktop/mobile, plus mobile light/dark variants).
-> Note: the production infra blueprint lives in the sibling `vortex/` repo
-> (`vortex/INFRA_ARCHITECTURE.md`); the local [ARCHITECTURE.md](ARCHITECTURE.md) is a
-> superseded single-node draft. This file is the FE design doc.
+> Note: the production infra blueprint lives in the omicron superproject
+> ([INFRA_ARCHITECTURE.md](https://github.com/kanatabi/omicron/blob/main/INFRA_ARCHITECTURE.md));
+> the superseded single-node draft is archived in the omicron vault
+> ([archive/earendil-ARCHITECTURE.md](https://github.com/kanatabi/omicron/blob/main/context-knowledge/archive/earendil-ARCHITECTURE.md)).
+> This file is the FE design doc.
 
 ## 1. Stack
 
