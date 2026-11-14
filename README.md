@@ -4,7 +4,7 @@ Part of the [`omicron`](https://github.com/kanatabi/omicron) superproject ·
 Backend contract: [`lumen`](https://github.com/kanatabi/lumen) ·
 GitOps: [`vortex`](https://github.com/kanatabi/vortex)
 
-SvelteKit frontend for the Markdown-driven personal blog of **Faiz Ainur Rofiq**, published under the pen-word `gofar;` — "go far" (travel motif, cf. the `earendil` codename), and a legitimate Arabic/Indonesian name besides; the legal identity stays in the byline, ©, and schema. Content is served by a REST BE (`cms.`, contract in [DESIGN.md §4](DESIGN.md)); an in-repo mock layer runs until it exists — flip with `PUBLIC_API_BASE`.
+SvelteKit frontend for the Markdown-driven personal blog of **Faiz Ainur Rofiq**, published under the pen-word `gofar;` — "go far" (travel motif, cf. the `earendil` codename), and a legitimate Arabic/Indonesian name besides; the legal identity stays in the byline, ©, and schema. Content is served by the REST BE, lumen (`cms.`, contract in [DESIGN.md §4](DESIGN.md)); real-by-default — unset `API_BASE` falls back to the local dev server.
 
 **Canonical URL: `https://gofar.id`** (domain strategy & migration checklist in DESIGN.md §9; `ainurrofiq.com` 301s to it).
 
@@ -20,7 +20,7 @@ SvelteKit frontend for the Markdown-driven personal blog of **Faiz Ainur Rofiq**
 
 Plus: **⌘K / `Mod+K` command palette** (capped launcher with see-all hand-off), cookie-persisted light/dark (View-Transitions cross-fade), brand-violet route progress bar, staggered fade entrances, animated mobile hamburger.
 
-**Stack:** Svelte 5 + SvelteKit (Kit 3) + TypeScript · Tailwind v4 (semantic token palette, ~7 deliberate raw-CSS exceptions) · markdown-it pipeline (anchors, task lists, container directive) + Shiki + DOMPurify · vitest. Docs: [DESIGN.md](DESIGN.md) (living spec) · [PLAN.md](PLAN.md) (milestones & status) · [ARCHITECTURE.md](ARCHITECTURE.md) (legacy single-node draft — the live blueprint is `vortex/INFRA_ARCHITECTURE.md`).
+**Stack:** Svelte 5 + SvelteKit (Kit 3) + TypeScript · Tailwind v4 (semantic token palette, ~7 deliberate raw-CSS exceptions) · markdown-it pipeline (anchors, task lists, container directive) + Shiki + DOMPurify · vitest. Docs: [DESIGN.md](DESIGN.md) (living spec). The infra blueprint lives in omicron (`INFRA_ARCHITECTURE.md`); the superseded single-node draft is archived in the [omicron vault](https://github.com/kanatabi/omicron/blob/main/context-knowledge/archive/earendil-ARCHITECTURE.md), and `PLAN.md` is the owner's local journal (untracked).
 
 ## Live preview
 
@@ -69,7 +69,7 @@ Theme check: flip the sun/moon toggle in the navbar, reload — the choice persi
 
 | Var               | Meaning                                                       | Unset behavior     |
 | ----------------- | ------------------------------------------------------------- | ------------------ |
-| `PUBLIC_API_BASE` | REST BE base URL (in-cluster service URL in production)       | mock fixture layer |
+| `PUBLIC_API_BASE` | REST BE base URL (in-cluster service URL in production)       | same-origin `/` → the `/api/*` SSR proxy |
 | `PUBLIC_SITE_URL` | canonical origin (used for RSS/canonical absolutes at deploy) | reserved for M8    |
 
 ## Re-creating the scaffold

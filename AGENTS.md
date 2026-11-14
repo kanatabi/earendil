@@ -9,10 +9,11 @@ the index.
 - **SvelteKit 3** (Svelte 5 runes, Vite 8) SSR blog frontend via **`adapter-node`** →
   containerized on a K3s cluster. The workspace parent (`../` = `omicron`) is the project
   family: **`lumen/`** = the REST backend (its own AGENTS/DESIGN; `../lumen/DESIGN.md` is
-  the contract mirror of `src/lib/api/client.ts`), **`vortex/`** = GitOps manifests + the
-  `INFRA_ARCHITECTURE.md` blueprint (no secrets in Git; public surfaces = this
-  frontend + `console.gofar.id` for mellon, never the API — INFRA §2 amendment
-  2026-11-08),
+  the contract mirror of `src/lib/api/client.ts`), **`vortex/`** = GitOps manifests
+  (no secrets in Git; public surfaces = this frontend + `console.gofar.id` for
+  mellon, never the API — INFRA §2 amendment 2026-11-08; the blueprint is
+  `../INFRA_ARCHITECTURE.md` in the omicron root — the old in-vortex copy was
+  retired 2026-11-15),
   `../AGENTS.md` = workspace-wide non-negotiables (the `omicron` superproject repo,
   GitHub: <https://github.com/kanatabi/omicron>).
 - Content arrives **at runtime from a REST backend** — and the BE EXISTS: the in-repo
@@ -31,12 +32,13 @@ the index.
    perf fixes).
 2. **`DESIGN.md`** — living spec: stack, routes, theming, API contract, markdown pipeline,
    the 7 raw-CSS exceptions, deployment. Most "why is it like this?" questions answer here.
-3. **`PLAN.md`** — round-by-round journal with decision records (append-only history; don't
-   rewrite old entries, add "Refined/Decision" notes).
 4. Code spine: `src/routes/+layout.svelte` → a page's `+page.server.ts` (SSR load) →
    `src/lib/api/` → `src/lib/markdown/render.ts` → `src/lib/actions.ts` (all post-render
    interactivity) → `src/lib/components/`.
 5. `README.md` is user-facing (routes, how to run) — rarely the place to look for internals.
+6. `PLAN.md` — the owner's **local-only** journal (gitignored; not in a fresh clone).
+   On the owner's disk it stays the append-only decision record: don't rewrite old
+   entries, add "Refined/Decision" notes. Never recreate it in Git.
 
 Don't start by grepping everything: DESIGN/PLAN already encode most decisions.
 
@@ -66,6 +68,8 @@ churn, `git checkout -- <file>` and redo the content edit.
 - **Never commit directly to the default branch** (`main` here; `master` in the legacy
   `fzr-blog/sv-fzr` copy). One branch per milestone/round (`feature/<slug>`,
   historically `milestone/<n>-<slug>`), human reviews and merges.
+- **PLAN.md is local-only** (owner ruling 2026-11-15): gitignored, never committed,
+  never recreated in Git — it is the owner's journal, not a repo doc.
 - **Club related changes into ONE commit** — never one commit per file, no micro-commits.
   Conventional Commit subject (`feat|fix|docs|perf(scope): …`) with a WHY body.
 - Unmerged branches: `feature/a-inline-diagrams` (the rejected Route A diagram design —
