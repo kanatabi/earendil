@@ -52,7 +52,7 @@ jobs:
         with:
           ref: ${{ inputs.tag || github.ref_name }}
       - name: publish-image
-        uses: kanatabi/anvil/actions/publish-image@728231b0a8c10eab8739e75a4c5394c8f2b6386c # v6 env-model
+        uses: kanatabi/anvil/actions/publish-image@829fa28eeb50eaf46a2d8167555236be0f232366 # wave assertions + fence/bot fixes
         with:
           app: earendil
           tag: ${{ inputs.tag || github.ref_name }}
@@ -70,11 +70,17 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      environments: read
     steps:
       - name: every chain parks on a PROTECTED environment
         env:
-          GH_TOKEN: ${{ github.token }}
+          # ENV_AUDIT_PAT: fine-grained PAT, Administration: read — explicit,
+          # auditable identity for the environments API (read access alone
+          # suffices per docs; the default token works but keeps the audit
+          # on a purpose-made credential). Walked 2026-11-14: the audit's
+          # "NO required reviewers" verdicts were TRUE positives — the
+          # deploy-* environments genuinely lacked reviewers until the
+          # owner configured them (kanatabi, self-review off).
+          GH_TOKEN: ${{ secrets.ENV_AUDIT_PAT }}
           CHAINS: deploy-staging deploy-production
         run: |
           set -uo pipefail
@@ -94,7 +100,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: plan the bump (evidence only)
-        uses: kanatabi/anvil/actions/deploy-plan@728231b0a8c10eab8739e75a4c5394c8f2b6386c # v6 env-model
+        uses: kanatabi/anvil/actions/deploy-plan@829fa28eeb50eaf46a2d8167555236be0f232366 # wave assertions + fence/bot fixes
         with:
           app: earendil
           env: staging
@@ -109,7 +115,7 @@ jobs:
     environment: deploy-staging
     steps:
       - name: open the bump PR (human-approved)
-        uses: kanatabi/anvil/actions/deploy-bump@728231b0a8c10eab8739e75a4c5394c8f2b6386c # v6 env-model
+        uses: kanatabi/anvil/actions/deploy-bump@829fa28eeb50eaf46a2d8167555236be0f232366 # wave assertions + fence/bot fixes
         with:
           app: earendil
           env: staging
@@ -124,7 +130,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: plan the bump (evidence only)
-        uses: kanatabi/anvil/actions/deploy-plan@728231b0a8c10eab8739e75a4c5394c8f2b6386c # v6 env-model
+        uses: kanatabi/anvil/actions/deploy-plan@829fa28eeb50eaf46a2d8167555236be0f232366 # wave assertions + fence/bot fixes
         with:
           app: earendil
           env: production
@@ -139,7 +145,7 @@ jobs:
     environment: deploy-production
     steps:
       - name: open the bump PR (human-approved)
-        uses: kanatabi/anvil/actions/deploy-bump@728231b0a8c10eab8739e75a4c5394c8f2b6386c # v6 env-model
+        uses: kanatabi/anvil/actions/deploy-bump@829fa28eeb50eaf46a2d8167555236be0f232366 # wave assertions + fence/bot fixes
         with:
           app: earendil
           env: production
