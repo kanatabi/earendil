@@ -236,3 +236,12 @@ are manually verified (§9).
   block / the escaped-source fallback without asking.
 - Commit to `master`, or split a logical change across micro-commits.
 - Trust in-session "done" claims — grep the files.
+
+## 12. Context sync (workspace rule, 2026-11-15)
+
+Changes that alter this repo's stack, anatomy, contract, commands,
+conventions, or state update the vault's learning note in the SAME round:
+`omicron` → `context-knowledge/repos/earendil/README.md` (+ its
+`LEARNING.md` if the change minted a lesson; + the runbook/INFRA docs when
+decision- or operation-level). "The code landed but the vault didn't" is
+an incomplete round — the checklist lives at the end of that note.
