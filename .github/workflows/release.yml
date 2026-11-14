@@ -52,7 +52,7 @@ jobs:
         with:
           ref: ${{ inputs.tag || github.ref_name }}
       - name: publish-image
-        uses: kanatabi/anvil/actions/publish-image@829fa28eeb50eaf46a2d8167555236be0f232366 # wave assertions + fence/bot fixes
+        uses: kanatabi/anvil/actions/publish-image@004d3baf21efa1ccaf81d95e2017ac496e036df6 # SA + janitor table
         with:
           app: earendil
           tag: ${{ inputs.tag || github.ref_name }}
@@ -100,7 +100,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: plan the bump (evidence only)
-        uses: kanatabi/anvil/actions/deploy-plan@829fa28eeb50eaf46a2d8167555236be0f232366 # wave assertions + fence/bot fixes
+        uses: kanatabi/anvil/actions/deploy-plan@004d3baf21efa1ccaf81d95e2017ac496e036df6 # SA + janitor table
         with:
           app: earendil
           env: staging
@@ -115,7 +115,7 @@ jobs:
     environment: deploy-staging
     steps:
       - name: open the bump PR (human-approved)
-        uses: kanatabi/anvil/actions/deploy-bump@829fa28eeb50eaf46a2d8167555236be0f232366 # wave assertions + fence/bot fixes
+        uses: kanatabi/anvil/actions/deploy-bump@004d3baf21efa1ccaf81d95e2017ac496e036df6 # SA + janitor table
         with:
           app: earendil
           env: staging
@@ -130,7 +130,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: plan the bump (evidence only)
-        uses: kanatabi/anvil/actions/deploy-plan@829fa28eeb50eaf46a2d8167555236be0f232366 # wave assertions + fence/bot fixes
+        uses: kanatabi/anvil/actions/deploy-plan@004d3baf21efa1ccaf81d95e2017ac496e036df6 # SA + janitor table
         with:
           app: earendil
           env: production
@@ -145,7 +145,7 @@ jobs:
     environment: deploy-production
     steps:
       - name: open the bump PR (human-approved)
-        uses: kanatabi/anvil/actions/deploy-bump@829fa28eeb50eaf46a2d8167555236be0f232366 # wave assertions + fence/bot fixes
+        uses: kanatabi/anvil/actions/deploy-bump@004d3baf21efa1ccaf81d95e2017ac496e036df6 # SA + janitor table
         with:
           app: earendil
           env: production
