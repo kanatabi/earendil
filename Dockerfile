@@ -23,6 +23,11 @@ COPY --from=build /app/node_modules ./node_modules
 # Host); it was dropped from base env + ExternalSecrets 2026-11-10. Either way:
 # don't bake domains in here.
 COPY --from=build /app/build ./build
+# package.json rides along: the #lib/* imports ALIAS lives in its "imports"
+# field — without it server.js's import of #lib/server/metrics.js throws
+# ERR_PACKAGE_IMPORT_NOT_DEFINED at boot (the same bug mellon's v3.1.0
+# rollout crashed on). It also anchors "type": "module" for the .js files.
+COPY --from=build /app/package.json ./package.json
 # the custom server (2026-11-15): TWO listeners in ONE process — the app
 # on PORT and the UNROUTED /metrics listener on EARENDIL_METRICS_PORT
 # (default 9090, the no-sidecar contract's scrape door). server.js is
