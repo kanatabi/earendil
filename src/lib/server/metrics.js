@@ -24,7 +24,7 @@
  * flat cardinality by construction.
  */
 
-import { Counter, Gauge, Histogram, collectDefaultMetrics, Registry } from 'prom-client';
+import { Counter, Gauge, Histogram, collectDefaultMetrics, register } from 'prom-client';
 
 export const SERVICE = 'earendil';
 
@@ -128,49 +128,94 @@ export function effectiveTimeout(dependency, operation) {
 	return timeoutFor(dependency, operation);
 }
 
-/** The ONE register: prom-client resolves from node_modules at runtime for
- * BOTH importers (the SSR build externalizes real dependencies), so the
- * hook-side observations and the server-side scrape see the same series. */
-export const register = new Registry();
+// THE ONE REGISTER is prom-client's DEFAULT global registry — a deliberate
+// choice, not a shortcut: the runtime executes this module's SOURCE copy
+// (server.js imports it) AND the build's bundled chunk (the hooks chain
+// imports that) — two module instances. With per-instance `new Registry()`
+// the hooks' observations never reached the /metrics listener (mellon's
+// smoke test caught exactly that; the fix lands in both apps). The DEFAULT
+// registry is a property of the prom-client module itself, which the SSR
+// build EXTERNALIZES (real dependency → resolved from node_modules at
+// runtime) — so every copy shares ONE instance. Re-exported for server.js.
+//
+// Two copies also mean the DEFINITIONS run twice — hence define(): the
+// first instance wins, the second reuses its metrics (double-registration
+// would throw at boot). collectDefaultMetrics is guarded the same way.
+export { register };
 register.setDefaultLabels({ service: SERVICE });
-collectDefaultMetrics({ register });
+
+/**
+ * @param {string} name
+ * @param {() => import('prom-client').Metric<string>} factory
+ * @returns {import('prom-client').Metric<string>}
+ */
+function define(name, factory) {
+	return register.getSingleMetric(name) ?? factory();
+}
+
+if (!register.getSingleMetric('process_cpu_user_seconds_total')) collectDefaultMetrics();
 
 const OUTBOUND_BUCKETS = [0.005, 0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1, 2.5, 5, 10, 30];
 const INBOUND_BUCKETS = [0.005, 0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1, 2.5, 5, 10];
 
-export const outboundTotal = new Counter({
-	name: 'outbound_request_total',
-	help: 'Outbound call outcomes (result=ok|error|timeout).',
-	labelNames: ['dependency', 'operation', 'result'],
-	registers: [register]
-});
-export const outboundDuration = new Histogram({
-	name: 'outbound_request_duration_seconds',
-	help: 'Latency of outbound calls, by dependency and operation.',
-	labelNames: ['dependency', 'operation'],
-	buckets: OUTBOUND_BUCKETS,
-	registers: [register]
-});
-export const outboundInflight = new Gauge({
-	name: 'outbound_inflight',
-	help: 'Outbound calls currently in flight, by dependency.',
-	labelNames: ['dependency'],
-	registers: [register]
-});
+export const outboundTotal = /** @type {Counter} */ (
+	define(
+		'outbound_request_total',
+		() =>
+			new Counter({
+				name: 'outbound_request_total',
+				help: 'Outbound call outcomes (result=ok|error|timeout).',
+				labelNames: ['dependency', 'operation', 'result']
+			})
+	)
+);
+export const outboundDuration = /** @type {Histogram} */ (
+	define(
+		'outbound_request_duration_seconds',
+		() =>
+			new Histogram({
+				name: 'outbound_request_duration_seconds',
+				help: 'Latency of outbound calls, by dependency and operation.',
+				labelNames: ['dependency', 'operation'],
+				buckets: OUTBOUND_BUCKETS
+			})
+	)
+);
+export const outboundInflight = /** @type {Gauge} */ (
+	define(
+		'outbound_inflight',
+		() =>
+			new Gauge({
+				name: 'outbound_inflight',
+				help: 'Outbound calls currently in flight, by dependency.',
+				labelNames: ['dependency']
+			})
+	)
+);
 
-export const httpRequestTotal = new Counter({
-	name: 'http_request_total',
-	help: 'Inbound requests by SvelteKit route ID (never raw paths).',
-	labelNames: ['method', 'route', 'status'],
-	registers: [register]
-});
-export const httpRequestDuration = new Histogram({
-	name: 'http_request_duration_seconds',
-	help: 'Inbound request latency by route ID.',
-	labelNames: ['method', 'route'],
-	buckets: INBOUND_BUCKETS,
-	registers: [register]
-});
+export const httpRequestTotal = /** @type {Counter} */ (
+	define(
+		'http_request_total',
+		() =>
+			new Counter({
+				name: 'http_request_total',
+				help: 'Inbound requests by SvelteKit route ID (never raw paths).',
+				labelNames: ['method', 'route', 'status']
+			})
+	)
+);
+export const httpRequestDuration = /** @type {Histogram} */ (
+	define(
+		'http_request_duration_seconds',
+		() =>
+			new Histogram({
+				name: 'http_request_duration_seconds',
+				help: 'Inbound request latency by route ID.',
+				labelNames: ['method', 'route'],
+				buckets: INBOUND_BUCKETS
+			})
+	)
+);
 
 /**
  * The outbound wrapper — the seam every outside call rides: the budget
