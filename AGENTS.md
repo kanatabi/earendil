@@ -32,11 +32,11 @@ the index.
    perf fixes).
 2. **`DESIGN.md`** — living spec: stack, routes, theming, API contract, markdown pipeline,
    the 7 raw-CSS exceptions, deployment. Most "why is it like this?" questions answer here.
-4. Code spine: `src/routes/+layout.svelte` → a page's `+page.server.ts` (SSR load) →
+3. Code spine: `src/routes/+layout.svelte` → a page's `+page.server.ts` (SSR load) →
    `src/lib/api/` → `src/lib/markdown/render.ts` → `src/lib/actions.ts` (all post-render
    interactivity) → `src/lib/components/`.
-5. `README.md` is user-facing (routes, how to run) — rarely the place to look for internals.
-6. `PLAN.md` — the owner's **local-only** journal (gitignored; not in a fresh clone).
+4. `README.md` is user-facing (routes, how to run) — rarely the place to look for internals.
+5. `PLAN.md` — the owner's **local-only** journal (gitignored; not in a fresh clone).
    On the owner's disk it stays the append-only decision record: don't rewrite old
    entries, add "Refined/Decision" notes. Never recreate it in Git.
 

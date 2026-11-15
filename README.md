@@ -67,10 +67,10 @@ Theme check: flip the sun/moon toggle in the navbar, reload — the choice persi
 
 ## Env
 
-| Var               | Meaning                                                       | Unset behavior     |
-| ----------------- | ------------------------------------------------------------- | ------------------ |
+| Var               | Meaning                                                       | Unset behavior                           |
+| ----------------- | ------------------------------------------------------------- | ---------------------------------------- |
 | `PUBLIC_API_BASE` | REST BE base URL (in-cluster service URL in production)       | same-origin `/` → the `/api/*` SSR proxy |
-| `PUBLIC_SITE_URL` | canonical origin (used for RSS/canonical absolutes at deploy) | reserved for M8    |
+| `PUBLIC_SITE_URL` | canonical origin (used for RSS/canonical absolutes at deploy) | reserved for M8                          |
 
 ## Re-creating the scaffold
 
