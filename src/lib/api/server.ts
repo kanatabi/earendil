@@ -5,9 +5,13 @@
 // other server-only modules — $app/env/private is not importable from client code.
 import { PUBLIC_API_BASE } from '$app/env/public';
 import { createApi, DEV_DEFAULT_API_BASE } from './client';
+import { DEP, outbound } from '#lib/server/metrics.js';
 
 // real lumen is the ONLY runtime data source; unset env falls back to the
 // dev default (cluster overrides), never to fixtures.
-export const api = createApi(process.env.API_BASE || PUBLIC_API_BASE || DEV_DEFAULT_API_BASE);
+export const api = createApi(
+	process.env.API_BASE || PUBLIC_API_BASE || DEV_DEFAULT_API_BASE,
+	(op, run) => outbound(DEP.Lumen, op, run)
+);
 
 export { ApiError } from './client';
