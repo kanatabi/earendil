@@ -92,18 +92,6 @@ export function timeoutEnvKeys(dependency) {
 	return [depKey, ...Object.keys(entry.ops ?? {}).map((op) => `${depKey}_${opPiece(op)}`)];
 }
 
-/**
- * @param {string} name
- * @param {number} fallback
- * @returns {number}
- */
-function envTimeout(name, fallback) {
-	const raw = process.env[name];
-	if (raw === undefined || raw === '') return fallback;
-	const parsed = Number.parseInt(raw, 10);
-	return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback;
-}
-
 /** The effective budget AFTER env overrides — what outbound() actually
  * applies. Exported for tests. */
 /**
