@@ -646,16 +646,29 @@ function matches(
 
 // Explicit re-ordering; absent/unknown sorts leave the given order intact
 // (the curation order on /api/posts, the relevance order on search).
-function sorted<T extends { date: string; readTime: number }>(list: T[], sort?: SortValue): T[] {
+// The TIE-BREAK (2026-11-15): the engine's sort rules are single-key
+// (postSort: "readTime:asc" etc.) — ties resolve inside Meilisearch to
+// PRIMARY-KEY (slug) ascending, and the twin must mirror that observable
+// semantics or the contract test catches the drift (it did: two readTime-7
+// posts swapped between live and twin). JS sort is stable, so a bare
+// single-key comparator keeps fixture order instead — hence the explicit
+// slug chain on every branch.
+function sorted<T extends { date: string; readTime: number; slug: string }>(
+	list: T[],
+	sort?: SortValue
+): T[] {
+	// byte order — the engine's primary-key ordering is lexical-bytes, and
+	// localeCompare's ICU collation ignores hyphen weight (wrong for slugs)
+	const tie = (a: T, b: T) => (a.slug < b.slug ? -1 : a.slug > b.slug ? 1 : 0);
 	switch (sort) {
 		case 'newest':
-			return [...list].sort((a, b) => b.date.localeCompare(a.date));
+			return [...list].sort((a, b) => b.date.localeCompare(a.date) || tie(a, b));
 		case 'oldest':
-			return [...list].sort((a, b) => a.date.localeCompare(b.date));
+			return [...list].sort((a, b) => a.date.localeCompare(b.date) || tie(a, b));
 		case 'quickest':
-			return [...list].sort((a, b) => a.readTime - b.readTime);
+			return [...list].sort((a, b) => a.readTime - b.readTime || tie(a, b));
 		case 'longest':
-			return [...list].sort((a, b) => b.readTime - a.readTime);
+			return [...list].sort((a, b) => b.readTime - a.readTime || tie(a, b));
 		default:
 			return list;
 	}
