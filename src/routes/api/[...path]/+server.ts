@@ -8,8 +8,9 @@
 // the browser, and logs the relay outcome — the browser hop joins the same
 // chain the SSR loads ride, and the response header lets a user report the id
 // behind any visible error.
-import { DEV_DEFAULT_API_BASE } from '#lib/api/client.ts';
+import { DEV_DEFAULT_API_BASE, OP } from '#lib/api/client.ts';
 import { REQUEST_ID_HEADER, newRequestId, echoedRequestId, logAccess } from '#lib/api/requestid.ts';
+import { DEP, outbound } from '#lib/server/metrics.js';
 
 export const GET = async ({ url, params }: { url: URL; params: { path?: string } }) => {
 	// real-by-default (owner ruling 2026-11-09): unset env means the dev
@@ -21,9 +22,16 @@ export const GET = async ({ url, params }: { url: URL; params: { path?: string }
 
 	let res: Response;
 	try {
-		res = await fetch(new URL(`${proxiedPath}${url.search}`, base), {
-			headers: { [REQUEST_ID_HEADER]: requestId }
-		});
+		// COUNTED + BOUNDED like every outside call: the op is the CONSTANT
+		// `proxy-relay` (the forwarded path is USER INPUT — it must never
+		// become a label; the access line carries it), and the budget
+		// aborts a hung lumen instead of hanging the browser's fetch
+		res = await outbound(DEP.Lumen, OP.ProxyRelay, (signal) =>
+			fetch(new URL(`${proxiedPath}${url.search}`, base), {
+				headers: { [REQUEST_ID_HEADER]: requestId },
+				signal
+			})
+		);
 	} catch {
 		logAccess('proxy', 'GET', proxiedPath, 'unreachable', requestId);
 		return new Response(JSON.stringify({ error: 'lumen unreachable' }), {
