@@ -7,6 +7,7 @@ import type {
 	SuggestResponse,
 	Tag
 } from './types';
+import { REQUEST_ID_HEADER, newRequestId, echoedRequestId, logAccess } from './requestid';
 
 export interface BlogApi {
 	getPosts(opts?: {
@@ -49,7 +50,10 @@ export interface BlogApi {
 export class ApiError extends Error {
 	constructor(
 		readonly status: number,
-		message: string
+		message: string,
+		/** The chain's id (2026-11-15): the minted one, or lumen's echo when it
+		 * answered — grep it across BOTH services' logs in one step. */
+		readonly requestId?: string
 	) {
 		super(message);
 		this.name = 'ApiError';
@@ -67,9 +71,38 @@ export function createApi(base: string): BlogApi {
 }
 
 function createFetchApi(base: string): BlogApi {
+	/** The correlation seam's outbound half: mint → send → the access line.
+	 * Network failure throws (503); a non-ok status is the CALLER's decision
+	 * (get() turns it into ApiError, getFeaturedPhoto turns 404 into null) —
+	 * the line is logged either way, so the chain never loses the hop. */
+	async function send(
+		path: string,
+		init?: RequestInit
+	): Promise<{ res: Response; requestId: string }> {
+		const requestId = newRequestId();
+		const method = init?.method ?? 'GET';
+		try {
+			const res = await fetch(`${base}${path}`, {
+				...init,
+				headers: { [REQUEST_ID_HEADER]: requestId, ...init?.headers }
+			});
+			logAccess('ssr', method, path, res.status, echoedRequestId(res, requestId));
+			return { res, requestId };
+		} catch {
+			logAccess('ssr', method, path, 'unreachable', requestId);
+			throw new ApiError(503, 'lumen unreachable', requestId);
+		}
+	}
+
 	async function get<T>(path: string): Promise<T> {
-		const res = await fetch(`${base}${path}`);
-		if (!res.ok) throw new ApiError(res.status, `GET ${path} failed with status ${res.status}`);
+		const { res, requestId } = await send(path);
+		if (!res.ok) {
+			throw new ApiError(
+				res.status,
+				`GET ${path} failed with status ${res.status}`,
+				echoedRequestId(res, requestId)
+			);
+		}
 		return res.json() as Promise<T>;
 	}
 
@@ -114,10 +147,15 @@ function createFetchApi(base: string): BlogApi {
 			return get<PhotoListResponse>(`/api/photos${query ? `?${query}` : ''}`);
 		},
 		async getFeaturedPhoto() {
-			const res = await fetch(`${base}/api/photos/featured`);
+			const { res, requestId } = await send('/api/photos/featured');
 			if (res.status === 404) return null;
-			if (!res.ok)
-				throw new ApiError(res.status, `GET /api/photos/featured failed with status ${res.status}`);
+			if (!res.ok) {
+				throw new ApiError(
+					res.status,
+					`GET /api/photos/featured failed with status ${res.status}`,
+					echoedRequestId(res, requestId)
+				);
+			}
 			return (await res.json()) as Photo;
 		},
 		listTags() {
