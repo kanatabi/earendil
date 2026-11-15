@@ -646,29 +646,29 @@ function matches(
 
 // Explicit re-ordering; absent/unknown sorts leave the given order intact
 // (the curation order on /api/posts, the relevance order on search).
-// The TIE-BREAK (2026-11-15): the engine's sort rules are single-key
-// (postSort: "readTime:asc" etc.) — ties resolve inside Meilisearch to
-// PRIMARY-KEY (slug) ascending, and the twin must mirror that observable
-// semantics or the contract test catches the drift (it did: two readTime-7
-// posts swapped between live and twin). JS sort is stable, so a bare
-// single-key comparator keeps fixture order instead — hence the explicit
-// slug chain on every branch.
+// The tie-break is CONTRACT (2026-11-15): the engine's postSort names its
+// secondaries — quickest/longest tie by day DESC (recency within ties),
+// then rank:asc — and the twin mirrors the chain byte-wise (ISO dates:
+// byte order is the honest order; localeCompare's ICU collation ignores
+// hyphen weight). The LAST tie (rank:asc, the curator's hand) needs no
+// comparator: JS sort is STABLE, and this list arrives in fixture order —
+// which IS the curation order. The engine is the authority; the contract
+// job guards the agreement.
 function sorted<T extends { date: string; readTime: number; slug: string }>(
 	list: T[],
 	sort?: SortValue
 ): T[] {
-	// byte order — the engine's primary-key ordering is lexical-bytes, and
-	// localeCompare's ICU collation ignores hyphen weight (wrong for slugs)
-	const tie = (a: T, b: T) => (a.slug < b.slug ? -1 : a.slug > b.slug ? 1 : 0);
+	const byDateDesc = (a: T, b: T) => (a.date < b.date ? 1 : a.date > b.date ? -1 : 0);
+	const byDateAsc = (a: T, b: T) => -byDateDesc(a, b);
 	switch (sort) {
 		case 'newest':
-			return [...list].sort((a, b) => b.date.localeCompare(a.date) || tie(a, b));
+			return [...list].sort(byDateDesc);
 		case 'oldest':
-			return [...list].sort((a, b) => a.date.localeCompare(b.date) || tie(a, b));
+			return [...list].sort(byDateAsc);
 		case 'quickest':
-			return [...list].sort((a, b) => a.readTime - b.readTime || tie(a, b));
+			return [...list].sort((a, b) => a.readTime - b.readTime || byDateDesc(a, b));
 		case 'longest':
-			return [...list].sort((a, b) => b.readTime - a.readTime || tie(a, b));
+			return [...list].sort((a, b) => b.readTime - a.readTime || byDateDesc(a, b));
 		default:
 			return list;
 	}
