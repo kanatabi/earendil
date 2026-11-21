@@ -61,7 +61,7 @@ describe('renderMarkdown — Shiki code blocks', () => {
 	it('highlights go fences with dual-theme CSS vars that survive sanitization', async () => {
 		const post = await mockApi.getPost('shape-of-a-useful-queue');
 		const { html } = await renderMarkdown(post.content);
-		expect(html).toMatch(/<pre class="shiki[^"]*"[^>]*--shiki-light/);
+		expect(html).toMatch(/<pre[^>]*class="shiki[^"]*"[^>]*--shiki-light/); // attrs may precede class (the source-line anchor)
 		expect(html).toContain('--shiki-dark');
 		expect(html).toContain('language-go');
 		// class on pre/code preserved by DOMPurify
@@ -80,13 +80,13 @@ describe('renderMarkdown — rich blocks', () => {
 	it('renders blockquotes, tables, strikethrough, and task lists', async () => {
 		const post = await mockApi.getPost('shape-of-a-useful-queue');
 		const { html } = await renderMarkdown(post.content);
-		expect(html).toContain('<blockquote>');
+		expect(html).toContain('<blockquote'); // attrs may follow (the source-line anchor)
 
 		const rich = await renderMarkdown(richFixture);
 		// Tables ride a horizontal-scroll wrapper (`.prose .table-wrap`): a wide
 		// table's min-content beats the column and no wrap rule can shrink it.
 		expect(rich.html).toContain('<div class="table-wrap">');
-		expect(rich.html).toContain('<table>');
+		expect(rich.html).toContain('<table '); // attrs may follow (the source-line anchor)
 		expect(rich.html).toContain('</table>\n</div>');
 		expect(rich.html).toContain('<s>Old default</s>');
 		expect(rich.html).toMatch(/<input[^>]*checked[^>]*type="checkbox"/);
@@ -125,7 +125,7 @@ describe('renderMarkdown — ::: grid container', () => {
 describe('renderMarkdown — mermaid fences (Route B)', () => {
 	it('renders mermaid as a hydrating placeholder, never as Shiki output', async () => {
 		const { html } = await renderMarkdown('```mermaid\nflowchart LR\n  A --> B\n```\n');
-		expect(html).toContain('<pre class="mermaid-src">');
+		expect(html).toContain('<pre class="mermaid-src"');
 		expect(html).not.toContain('shiki');
 		// Escaped source survives as the honest no-JS/failure fallback.
 		expect(html).toContain('A --&gt; B');
@@ -140,8 +140,28 @@ describe('renderMarkdown — mermaid fences (Route B)', () => {
 			'xychart-beta\n  bar [1, 2, 3]'
 		]) {
 			const { html } = await renderMarkdown('```mermaid\n' + src + '\n```\n');
-			expect(html, src.split('\n')[0]).toContain('<pre class="mermaid-src">');
+			expect(html, src.split('\n')[0]).toContain('<pre class="mermaid-src"');
 			expect(html).not.toContain('shiki');
 		}
+	});
+});
+
+// SOURCE-LINE ANCHORS (synced scroll — the mellon parity rule): inert on the
+// blog, but the pipelines must stay shape-equivalent; these pin the attribute.
+describe('renderMarkdown — source-line anchors', () => {
+	it('stamps top-level blocks with data-source-lines (1-based ranges)', async () => {
+		const { html } = await renderMarkdown('# Hi\n\npara one\n\n```go\nx()\n```\n');
+		expect(html).toMatch(/<h1[^>]*data-source-lines="1-1"/);
+		expect(html).toMatch(/<p[^>]*data-source-lines="3-3"/);
+		// the fence's range INCLUDES the closing fence line (4 lines total);
+		// the Shiki renderer drops token attrs — the anchor is re-injected
+		expect(html).toMatch(/<pre[^>]*data-source-lines="5-7"/);
+	});
+	it('anchors tables through the .table-wrap override + mermaid placeholders', async () => {
+		const { html } = await renderMarkdown(
+			'| a | b |\n|---|---|\n| 1 | 2 |\n\n```mermaid\nflowchart LR\n  a --> b\n```\n'
+		);
+		expect(html).toMatch(/<table[^>]*data-source-lines="1-3"/);
+		expect(html).toMatch(/<pre class="mermaid-src"[^>]*data-source-lines="5-8"/);
 	});
 });

@@ -53,8 +53,29 @@ md.use(container, 'grid', {
 // a wide table's min-content beats the article column and no wrap rule can
 // shrink a table's intrinsic sizing — the scroll box is the only containment.
 // DOMPurify keeps the div+class (the grid container above proves it).
-md.renderer.rules.table_open = () => '<div class="table-wrap">\n<table>\n';
+// The attrs render through (the source-line anchor below lands on <table>).
+md.renderer.rules.table_open = (tokens, idx) => {
+	const token = tokens[idx];
+	const attrs = (token.attrs ?? []).map(([k, v]) => ` ${k}="${v}"`).join('');
+	return `<div class="table-wrap">\n<table${attrs}>\n`;
+};
 md.renderer.rules.table_close = () => '</table>\n</div>\n';
+
+// SOURCE-LINE ANCHORS (synced scroll, 2026-11-21 — the mellon parity rule):
+// block tokens carry token.map = the [startLine, endLine] they came from.
+// INERT on the blog (nothing reads the attribute — mellon's editor maps its
+// scroll through it); it rides here so the two pipelines stay byte-equivalent
+// in shape (the preview's fidelity is a contract).
+md.core.ruler.push('source_line_anchors', (state) => {
+	for (const token of state.tokens) {
+		// nesting -1 = the closing tag (covered by its opener); 0 = singletons
+		// (fence, hr, code_block) — they anchor themselves
+		if (token.map && token.level === 0 && token.nesting >= 0) {
+			token.attrSet('data-source-lines', `${token.map[0] + 1}-${token.map[1]}`);
+		}
+	}
+	return true;
+});
 
 /** Lazily build the Shiki-ready engine once per process (grammar loading is the slow part). */
 let engine: Promise<MarkdownItInstance> | null = null;
@@ -70,12 +91,26 @@ function markdownEngine(): Promise<MarkdownItInstance> {
 			md.use(shiki);
 			// `mermaid` fences skip Shiki entirely: emit a placeholder the client
 			// action hydrates. The escaped source doubles as the no-JS fallback.
+			// Attrs render through (the source-line anchor — inert here, the
+			// mellon parity rule).
 			const shikiFence = md.renderer.rules.fence!;
 			md.renderer.rules.fence = (tokens, idx, opts, env, self) => {
 				if (tokens[idx].info.trim().split(/\s+/)[0] === 'mermaid') {
-					return `<pre class="mermaid-src"><code>${escapeHtml(tokens[idx].content)}</code></pre>\n`;
+					const token = tokens[idx];
+					const attrs = (token.attrs ?? []).map(([k, v]) => ` ${k}="${v}"`).join('');
+					return `<pre class="mermaid-src"${attrs}><code>${escapeHtml(token.content)}</code></pre>\n`;
 				}
-				return shikiFence(tokens, idx, opts, env, self);
+				// the Shiki renderer builds its own <pre> and DROPS token attrs —
+				// re-inject the source-line anchor
+				const out = shikiFence(tokens, idx, opts, env, self);
+				const token = tokens[idx];
+				if (token.map && token.level === 0) {
+					return out.replace(
+						'<pre',
+						`<pre data-source-lines="${token.map[0] + 1}-${token.map[1]}"`
+					);
+				}
+				return out;
 			};
 			return md;
 		});
