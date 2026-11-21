@@ -57,10 +57,12 @@
 		</div>
 
 		<div class="col-span-12 min-w-0 lg:col-span-10">
-			<h1 class="mb-4 font-brand text-4xl font-semibold tracking-tight text-foreground md:text-5xl">
+			<h1
+				class="mb-4 font-brand text-4xl font-semibold tracking-tight break-words text-foreground md:text-5xl"
+			>
 				{data.post.title}
 			</h1>
-			<p class="mb-4 max-w-2xl text-xl leading-relaxed text-muted-foreground">
+			<p class="mb-4 max-w-2xl text-xl leading-relaxed break-words text-muted-foreground">
 				{data.post.preview}
 			</p>
 			<nav
