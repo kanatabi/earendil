@@ -3,7 +3,18 @@ import adapter from '@sveltejs/adapter-node';
 import { sveltekit } from '@sveltejs/kit/vite';
 import { defineConfig } from 'vite';
 
-export default defineConfig({
+export default defineConfig(({ command }) => ({
+	// DEV-ONLY SSR EXTERNAL (the vite-8 walk, 2026-11-21 — mellon first):
+	// vite 8's dev module-runner inlines CJS-only deps as ESM —
+	// markdown-it-task-lists' `module.exports` explodes as "module is not
+	// defined" in dev. The BUILT app bundles it fine (staging unaffected).
+	environments: {
+		ssr: {
+			resolve: {
+				external: command === 'serve' ? ['markdown-it-task-lists'] : []
+			}
+		}
+	},
 	// SSR dependency split, learned live (2026-11-11, mellon first then earendil):
 	// vite EXTERNALIZES node_modules by default in SSR builds — but the
 	// adapter-node runtime stage carries no node_modules, so every externalized
@@ -61,4 +72,4 @@ export default defineConfig({
 			adapter: adapter({ out: 'build' })
 		})
 	]
-});
+}));
