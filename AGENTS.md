@@ -72,6 +72,10 @@ churn, `git checkout -- <file>` and redo the content edit.
   never recreated in Git — it is the owner's journal, not a repo doc.
 - **Club related changes into ONE commit** — never one commit per file, no micro-commits.
   Conventional Commit subject (`feat|fix|docs|perf(scope): …`) with a WHY body.
+- **MERGE RITUAL (owner ruling 2026-11-21): merging to `main` = SQUASH — one
+  conventional commit per round (`git merge --squash <branch>` + one commit);
+  NEVER fast-forward a branch merge, NEVER rebase.** Syncing `main` from its
+  remote stays `--ff-only` (not a branch merge).
 - Unmerged branches: `feature/a-inline-diagrams` (the rejected Route A diagram design —
   keep for reference, don't delete without asking), `feature/interactive-diagrams`
   (stale doc branch).
