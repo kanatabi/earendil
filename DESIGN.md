@@ -131,7 +131,7 @@ Rules:
 
 ## 6. Markdown Rendering Pipeline (server-side, in `+page.server.ts`)
 
-1. **Parse**: markdown-it + anchor plugin (heading slugs) + tables, strikethrough, task lists. **Authoring directives**: `::: grid … :::` → Pinterest-style masonry (`columns-2 md:columns-3`, natural aspect ratios, uniform gutters, items never split across columns). Author images as separate paragraphs (blank line between); the FE additionally forces `display: block` so single-paragraph authoring still staggers. Unknown `:::name` blocks stay plain text, so content degrades gracefully.
+1. **Parse**: markdown-it + anchor plugin (heading slugs) + tables, strikethrough, task lists. **Authoring directives**: `::: grid … :::` → Pinterest-style masonry (`columns-2 md:columns-3`, natural aspect ratios, uniform gutters, items never split across columns). Author images as separate paragraphs (blank line between); the FE additionally forces `display: block` so single-paragraph authoring still staggers. Unknown `:::name` blocks stay plain text, so content degrades gracefully. **Tables** render inside a `.table-wrap` scroll box (a wide table's min-content beats the article column and no wrap rule can shrink intrinsic sizing — the wrapper scrolls only the overflow case).
 2. **Highlight**: Shiki fence override, `themes: { light, dark }` dual mode → CSS-variable spans.
 3. **Sanitize**: DOMPurify (jsdom) before serialization — always, regardless of source.
 4. **TOC extraction**: from markdown-it tokens (h2/h3 + anchor ids) → JSON. FE renders both the inline TOC under the title and the right sticky rail. This is a **rendering step, not data post-processing** — derived while parsing the article Markdown, like highlighting; the BE does not send a TOC field.
@@ -142,10 +142,10 @@ Perf — Shiki bundled language set (confirmed): `go, rust, clojure, javascript,
 
 ## 7. Deliberate raw-CSS exceptions (everything else is Tailwind utilities)
 
-1. `.prose` overrides for markdown content (outside Svelte scope) — layered on `@tailwindcss/typography`.
+1. `.prose` overrides for markdown content (outside Svelte scope) — layered on `@tailwindcss/typography`. The base `html` rule `overflow-wrap: break-word` is the app-wide unbreakable-token guard (flex/grid items still need `min-w-0`; tables can't shrink — see the `.table-wrap` wrapper).
 2. Shiki `--shiki-light` / `--shiki-dark` variable mapping so code colors flip with `data-theme`.
 3. Theme-switch View Transitions — reduced-motion opt-out on `::view-transition-*(root)` (pseudo-elements not reachable via utilities); the swap itself is the UA-default cross-fade on every device (the old `theme-reveal` clip-path bloom stuttered on 60Hz mobile panels and was retired).
-4. Slim themed horizontal scrollbar (`.scroll-slim` + `.prose pre`) — overflowing code blocks and masonry gutters; pseudo-elements aren't reachable via utilities.
+4. Slim themed horizontal scrollbar (`.scroll-slim` + `.prose pre` + `.prose .table-wrap`) — overflowing code blocks, article tables and masonry gutters; pseudo-elements aren't reachable via utilities.
 5. Route-change progress bar (`.route-progress`) — fixed 2px brand-violet bar; active/finishing/idle phases driven by `$app/state navigating` (minimum visible beat for preloaded instant navigations; hash-only jumps excluded).
 6. Entrance choreography — `.fade-up` (staggered rise for page sections, per-section `animation-delay`) and `.fade-in` (pure-opacity swap for paginated/filterable lists via `{#key}` re-mount); reduced-motion disables both.
 7. Diagram loading shimmer — the `.mermaid-src` placeholder paints the skeleton itself + `diagram-shimmer` sweep keyframes (a moving gradient is not expressible with utilities; reduced-motion disables the sweep; `<noscript>` restores the source). Diagram neutrals and chart-series ramps flow from the `--diagram-*` tokens ONLY (the mermaid mapping, `MERMAID_VARS` in `actions.ts`, holds no color values; `theming.contract.test.ts` owns the coupling); per-entity colors belong to mermaid's categorical theme.

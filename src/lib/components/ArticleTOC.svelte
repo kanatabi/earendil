@@ -23,7 +23,10 @@
 		</h2>
 		<ul class={variant === 'inline' ? 'grid gap-2' : 'grid gap-3'}>
 			{#each toc as entry (entry.id)}
-				<li class={entry.depth === 3 ? 'pl-3' : undefined}>
+				<!-- min-w-0: a grid item refuses to shrink below min-content by default —
+				     a long unbroken heading token would pan the page (the inline variant
+				     has no scroll parent). -->
+				<li class="min-w-0 break-words" class:pl-3={entry.depth === 3}>
 					<a
 						href="#{entry.id}"
 						data-toc-link={entry.id}

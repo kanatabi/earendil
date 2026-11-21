@@ -154,7 +154,7 @@
 				{#each data.tags as t (t)}
 					<a
 						href="/search?{buildQs({ ...current, tags: data.tags.filter((x) => x !== t) })}"
-						class="flex items-center gap-1.5 rounded-full border border-brand/40 bg-brand/10 px-3 py-1 font-mono text-xs text-foreground transition-colors hover:border-brand"
+						class="flex max-w-full min-w-0 items-center gap-1.5 rounded-full border border-brand/40 bg-brand/10 px-3 py-1 font-mono text-xs break-words text-foreground transition-colors hover:border-brand"
 					>
 						{t}
 						<span aria-hidden="true" class="text-muted-foreground">×</span>

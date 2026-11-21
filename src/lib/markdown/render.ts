@@ -49,6 +49,13 @@ md.use(container, 'grid', {
 		tokens[idx].nesting === 1 ? '<div class="article-grid columns-2 md:columns-3">\n' : '</div>\n'
 });
 
+// Tables ride a horizontal-scroll wrapper (`.prose .table-wrap` in layout.css):
+// a wide table's min-content beats the article column and no wrap rule can
+// shrink a table's intrinsic sizing — the scroll box is the only containment.
+// DOMPurify keeps the div+class (the grid container above proves it).
+md.renderer.rules.table_open = () => '<div class="table-wrap">\n<table>\n';
+md.renderer.rules.table_close = () => '</table>\n</div>\n';
+
 /** Lazily build the Shiki-ready engine once per process (grammar loading is the slow part). */
 let engine: Promise<MarkdownItInstance> | null = null;
 function markdownEngine(): Promise<MarkdownItInstance> {

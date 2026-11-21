@@ -233,8 +233,13 @@ are manually verified (§9).
     `overflow-wrap: break-word` (NOT `anywhere` — it would change intrinsic
     min-content sizing of grids and tables); inheritance covers
     p/li/td/blockquote/headings, while fenced code keeps its horizontal scroll
-    (`white-space: pre` never wraps). mellon's vendored `.preview .prose` mirrors the
-    guard — keep parity when touching either block.
+    (`white-space: pre` never wraps). Tables are the one thing wrap rules can
+    NEVER fix (min-content is intrinsic) — the renderer wraps every table in a
+    `.table-wrap` scroll box; flex/grid items holding user text (breadcrumb
+    title, TOC entries, tag chips) need explicit `min-w-0` to shrink. The
+    app-wide base guard on `html` covers every other text surface. mellon's
+    vendored `.preview .prose` mirrors the guard — keep parity when touching
+    either block.
 
 ## 11. Explicitly do NOT
 

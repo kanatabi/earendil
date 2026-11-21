@@ -83,7 +83,11 @@ describe('renderMarkdown — rich blocks', () => {
 		expect(html).toContain('<blockquote>');
 
 		const rich = await renderMarkdown(richFixture);
+		// Tables ride a horizontal-scroll wrapper (`.prose .table-wrap`): a wide
+		// table's min-content beats the column and no wrap rule can shrink it.
+		expect(rich.html).toContain('<div class="table-wrap">');
 		expect(rich.html).toContain('<table>');
+		expect(rich.html).toContain('</table>\n</div>');
 		expect(rich.html).toContain('<s>Old default</s>');
 		expect(rich.html).toMatch(/<input[^>]*checked[^>]*type="checkbox"/);
 		expect(rich.html).toMatch(/<input[^>]*type="checkbox"/);
