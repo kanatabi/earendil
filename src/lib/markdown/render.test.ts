@@ -165,3 +165,43 @@ describe('renderMarkdown — source-line anchors', () => {
 		expect(html).toMatch(/<pre class="mermaid-src"[^>]*data-source-lines="5-8"/);
 	});
 });
+
+// THE EXTENDED DIALECT (the markdownguide basic+extended coverage) — the
+// publishing contract: what the editor previews, the blog renders. Each
+// component + its source-line anchor.
+describe('renderMarkdown — the extended dialect', () => {
+	it('task lists render checkboxes (the vendored renderer)', async () => {
+		const { html } = await renderMarkdown('- [x] done\n- [ ] todo\n');
+		expect(html).toContain('contains-task-list');
+		expect(html).toContain('task-list-item');
+		expect(html).toMatch(/<input[^>]*checked[^>]*type="checkbox"/);
+		expect(html).not.toContain('[x]');
+		expect(html).toMatch(/<ul[^>]*data-source-lines="1-2"/);
+	});
+
+	it('footnotes render refs + the section', async () => {
+		const { html } = await renderMarkdown('ref[^1].\n\n[^1]: the note\n');
+		expect(html).toContain('footnote-ref');
+		expect(html).toContain('footnotes');
+	});
+
+	it('definition lists render dl/dt/dd', async () => {
+		const { html } = await renderMarkdown('term\n: the definition\n');
+		expect(html).toContain('<dt>term</dt>');
+		expect(html).toContain('<dd>the definition</dd>');
+		expect(html).toMatch(/<dl[^>]*data-source-lines="/);
+	});
+
+	it('==highlight== renders <mark>; sub/sup render their tags; emoji shortcodes resolve', async () => {
+		const { html } = await renderMarkdown('==marked== H~2~O X^2^ :tent:\n');
+		expect(html).toContain('<mark>marked</mark>');
+		expect(html).toContain('<sub>2</sub>');
+		expect(html).toContain('<sup>2</sup>');
+		expect(html).toContain('⛺');
+	});
+
+	it('custom heading ids via {#id} override the slug', async () => {
+		const { html } = await renderMarkdown('### My Heading {#custom-id}\n');
+		expect(html).toContain('id="custom-id"');
+	});
+});

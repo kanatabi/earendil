@@ -1,6 +1,15 @@
 {
 	"extends": "$app/tsconfig",
 	"compilerOptions": {
+		"paths": {
+			"markdown-it-footnote": ["./src/lib/markdown/markdown-it-plugins.d.ts"],
+			"markdown-it-attrs": ["./src/lib/markdown/markdown-it-plugins.d.ts"],
+			"markdown-it-deflist": ["./src/lib/markdown/markdown-it-plugins.d.ts"],
+			"markdown-it-mark": ["./src/lib/markdown/markdown-it-plugins.d.ts"],
+			"markdown-it-sub": ["./src/lib/markdown/markdown-it-plugins.d.ts"],
+			"markdown-it-sup": ["./src/lib/markdown/markdown-it-plugins.d.ts"],
+			"markdown-it-emoji": ["./src/lib/markdown/markdown-it-plugins.d.ts"]
+		},
 		"strict": true,
 		"types": ["$app/types", "node"]
 	},

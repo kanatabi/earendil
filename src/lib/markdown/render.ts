@@ -6,7 +6,18 @@
 import MarkdownIt, { type MarkdownIt as MarkdownItInstance, type Token } from 'markdown-it';
 import anchor from 'markdown-it-anchor';
 import container from 'markdown-it-container';
-import taskLists from 'markdown-it-task-lists';
+import { taskListsPlugin } from './task-lists.ts';
+// THE EXTENDED DIALECT (owner round 2026-11-21 — the markdownguide
+// basic+extended coverage): footnotes, custom heading ids, definition
+// lists, ==highlight==, sub/sup, emoji shortcodes — the mellon parity
+// (the editor previews it; the blog publishes it).
+import footnote from 'markdown-it-footnote';
+import attrs from 'markdown-it-attrs';
+import deflist from 'markdown-it-deflist';
+import mark from 'markdown-it-mark';
+import sub from 'markdown-it-sub';
+import sup from 'markdown-it-sup';
+import { full as emoji } from 'markdown-it-emoji';
 import markdownItShiki from '@shikijs/markdown-it';
 import type { BuiltinLanguage } from 'shiki';
 import DOMPurify from 'isomorphic-dompurify';
@@ -38,7 +49,7 @@ const escapeHtml = (s: string) =>
 	s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 // `permalink` defaults to false in markdown-it-anchor v10 — heading ids only, no anchor icons.
 md.use(anchor, { level: [2, 3] });
-md.use(taskLists);
+md.use(taskListsPlugin);
 /**
  * Authoring directive `::: grid ... :::` — a masonry image grid inside articles,
  * styled to match /gallery. Unknown `:::name` blocks are left to render as plain
@@ -48,6 +59,15 @@ md.use(container, 'grid', {
 	render: (tokens, idx) =>
 		tokens[idx].nesting === 1 ? '<div class="article-grid columns-2 md:columns-3">\n' : '</div>\n'
 });
+// THE EXTENDED DIALECT: attrs LAST among the id-touching plugins (anchor
+// slugs first; {#custom-id} overrides) — the rest are order-insensitive.
+md.use(footnote);
+md.use(deflist);
+md.use(mark);
+md.use(sub);
+md.use(sup);
+md.use(emoji);
+md.use(attrs);
 
 // Tables ride a horizontal-scroll wrapper (`.prose .table-wrap` in layout.css):
 // a wide table's min-content beats the article column and no wrap rule can
@@ -97,8 +117,8 @@ function markdownEngine(): Promise<MarkdownItInstance> {
 			md.renderer.rules.fence = (tokens, idx, opts, env, self) => {
 				if (tokens[idx].info.trim().split(/\s+/)[0] === 'mermaid') {
 					const token = tokens[idx];
-					const attrs = (token.attrs ?? []).map(([k, v]) => ` ${k}="${v}"`).join('');
-					return `<pre class="mermaid-src"${attrs}><code>${escapeHtml(token.content)}</code></pre>\n`;
+					const attrStr = (token.attrs ?? []).map(([k, v]) => ` ${k}="${v}"`).join('');
+					return `<pre class="mermaid-src"${attrStr}><code>${escapeHtml(token.content)}</code></pre>\n`;
 				}
 				// the Shiki renderer builds its own <pre> and DROPS token attrs —
 				// re-inject the source-line anchor
