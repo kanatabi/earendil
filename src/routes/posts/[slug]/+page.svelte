@@ -29,8 +29,10 @@
 	let date = $derived(dateFormatter.format(new Date(data.post.date)));
 
 	// Chip pills are clickable tag filters: soften->deepen fill, foreground text, slight lift.
+	// min-w-0/max-w-full/break-words: a long unbroken tag must wrap inside the
+	// pill instead of pushing the flex row wider than the column.
 	const chip =
-		'rounded-full bg-muted px-2.5 py-0.5 text-xs font-medium text-muted-foreground transition-all duration-150 hover:bg-foreground/10 hover:text-foreground hover:-translate-y-0.5';
+		'min-w-0 max-w-full break-words rounded-full bg-muted px-2.5 py-0.5 text-xs font-medium text-muted-foreground transition-all duration-150 hover:bg-foreground/10 hover:text-foreground hover:-translate-y-0.5';
 </script>
 
 <svelte:head>
@@ -73,7 +75,9 @@
 				<span aria-hidden="true">/</span>
 				<a href="/#writing" class="transition-colors hover:text-foreground">Writing</a>
 				<span aria-hidden="true">/</span>
-				<span class="text-foreground">{data.post.title}</span>
+				<!-- min-w-0: a flex item refuses to shrink below min-content by default —
+				     a long unbroken title token would pan the page. -->
+				<span class="min-w-0 break-words text-foreground">{data.post.title}</span>
 			</nav>
 			{#if data.post.thumbnail}
 				<img

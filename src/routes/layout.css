@@ -86,30 +86,39 @@
 		font-family: var(--font-sans);
 		background: var(--background);
 		color: var(--foreground);
+		/* App-wide unbreakable-token guard (AGENTS §10 #10): a space-free token
+		   (pasted URL, key material) may not pan the page. Paint-level only —
+		   flex/grid items still need min-w-0 to shrink below min-content. */
+		overflow-wrap: break-word;
 	}
 }
 
-/* Slim themed horizontal scrollbars — homepage photo strip + article code blocks (pseudo-elements aren't reachable via utilities). */
+/* Slim themed horizontal scrollbars — homepage photo strip + article code blocks + article tables (pseudo-elements aren't reachable via utilities). */
 .scroll-slim,
-.prose pre {
+.prose pre,
+.prose .table-wrap {
 	scrollbar-width: thin;
 	scrollbar-color: var(--border) transparent;
 }
 .scroll-slim::-webkit-scrollbar,
-.prose pre::-webkit-scrollbar {
+.prose pre::-webkit-scrollbar,
+.prose .table-wrap::-webkit-scrollbar {
 	height: 6px;
 }
 .scroll-slim::-webkit-scrollbar-track,
-.prose pre::-webkit-scrollbar-track {
+.prose pre::-webkit-scrollbar-track,
+.prose .table-wrap::-webkit-scrollbar-track {
 	background: transparent;
 }
 .scroll-slim::-webkit-scrollbar-thumb,
-.prose pre::-webkit-scrollbar-thumb {
+.prose pre::-webkit-scrollbar-thumb,
+.prose .table-wrap::-webkit-scrollbar-thumb {
 	background: var(--border);
 	border-radius: 9999px;
 }
 .scroll-slim::-webkit-scrollbar-thumb:hover,
-.prose pre::-webkit-scrollbar-thumb:hover {
+.prose pre::-webkit-scrollbar-thumb:hover,
+.prose .table-wrap::-webkit-scrollbar-thumb:hover {
 	background: var(--muted-foreground);
 }
 
@@ -335,7 +344,15 @@
 	break-inside: avoid;
 }
 /* Tables: rounded soft header band, hairline row separators, row hover.
-   (typography draws table borders via box-shadow — reset it first) */
+   (typography draws table borders via box-shadow — reset it first)
+   A wide table's min-content beats the article column and no wrap rule can
+   shrink a table's intrinsic sizing — so the renderer wraps every table in a
+   scroll box (render.ts) and only the overflow case scrolls. A table that
+   fits keeps width: 100%, the header band and the row hover untouched. */
+.prose .table-wrap {
+	overflow-x: auto;
+	overscroll-behavior-x: contain;
+}
 .prose table {
 	width: 100%;
 	font-size: 0.875rem;
