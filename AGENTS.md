@@ -224,6 +224,17 @@ are manually verified (§9).
    literal `{...}` inside a `{@html `...`}` template trips the svelte-eslint-parser lexer.
    The JSON-LD in `+layout.svelte` walks both lines with `JSON.stringify` + split tags —
    copy that pattern, don't inline HTML with braces.
+10. **The typography plugin ships no `overflow-wrap` — prose has no unbreakable-token
+    guard.** A space-free token (pasted URL, key material, keyboard-mash) paints past
+    the article column, and on phones the resulting page-wide scrollable overflow
+    makes the WHOLE canvas pan sideways (body looks half-width, fixed chrome
+    misaligns, full-page captures come out twice as wide). Space-rich lines wrap
+    regardless, which masks the gap on desktop. `.prose` carries
+    `overflow-wrap: break-word` (NOT `anywhere` — it would change intrinsic
+    min-content sizing of grids and tables); inheritance covers
+    p/li/td/blockquote/headings, while fenced code keeps its horizontal scroll
+    (`white-space: pre` never wraps). mellon's vendored `.preview .prose` mirrors the
+    guard — keep parity when touching either block.
 
 ## 11. Explicitly do NOT
 
