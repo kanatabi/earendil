@@ -22,3 +22,13 @@ export const handle: Handle = async ({ event, resolve }) => {
 	);
 	return res;
 };
+
+// THE BOOT WARM-UP (2026-11-22): the markdown engine's grammar build =
+// the seconds of sync, event-loop-freezing CPU — pay it at the pod's
+// STARTUP, never on the first reader's click (the cold-engine walk:
+// the first post view after a deploy stalled the navigation). The route
+// modules load lazily, so the hooks = the only eager touchpoint.
+import('#lib/markdown/render.ts')
+	.then((m) => m.warmup())
+	.then(() => console.log('[boot] markdown engine warm'))
+	.catch(() => {}); // the failure surfaces on the first render (the engine's own retry)
