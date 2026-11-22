@@ -96,24 +96,53 @@
 					<a href="/search?tag={encodeURIComponent(tag)}" class={chip}>{tag}</a>
 				{/each}
 			</div>
-			{#if data.toc.length > 0}
-				<div class="mb-4 lg:hidden">
-					<ArticleTOC toc={data.toc} />
-				</div>
-			{/if}
+			{#await data.toc}
+				<div class="mb-4 h-24 animate-pulse rounded bg-muted lg:hidden" aria-hidden="true"></div>
+			{:then toc}
+				{#if toc && toc.length > 0}
+					<div class="mb-4 lg:hidden">
+						<ArticleTOC {toc} />
+					</div>
+				{/if}
+			{:catch}
+				<!-- the TOC is an amenity — the article below never depends on it -->
+			{/await}
 
-			<!-- Rendered Markdown (DESIGN.md §6.5); enhanced by the actions below. -->
-			<div
-				class="prose mt-10 max-w-none text-base leading-relaxed"
-				use:codeBlockTools
-				use:tocSpy
-				use:headingAnchors
-				use:zoomableImages={(image) => (zoomed = image)}
-				use:mermaidDiagrams={(image) => (zoomed = image)}
-			>
-				<!-- eslint-disable-next-line svelte/no-at-html-tags -- HTML is DOMPurify-sanitized in the server Markdown pipeline -->
-				{@html data.html}
-			</div>
+			{#await data.html}
+				<!-- THE ARTICLE SHIMMER (the streamed-load round, 2026-11-22): the
+				     shell above (title, breadcrumb, tags, meta) is already painted —
+				     the navigation left the homepage instantly. The prose-shaped
+				     pulse covers the render's stream: a blink on a cache hit, the
+				     render's duration on a cold post — never a stuck navigation. -->
+				<div class="prose mt-10 max-w-none text-base leading-relaxed" aria-hidden="true">
+					<div class="mb-6 h-8 w-1/3 animate-pulse rounded bg-muted"></div>
+					<div class="mb-3 h-3.5 w-full animate-pulse rounded bg-muted"></div>
+					<div class="mb-3 h-3.5 w-11/12 animate-pulse rounded bg-muted"></div>
+					<div class="mb-3 h-3.5 w-4/5 animate-pulse rounded bg-muted"></div>
+					<div class="mb-6 h-24 w-full animate-pulse rounded bg-muted"></div>
+					<div class="mb-3 h-3.5 w-full animate-pulse rounded bg-muted"></div>
+					<div class="mb-3 h-3.5 w-5/6 animate-pulse rounded bg-muted"></div>
+					<div class="h-3.5 w-2/3 animate-pulse rounded bg-muted"></div>
+				</div>
+			{:then html}
+				<!-- Rendered Markdown (DESIGN.md §6.5); enhanced by the actions below. -->
+				<div
+					class="prose mt-10 max-w-none text-base leading-relaxed"
+					use:codeBlockTools
+					use:tocSpy
+					use:headingAnchors
+					use:zoomableImages={(image) => (zoomed = image)}
+					use:mermaidDiagrams={(image) => (zoomed = image)}
+				>
+					<!-- eslint-disable-next-line svelte/no-at-html-tags -- HTML is DOMPurify-sanitized in the server Markdown pipeline -->
+					{@html html ?? ''}
+				</div>
+			{:catch}
+				<!-- the render's rejection = the honest quiet failure (the shell stays) -->
+				<p class="mt-10 font-mono text-sm text-muted-foreground">
+					the article failed to render — try reloading.
+				</p>
+			{/await}
 
 			<!-- The author card, automatic on every post: mobile/tablet get the
 			     end-of-body mount; desktop sees it in the right rail under the TOC. -->
@@ -129,16 +158,22 @@
 	     card) off the viewport. -->
 	<aside class="fade-up col-span-3 hidden [animation-delay:120ms] lg:block">
 		<div class="sticky top-6 flex flex-col gap-6">
-			{#if data.toc.length > 0}
-				<div class="max-h-[50svh] overflow-y-auto overscroll-contain">
-					<ArticleTOC toc={data.toc} variant="sticky" />
-				</div>
-				<div class="border-t border-border pt-6">
+			{#await data.toc}
+				<div class="h-24 animate-pulse rounded bg-muted" aria-hidden="true"></div>
+			{:then toc}
+				{#if toc && toc.length > 0}
+					<div class="max-h-[50svh] overflow-y-auto overscroll-contain">
+						<ArticleTOC {toc} variant="sticky" />
+					</div>
+					<div class="border-t border-border pt-6">
+						<IdentityCard />
+					</div>
+				{:else}
 					<IdentityCard />
-				</div>
-			{:else}
+				{/if}
+			{:catch}
 				<IdentityCard />
-			{/if}
+			{/await}
 		</div>
 	</aside>
 

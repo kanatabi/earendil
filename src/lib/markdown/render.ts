@@ -21,6 +21,7 @@ import { full as emoji } from 'markdown-it-emoji';
 import markdownItShiki from '@shikijs/markdown-it';
 import type { BuiltinLanguage } from 'shiki';
 import DOMPurify from 'isomorphic-dompurify';
+import { createHash } from 'node:crypto';
 
 export interface TocEntry {
 	id: string;
@@ -145,6 +146,34 @@ export async function renderMarkdown(markdown: string): Promise<{ html: string; 
 	const toc = extractToc(tokens);
 	const html = instance.renderer.render(tokens, instance.options, env);
 	return { html: DOMPurify.sanitize(html), toc };
+}
+
+// THE WHOLE-POST CACHE (the reader-side perf round, 2026-11-22): a published
+// post's markdown is IMMUTABLE between edits — the same bytes always produce
+// the same render — yet the SSR re-rendered the identical post per visitor
+// request (the Shiki over every fence, for every reader). The key = the
+// CONTENT HASH: the key IS the invalidation (an edit = new bytes = a new
+// entry) — zero staleness possible, zero invalidation logic, zero
+// cross-replica consistency concerns (each pod computes the same answer).
+// Bounded LRU: 100 posts × ~100-300KB ≈ 10-30MB worst case.
+const renderCache = new Map<string, { html: string; toc: TocEntry[] }>();
+const RENDER_CACHE_CAP = 100;
+
+export async function renderMarkdownCached(
+	markdown: string
+): Promise<{ html: string; toc: TocEntry[] }> {
+	const key = createHash('sha256').update(markdown).digest('hex');
+	const hit = renderCache.get(key);
+	if (hit) return hit; // the same object instance — the callers read, never mutate
+	const rendered = await renderMarkdown(markdown);
+	if (renderCache.size >= RENDER_CACHE_CAP) {
+		// FIFO trim over the insertion-ordered Map (a long-lived process
+		// rotates many posts; the working set of any real blog never churns)
+		const oldest = renderCache.keys().next();
+		if (oldest.done !== true) renderCache.delete(oldest.value);
+	}
+	renderCache.set(key, rendered);
+	return rendered;
 }
 
 /**
