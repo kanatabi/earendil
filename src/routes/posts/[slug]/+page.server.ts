@@ -1,6 +1,8 @@
 import { error } from '@sveltejs/kit';
 import { ApiError, api } from '#lib/api/server.ts';
 import { renderMarkdownCached } from '#lib/markdown/render.ts';
+import { profile } from '#lib/content/about.ts';
+import { resolveOrigin } from '#lib/site.ts';
 import type { PageServerLoad } from './$types';
 
 export const load = (async ({ params }) => {
@@ -22,8 +24,29 @@ export const load = (async ({ params }) => {
 	// Both promises ride the SAME render — they resolve together.
 	const { content: markdown, ...summary } = post;
 	const rendered = renderMarkdownCached(markdown);
+
+	// THE SYNDICATION ROUND: per-post OG tags + the Article JSON-LD —
+	// shared links become cards, and machines get the canonical facts.
+	// Built server-side (it embeds into <svelte:head> via @html); the
+	// origin is the deployment's identity anchor (ORIGIN env). The JSON
+	// escapes `<` so a title can never close the script early.
+	const origin = resolveOrigin(process.env.ORIGIN);
+	const jsonLd = `<script type="application/ld+json">${JSON.stringify({
+		'@context': 'https://schema.org',
+		'@type': 'BlogPosting',
+		headline: post.title,
+		description: post.preview,
+		datePublished: post.date,
+		dateModified: post.date,
+		author: { '@type': 'Person', name: profile.name },
+		mainEntityOfPage: { '@type': 'WebPage', '@id': `${origin}/posts/${post.slug}` },
+		...(post.thumbnail ? { image: [post.thumbnail] } : {})
+	}).replace(/</g, '\\u003c')}</script>`;
+
 	return {
 		post: summary,
+		origin,
+		jsonLd,
 		html: rendered.then((r) => r.html),
 		toc: rendered.then((r) => r.toc)
 	};

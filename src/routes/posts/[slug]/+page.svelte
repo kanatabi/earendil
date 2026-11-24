@@ -37,6 +37,18 @@
 
 <svelte:head>
 	<title>{data.post.title} · gofar;</title>
+	<meta name="description" content={data.post.preview} />
+	<link rel="canonical" href="{data.origin}/posts/{data.post.slug}" />
+	{#if data.post.thumbnail}
+		<meta property="og:image" content={data.post.thumbnail} />
+	{/if}
+	<meta property="og:title" content={data.post.title} />
+	<meta property="og:type" content="article" />
+	<meta property="og:url" content="{data.origin}/posts/{data.post.slug}" />
+	<meta property="og:description" content={data.post.preview} />
+	<meta property="article:published_time" content={data.post.date} />
+	<!-- eslint-disable-next-line svelte/no-at-html-tags -- server-built JSON-LD; `<` escaped to \u003c -->
+	{@html data.jsonLd}
 </svelte:head>
 
 <!-- Twelve columns only exist at lg: a 12-col grid with gap-8 spends 11 gaps

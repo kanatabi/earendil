@@ -20,6 +20,15 @@
 
 <svelte:head>
 	<title>gofar; — essays by Faiz Ainur Rofiq</title>
+	<meta property="og:title" content="gofar; — essays by Faiz Ainur Rofiq" />
+	<meta property="og:type" content="website" />
+	<meta property="og:url" content={data.origin} />
+	<link
+		rel="alternate"
+		type="application/rss+xml"
+		title="gofar; (RSS)"
+		href="{data.origin}/rss.xml"
+	/>
 </svelte:head>
 
 <!-- Hero: display serif headline, "currently" line, ASCII profile portrait -->
