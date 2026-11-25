@@ -96,6 +96,8 @@ src/routes/layout.css           @theme tokens (--brand, --diagram-* light/dark) 
                                 exceptions (DESIGN §7) + Shiki var mapping + prose overrides
 src/routes/api/[...path]/       SAME-ORIGIN PROXY: browser GET /api/… → API_BASE (no public API!)
 src/routes/{,search,gallery,about,posts/[slug]}/  pages; loads call #lib/api/server.ts
+src/routes/rss.xml/,sitemap.xml/,robots.txt/      the syndication doors (site.ts assembly,
+                                                  BE curation order, origin via resolveOrigin)
 src/lib/api/client.ts           BlogApi interface (CONTRACT SOURCE OF TRUTH) + createApi + ApiError
 src/lib/api/server.ts           server-only api singleton; API_BASE resolution chain
 src/lib/api/index.ts            client-safe entry (always fetches lumen) — what components import
