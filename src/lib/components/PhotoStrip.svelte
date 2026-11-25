@@ -11,9 +11,10 @@
 
 <section id="photography" class="mx-auto flex w-full max-w-3xl flex-col gap-6">
 	<SectionLabel title="Photography" />
-	<!-- Teaser: uniform fixed-height crops on a calm strip; the mixed-aspect masonry lives on /gallery. -->
+	<!-- Teaser: uniform fixed-height crops on a calm strip; the mixed-aspect masonry lives on /gallery.
+	     KEY = index - duplicate src is legal payload (shared storage objects), never a key. -->
 	<div class="scroll-slim flex snap-x snap-mandatory gap-3 overflow-x-auto pb-2">
-		{#each photos as photo (photo.src)}
+		{#each photos as photo, i (i)}
 			<img
 				src={photo.src}
 				alt={photo.alt}

@@ -22,9 +22,14 @@
 		opacity={0.04}
 	/>
 	<SectionLabel title="Photography" />
-	<!-- CSS-columns masonry: mixed aspect ratios never force rows to align (Pinterest-style). -->
+	<!-- CSS-columns masonry: mixed aspect ratios never force rows to align (Pinterest-style).
+	     KEY = the list index: lumen's storage lets multiple media rows share one object
+	     (identical bytes -> identical hash path), so duplicate src is LEGAL payload - a
+	     src-keyed each crashes with each_key_duplicate (hit with two same-file uploads
+	     carrying different alt text). The grid is static (no client reordering), so the
+	     index is the honest identity here. -->
 	<div class="columns-2 gap-4 md:columns-3">
-		{#each photos as photo (photo.src)}
+		{#each photos as photo, i (i)}
 			<button
 				type="button"
 				class="mb-4 block w-full cursor-zoom-in break-inside-avoid"
